@@ -11,7 +11,8 @@ import SwiftUI
 struct GameSearchApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ClubListView(viewModel: ClubListViewModel())
+                .preferredColorScheme(.dark)
         }
     }
 }

@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+
+protocol ClubListViewModelProtocol: ObservableObject {
+    var clubs: [Club] { get }
+    
+    func userDidRefresh() async
+}

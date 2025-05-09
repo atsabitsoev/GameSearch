@@ -13,12 +13,11 @@ struct Penis {
 }
 
 
-struct ClubListView: View {
+struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     @State private var searchText = ""
     
-    let penises = Array(0..<99).map { int in
-        return Penis(size: int)
-    }
+    @ObservedObject private(set) var viewModel: ViewModel
+    
     
     
     var body: some View {
@@ -28,20 +27,16 @@ struct ClubListView: View {
     var navigationView: some View {
         NavigationStack {
             listView
+                .searchable(text: $searchText, placement: .automatic ,prompt: "Поиск")
                 .navigationTitle("Ближайшие клубы")
         }
-        .searchable(text: $searchText, prompt: "Поиск")
         .onAppear {
             let appearance = UINavigationBarAppearance()
             appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = UIColor.black
-            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-            appearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
             UINavigationBar.appearance().standardAppearance = appearance
             UINavigationBar.appearance().compactAppearance = appearance
             UINavigationBar.appearance().scrollEdgeAppearance = appearance
         }
-        .background(Color.white)
     }
     
     var tabBar: some View {
@@ -57,7 +52,6 @@ struct ClubListView: View {
         .onAppear {
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = UIColor.black
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
@@ -65,23 +59,24 @@ struct ClubListView: View {
     
     var listView: some View {
         ScrollView {
-            ForEach(penises, id: \.size) { penis in
+            ForEach(viewModel.clubs, id: \.name) { club in
                 LazyVStack(alignment: .leading) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 16, style: .circular)
                             .fill(LinearGradient(colors: [.blue, .purple], startPoint: .bottomTrailing, endPoint: .topLeading))
                             .frame(height: 160)
-                        Text("\(penis.size)")
+                        Text("\(club.name)")
                             
                     }
                 }
                 .padding(.horizontal)
             }
+            .padding(.vertical)
         }
-        .background(Color.black)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    ClubListView()
+    ClubListView(viewModel: ClubListViewModel())
 }
