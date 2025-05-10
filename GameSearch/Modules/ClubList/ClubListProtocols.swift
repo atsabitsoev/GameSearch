@@ -11,5 +11,5 @@ import Foundation
 protocol ClubListViewModelProtocol: ObservableObject {
     var clubs: [Club] { get }
     
-    func userDidRefresh() async
+    func searchTextChanged(_ searchText: String)
 }

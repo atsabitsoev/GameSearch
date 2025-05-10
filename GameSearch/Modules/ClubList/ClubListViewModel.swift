@@ -10,19 +10,32 @@ import Foundation
 final class ClubListViewModel: ClubListViewModelProtocol {
     @Published var clubs: [Club] = Club.mock
     
-    
-    func userDidRefresh() async {
-        try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
-        await updateClubs()
-    }
+    private var currentTask: Task<(), any Error>?
     
     
-    @MainActor
-    private func updateClubs() {
-        if self.clubs.count > 1 {
-            self.clubs = [Club(name: "Писька")]
-        } else {
-            self.clubs = Club.mock
+    func searchTextChanged(_ searchText: String) {
+        currentTask?.cancel()
+        
+        guard !searchText.isEmpty else {
+            clubs = Club.mock
+            return
         }
+        
+        currentTask = Task {
+            do {
+                try await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                await updateClubs(Club.mock.filter({ club in
+                    club.name.contains(searchText)
+                }))
+            }
+        }
+    }
+}
+
+
+private extension ClubListViewModel {
+    @MainActor
+    func updateClubs(_ clubs: [Club]) {
+        self.clubs = clubs
     }
 }
