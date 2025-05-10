@@ -10,20 +10,20 @@ import MapKit
 
 fileprivate final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     let manager = CLLocationManager()
-
+    
     @Published var location: CLLocationCoordinate2D?
-
+    
     override init() {
         super.init()
         manager.delegate = self
         manager.startUpdatingLocation()
     }
-
+    
     func requestLocation() {
         manager.requestWhenInUseAuthorization()
         manager.requestAlwaysAuthorization()
     }
-
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         location = locations.first?.coordinate
     }
@@ -78,8 +78,8 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     var navigationView: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                switch mapListButtonState {
-                case .list: listView
+                if mapListButtonState == .list {
+                    listView
                         .searchable(
                             text: $searchText,
                             placement: .navigationBarDrawer(
@@ -87,7 +87,10 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                             ),
                             prompt: "Поиск"
                         )
-                case .map: mapView
+                        .transition(.move(edge: .bottom))
+                        .animation(.default, value: mapListButtonState)
+                } else {
+                    mapView
                 }
                 mapListButton
                     .padding(.bottom, 16)
@@ -109,7 +112,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     
     var mapListButton: some View {
         Button {
-            mapListButtonState.toggle()
+            withAnimation {
+                mapListButtonState.toggle()
+            }
         } label: {
             Label(
                 mapListButtonState.mapListButtonData.title,
@@ -182,7 +187,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                             .fill(LinearGradient(colors: [.blue, .purple], startPoint: .bottomTrailing, endPoint: .topLeading))
                             .frame(height: 160)
                         Text("\(club.name)")
-                            
+                        
                     }
                 }
                 .padding(.horizontal)
