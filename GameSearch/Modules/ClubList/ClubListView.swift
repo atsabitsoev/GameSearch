@@ -78,7 +78,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     var navigationView: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                if mapListButtonState == .list {
+                mapView
+                    .opacity(mapListButtonState == .map ? 1 : 0)
+                GeometryReader { geo in
                     listView
                         .searchable(
                             text: $searchText,
@@ -87,20 +89,23 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                             ),
                             prompt: "Поиск"
                         )
-                        .transition(.move(edge: .bottom))
-                        .animation(.default, value: mapListButtonState)
-                } else {
-                    mapView
+                        .offset(y: mapListButtonState == .map ? geo.size.height : 0)
+                        .opacity(mapListButtonState == .map ? 0 : 1)
+                        .animation(.spring, value: mapListButtonState)
                 }
                 mapListButton
                     .padding(.bottom, 16)
             }
+            .toolbarVisibility(.visible, for: .navigationBar)
+            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
             .onChange(of: searchText, { _, newValue in
                 viewModel.searchTextChanged(newValue)
             })
             .navigationTitle("Ближайшие клубы")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .toolbarVisibility(.visible, for: .tabBar)
+        .toolbarBackground(Color(.systemBackground), for: .tabBar)
         .onAppear {
             let appearance = UINavigationBarAppearance()
             appearance.configureWithOpaqueBackground()
@@ -150,7 +155,6 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
         }
     }
     
-    @ViewBuilder
     var mapView: some View {
         if let location = locationManager.location {
             Map(
@@ -174,7 +178,26 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                 MapUserLocationButton()
             }
         } else {
-            Map()
+            Map(
+                position: Binding<MapCameraPosition>.constant(
+                    MapCameraPosition.region(
+                        MKCoordinateRegion.init(
+                            center: .init(latitude: 55.4424, longitude: 37.3636),
+                            latitudinalMeters: 1500,
+                            longitudinalMeters: 1500
+                        )
+                    )
+                ),
+                bounds: nil,
+                interactionModes: .all,
+                scope: nil,
+                content: {
+                    UserAnnotation()
+                }
+            )
+            .mapControls {
+                MapUserLocationButton()
+            }
         }
     }
     
