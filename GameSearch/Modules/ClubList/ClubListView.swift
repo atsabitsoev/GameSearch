@@ -8,64 +8,12 @@
 import SwiftUI
 import MapKit
 
-fileprivate final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    let manager = CLLocationManager()
-    
-    @Published var location: CLLocationCoordinate2D?
-    
-    override init() {
-        super.init()
-        manager.delegate = self
-        manager.startUpdatingLocation()
-    }
-    
-    func requestLocation() {
-        manager.requestWhenInUseAuthorization()
-        manager.requestAlwaysAuthorization()
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        location = locations.first?.coordinate
-    }
-}
-
-
-fileprivate struct MapListButtonData {
-    let title: String
-    let systemImage: String
-}
-
-
-fileprivate enum MapListButtonState {
-    case map
-    case list
-    
-    var mapListButtonData: MapListButtonData {
-        switch self {
-        case .map: return MapListButtonData(title: "Список", systemImage: "list.bullet")
-        case .list: return MapListButtonData(title: "Карта", systemImage: "map")
-        }
-    }
-    
-    
-    mutating func toggle() {
-        switch self {
-        case .map:
-            self = .list
-        case .list:
-            self = .map
-        }
-    }
-}
-
-
 struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
-    @State private var searchText = ""
-    @State private var mapListButtonState: MapListButtonState = .list
-    
     @ObservedObject private(set) var viewModel: ViewModel
     @StateObject private var locationManager = LocationManager()
     
+    @State private var searchText = ""
+    @State private var mapListButtonState: MapListButtonState = .list
     
     
     var body: some View {
@@ -73,68 +21,6 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
             .onAppear {
                 locationManager.requestLocation()
             }
-    }
-    
-    var navigationView: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                mapView
-                    .opacity(mapListButtonState == .map ? 1 : 0)
-                GeometryReader { geo in
-                    listView
-                        .searchable(
-                            text: $searchText,
-                            placement: .navigationBarDrawer(
-                                displayMode: .always
-                            ),
-                            prompt: "Поиск"
-                        )
-                        .offset(y: mapListButtonState == .map ? geo.size.height : 0)
-                        .opacity(mapListButtonState == .map ? 0 : 1)
-                        .animation(.spring, value: mapListButtonState)
-                }
-                mapListButton
-                    .padding(.bottom, 16)
-            }
-            .toolbarVisibility(.visible, for: .navigationBar)
-            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
-            .onChange(of: searchText, { _, newValue in
-                viewModel.searchTextChanged(newValue)
-            })
-            .navigationTitle("Ближайшие клубы")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        .toolbarVisibility(.visible, for: .tabBar)
-        .toolbarBackground(Color(.systemBackground), for: .tabBar)
-        .onAppear {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().compactAppearance = appearance
-            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        }
-    }
-    
-    var mapListButton: some View {
-        Button {
-            withAnimation {
-                mapListButtonState.toggle()
-            }
-        } label: {
-            Label(
-                mapListButtonState.mapListButtonData.title,
-                systemImage: mapListButtonState.mapListButtonData.systemImage
-            )
-            .padding()
-            .background(.white)
-            .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 24,
-                    style: .circular
-                )
-            )
-        }
-        .buttonStyle(.automatic)
     }
     
     var tabBar: some View {
@@ -147,73 +33,48 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
             }
         }
         .tint(Color.purple)
-        .onAppear {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            UITabBar.appearance().standardAppearance = appearance
-            UITabBar.appearance().scrollEdgeAppearance = appearance
-        }
+        .setupTabBarAppearance()
     }
     
-    var mapView: some View {
-        if let location = locationManager.location {
-            Map(
-                position: Binding<MapCameraPosition>.constant(
-                    MapCameraPosition.region(
-                        MKCoordinateRegion.init(
-                            center: location,
-                            latitudinalMeters: 1500,
-                            longitudinalMeters: 1500
+    var navigationView: some View {
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                MapView(centerLocation: locationManager.location)
+                    .opacity(mapListButtonState.isMap ? 1 : 0)
+                GeometryReader { geo in
+                    listView
+                        .searchable(
+                            text: $searchText,
+                            placement: .navigationBarDrawer(
+                                displayMode: .always
+                            ),
+                            prompt: "Поиск"
                         )
-                    )
-                ),
-                bounds: nil,
-                interactionModes: .all,
-                scope: nil,
-                content: {
-                    UserAnnotation()
+                        .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
+                        .opacity(mapListButtonState.isMap ? 0 : 1)
+                        .animation(.spring, value: mapListButtonState)
                 }
-            )
-            .mapControls {
-                MapUserLocationButton()
+                MapListButton(buttonState: $mapListButtonState)
+                    .padding(.bottom, 16)
             }
-        } else {
-            Map(
-                position: Binding<MapCameraPosition>.constant(
-                    MapCameraPosition.region(
-                        MKCoordinateRegion.init(
-                            center: .init(latitude: 55.4424, longitude: 37.3636),
-                            latitudinalMeters: 1500,
-                            longitudinalMeters: 1500
-                        )
-                    )
-                ),
-                bounds: nil,
-                interactionModes: .all,
-                scope: nil,
-                content: {
-                    UserAnnotation()
-                }
-            )
-            .mapControls {
-                MapUserLocationButton()
-            }
+            .toolbarVisibility(.visible, for: .navigationBar)
+            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+            .onChange(of: searchText, { _, newValue in
+                viewModel.searchTextChanged(newValue)
+            })
+            .navigationTitle("Ближайшие клубы")
+            .navigationBarTitleDisplayMode(.inline)
         }
+        .toolbarVisibility(.visible, for: .tabBar)
+        .toolbarBackground(Color(.systemBackground), for: .tabBar)
+        .setupNavigationBarAppearance()
     }
     
     var listView: some View {
         ScrollView {
             ForEach(viewModel.clubs, id: \.name) { club in
-                LazyVStack(alignment: .leading) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 16, style: .circular)
-                            .fill(LinearGradient(colors: [.blue, .purple], startPoint: .bottomTrailing, endPoint: .topLeading))
-                            .frame(height: 160)
-                        Text("\(club.name)")
-                        
-                    }
-                }
-                .padding(.horizontal)
+                ClubListCell(club: club)
+                    .padding(.horizontal)
             }
             .padding(.vertical)
         }
