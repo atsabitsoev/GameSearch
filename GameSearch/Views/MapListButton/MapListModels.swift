@@ -6,7 +6,7 @@
 //
 
 
-public enum MapListButtonState {
+enum MapListButtonState {
     case map
     case list
     
