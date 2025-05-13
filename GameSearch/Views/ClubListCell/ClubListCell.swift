@@ -15,13 +15,11 @@ struct ClubListCell: View {
     }
     
     var body: some View {
-        LazyVStack(alignment: .leading) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16, style: .circular)
-                    .fill(LinearGradient(colors: [.blue, .purple], startPoint: .bottomTrailing, endPoint: .topLeading))
-                    .frame(height: 160)
-                Text("\(club.name)")
-            }
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .circular)
+                .fill(LinearGradient(colors: [.blue, .purple], startPoint: .bottomTrailing, endPoint: .topLeading))
+                .frame(height: 160)
+            Text("\(club.name)")
         }
     }
 }
