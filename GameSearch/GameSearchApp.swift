@@ -12,7 +12,7 @@ import CoreLocation
 struct GameSearchApp: App {
     var body: some Scene {
         WindowGroup {
-            ClubListView(viewModel: ClubListViewModel())
+            ClubListView(viewModel: ClubListViewModel(interactor: ClubListInteractor()))
                 .preferredColorScheme(.dark)
         }
     }

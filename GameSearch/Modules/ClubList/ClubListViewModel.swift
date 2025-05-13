@@ -6,35 +6,58 @@
 //
 
 import Foundation
+import Combine
 
-final class ClubListViewModel: ClubListViewModelProtocol {
-    @Published var clubs: [Club] = Club.mock
+final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListViewModelProtocol {
+    private let interactor: Interactor
+    
+    @Published var searchText = ""
+    @Published var clubs: [Club] = []
     
     private var currentTask: Task<(), any Error>?
+    private var cancellables = Set<AnyCancellable>()
     
     
-    func searchTextChanged(_ searchText: String) {
-        currentTask?.cancel()
-        
-        guard !searchText.isEmpty else {
-            clubs = Club.mock
-            return
-        }
-        
-        currentTask = Task {
-            do {
-                try await Task.sleep(nanoseconds: 2 * 1_000_000_000)
-                await updateClubs(Club.mock.filter({ club in
-                    club.name.contains(searchText)
-                }))
-            }
-        }
+    init(interactor: Interactor) {
+        self.interactor = interactor
+        subscribeSearchText()
+    }
+    
+    
+    func onViewAppear() {
+        fetchClubs()
     }
 }
 
 
 private extension ClubListViewModel {
-    @MainActor
+    func subscribeSearchText() {
+        $searchText
+            .removeDuplicates()
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] text in
+                self?.searchTextChanged(text)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func fetchClubs(filter: ClubsFilter? = nil) {
+        interactor.fetchClubs(filter: filter)
+            .receive(on: RunLoop.main)
+            .sink { completion in
+                if case let .failure(error) = completion {
+                    print(error.localizedDescription)
+                }
+            } receiveValue: { clubs in
+                self.updateClubs(clubs)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func searchTextChanged(_ searchText: String) {
+        fetchClubs(filter: searchText.isEmpty ? nil : .name(searchText))
+    }
+    
     func updateClubs(_ clubs: [Club]) {
         self.clubs = clubs
     }
