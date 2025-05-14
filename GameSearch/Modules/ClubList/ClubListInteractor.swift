@@ -9,17 +9,10 @@ import Foundation
 import Combine
 
 final class ClubListInteractor: ClubListInteractorProtocol {
+    private let service: NetworkServiceProtocol = FirestoreService()
+    
+    
     func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[FullClubData], any Error> {
-        return Just(FullClubData.mock)
-            .map({ clubs in
-                guard let filter else { return clubs }
-                switch filter {
-                case .name(let name):
-                    return clubs.filter({ $0.name.contains(name) })
-                }
-            })
-            .setFailureType(to: Error.self)
-            .delay(for: .seconds(1), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        service.fetchClubs(filter: filter).eraseToAnyPublisher()
     }
 }
