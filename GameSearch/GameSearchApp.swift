@@ -7,9 +7,15 @@
 
 import SwiftUI
 import CoreLocation
+import Firebase
 
 @main
 struct GameSearchApp: App {
+    
+    init() {
+        FirebaseApp.configure()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ClubListView(viewModel: ClubListViewModel(interactor: ClubListInteractor()))
