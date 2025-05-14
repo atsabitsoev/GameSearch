@@ -14,7 +14,6 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published var searchText = ""
     @Published var clubs: [Club] = []
     
-    private var currentTask: Task<(), any Error>?
     private var cancellables = Set<AnyCancellable>()
     
     
