@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct ClubListCell: View {
-    private let club: Club
+    private let club: FullClubData
     
-    init(club: Club) {
+    init(club: FullClubData) {
         self.club = club
     }
     
@@ -56,5 +56,5 @@ struct ClubListCell: View {
 }
 
 #Preview {
-    ClubListCell(club: .init(name: "Cyber Arena"))
+    ClubListCell(club: FullClubData.mock[0])
 }

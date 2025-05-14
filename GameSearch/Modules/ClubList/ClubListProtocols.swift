@@ -10,18 +10,18 @@ import Combine
 
 protocol ClubListViewModelProtocol: ObservableObject {
     var searchText: String { get set }
-    var clubs: [Club] { get }
+    var clubs: [FullClubData] { get }
     
     func onViewAppear() -> Void
 }
 
 
 protocol ClubListInteractorProtocol {
-    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[Club], Error>
+    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[FullClubData], Error>
 }
 
 extension ClubListInteractorProtocol {
-    func fetchClubs() -> AnyPublisher<[Club], Error> {
+    func fetchClubs() -> AnyPublisher<[FullClubData], Error> {
         fetchClubs(filter: nil)
     }
 }

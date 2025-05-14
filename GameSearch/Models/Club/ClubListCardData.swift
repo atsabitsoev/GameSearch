@@ -28,6 +28,6 @@ extension FullClubData {
 
 extension Array where Element == FullClubData {
     func getListCardData() -> [ClubListCardData] {
-        self.map({ ClubListCardData(club: $0) })
+        self.map{ $0.getListCardData() }
     }
 }

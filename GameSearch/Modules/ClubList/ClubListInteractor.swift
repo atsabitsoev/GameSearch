@@ -9,8 +9,8 @@ import Foundation
 import Combine
 
 final class ClubListInteractor: ClubListInteractorProtocol {
-    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[Club], any Error> {
-        return Just(Club.mock)
+    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[FullClubData], any Error> {
+        return Just(FullClubData.mock)
             .map({ clubs in
                 guard let filter else { return clubs }
                 switch filter {

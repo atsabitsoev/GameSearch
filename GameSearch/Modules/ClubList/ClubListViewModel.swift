@@ -12,7 +12,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     private let interactor: Interactor
     
     @Published var searchText = ""
-    @Published var clubs: [Club] = []
+    @Published var clubs: [FullClubData] = []
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -57,7 +57,7 @@ private extension ClubListViewModel {
         fetchClubs(filter: searchText.isEmpty ? nil : .name(searchText))
     }
     
-    func updateClubs(_ clubs: [Club]) {
+    func updateClubs(_ clubs: [FullClubData]) {
         self.clubs = clubs
     }
 }

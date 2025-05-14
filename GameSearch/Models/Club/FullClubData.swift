@@ -7,26 +7,6 @@
 
 import Foundation
 
-struct Club {
-    let name: String
-}
-
-
-extension Club {
-    static let mock: [Club] = [
-        Club(name: "Cyber Arena"),
-        Club(name: "Ultra Game"),
-        Club(name: "Gaming Gladiator"),
-        Club(name: "Force"),
-        Club(name: "Space"),
-        Club(name: "Rage"),
-        Club(name: "Rampage"),
-        Club(name: "Shoot"),
-        Club(name: "AltPC"),
-        Club(name: "WarGame")
-    ]
-}
-
 struct FullClubData {
     let id: Int
     let name: String
@@ -39,6 +19,13 @@ struct FullClubData {
     let comments: [String]
     let additionalInfo: String
     let subscribers: Int
+    let addressData: ClubAddressData
+}
+
+struct ClubAddressData {
+    let address: String
+    let latitude: Double
+    let longitude: Double
 }
 
 struct ClubConfiguration {
@@ -78,7 +65,12 @@ extension FullClubData {
             promos: "10% скидка в будни до 15:00",
             comments: ["Лучшее место!", "Очень комфортно и мощно."],
             additionalInfo: "Открыто 24/7, бесплатный Wi-Fi",
-            subscribers: 1200
+            subscribers: 1200,
+            addressData: ClubAddressData(
+                address: "йуцйуц",
+                latitude: 55.775349,
+                longitude: 37.588686
+            )
         ),
         FullClubData(
             id: 2,
@@ -101,7 +93,12 @@ extension FullClubData {
             promos: "Каждый 5-й час бесплатно",
             comments: ["Уютная атмосфера.", "Персонал дружелюбный."],
             additionalInfo: "Есть зона отдыха и кафе",
-            subscribers: 850
+            subscribers: 850,
+            addressData: ClubAddressData(
+                address: "цукцук",
+                latitude: 55.790897,
+                longitude: 37.530479
+            )
         ),
         FullClubData(
             id: 3,
@@ -124,7 +121,12 @@ extension FullClubData {
             promos: "Счастливые часы с 12:00 до 16:00",
             comments: ["Много места и крутая техника."],
             additionalInfo: "Проводятся турниры каждую субботу",
-            subscribers: 2300
+            subscribers: 2300,
+            addressData: ClubAddressData(
+                address: "укеуке",
+                latitude: 55.820086,
+                longitude: 37.431330
+            )
         ),
         FullClubData(
             id: 4,
@@ -147,7 +149,12 @@ extension FullClubData {
             promos: "1 час в подарок при первом визите",
             comments: ["Хорошо для вечернего отдыха."],
             additionalInfo: "Работает до полуночи",
-            subscribers: 600
+            subscribers: 600,
+            addressData: ClubAddressData(
+                address: "фвыафыв",
+                latitude: 55.849986,
+                longitude: 37.436999
+            )
         ),
         FullClubData(
             id: 5,
@@ -170,7 +177,12 @@ extension FullClubData {
             promos: "3 часа — по цене 2-х",
             comments: ["Крутая атмосфера и звук."],
             additionalInfo: "Поддержка VR, гарнитуры включены",
-            subscribers: 950
+            subscribers: 950,
+            addressData: ClubAddressData(
+                address: "чмсчсмчсм",
+                latitude: 55.821923,
+                longitude: 37.435432
+            )
         )
     ]
 }
