@@ -52,18 +52,19 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                         )
                         .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
                         .opacity(mapListButtonState.isMap ? 0 : 1)
-                        .animation(.spring, value: mapListButtonState)
+                        .animation(.spring(duration: 0.3), value: mapListButtonState)
                 }
                 MapListButton(buttonState: $mapListButtonState)
                     .padding(.bottom, 16)
             }
             .toolbarVisibility(.visible, for: .navigationBar)
-            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+            .toolbarBackground(Color(white: 0.1), for: .navigationBar)
             .navigationTitle("Ближайшие клубы")
             .navigationBarTitleDisplayMode(.inline)
+            .background(Color(white: 0.1))
         }
         .toolbarVisibility(.visible, for: .tabBar)
-        .toolbarBackground(Color(.systemBackground), for: .tabBar)
+        .toolbarBackground(Color(white: 0.1), for: .tabBar)
         .setupNavigationBarAppearance()
     }
     
