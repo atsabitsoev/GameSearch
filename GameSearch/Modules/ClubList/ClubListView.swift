@@ -12,7 +12,6 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     @ObservedObject private(set) var viewModel: ViewModel
     @StateObject private var locationManager = LocationManager()
     
-    @State private var searchText = ""
     @State private var mapListButtonState: MapListButtonState = .list
     
     
@@ -20,6 +19,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
         tabBar
             .onAppear {
                 locationManager.requestLocation()
+                viewModel.onViewAppear()
             }
     }
     
@@ -44,7 +44,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                 GeometryReader { geo in
                     listView
                         .searchable(
-                            text: $searchText,
+                            text: $viewModel.searchText,
                             placement: .navigationBarDrawer(
                                 displayMode: .always
                             ),
@@ -59,9 +59,6 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
             }
             .toolbarVisibility(.visible, for: .navigationBar)
             .toolbarBackground(Color(.systemBackground), for: .navigationBar)
-            .onChange(of: searchText, { _, newValue in
-                viewModel.searchTextChanged(newValue)
-            })
             .navigationTitle("Ближайшие клубы")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -84,5 +81,5 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
 }
 
 #Preview {
-    ClubListView(viewModel: ClubListViewModel())
+    ClubListView(viewModel: ClubListViewModel(interactor: ClubListInteractor()))
 }

@@ -5,11 +5,23 @@
 //  Created by Ацамаз on 09.05.2025.
 //
 
-import Foundation
+import Combine
 
 
 protocol ClubListViewModelProtocol: ObservableObject {
+    var searchText: String { get set }
     var clubs: [Club] { get }
     
-    func searchTextChanged(_ searchText: String)
+    func onViewAppear() -> Void
+}
+
+
+protocol ClubListInteractorProtocol {
+    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[Club], Error>
+}
+
+extension ClubListInteractorProtocol {
+    func fetchClubs() -> AnyPublisher<[Club], Error> {
+        fetchClubs(filter: nil)
+    }
 }

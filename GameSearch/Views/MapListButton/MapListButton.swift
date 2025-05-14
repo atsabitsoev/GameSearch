@@ -30,9 +30,11 @@ struct MapListButton: View {
             )
         }
         .buttonStyle(.automatic)
+        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
     }
 }
 
 #Preview {
     MapListButton(buttonState: .constant(.list))
+        .frame(width: 160, height: 48)
 }
