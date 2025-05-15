@@ -59,9 +59,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                 MapListButton(buttonState: $mapListButtonState)
                     .padding(.bottom, 16)
             }
+            .navigationTitle("Ближайшие клубы")
             .toolbarVisibility(.visible, for: .navigationBar)
             .toolbarBackground(Color(white: 0.1), for: .navigationBar)
-            .navigationTitle("Ближайшие клубы")
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(white: 0.1))
         }
