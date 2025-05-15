@@ -58,12 +58,12 @@ private extension ClubListViewModel {
         fetchClubs(filter: searchText.isEmpty ? nil : .name(searchText))
     }
     
-    func updateMapClubs(by clubs: [FullClubData]) {
-        mapClubs = clubs.getMapClubData()
-    }
-    
     func updateClubs(_ clubs: [FullClubData]) {
         self.clubs = clubs
         updateMapClubs(by: clubs)
+    }
+    
+    func updateMapClubs(by clubs: [FullClubData]) {
+        mapClubs = clubs.getMapClubData()
     }
 }
