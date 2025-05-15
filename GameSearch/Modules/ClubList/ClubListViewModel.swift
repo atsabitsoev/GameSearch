@@ -16,8 +16,9 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     private let interactor: Interactor
     
     @Published var searchText = ""
-    @Published var clubs: [FullClubData] = []
+    @Published private var clubs: [FullClubData] = []
     @Published var mapClubs: [MapClubData] = []
+    @Published var clubListCards: [ClubListCardData] = []
     @Published var destination: Destination?
     
     private var cancellables = Set<AnyCancellable>()
@@ -74,10 +75,15 @@ private extension ClubListViewModel {
     func updateClubs(_ clubs: [FullClubData]) {
         self.clubs = clubs
         updateMapClubs(by: clubs)
+        updateClubListCards(by: clubs)
     }
     
     func updateMapClubs(by clubs: [FullClubData]) {
         mapClubs = clubs.getMapClubData()
+    }
+    
+    func updateClubListCards(by clubs: [FullClubData]) {
+        clubListCards = clubs.getListCardData()
     }
     
     func getClub(by clubID: Int) -> ClubDetailsData? {

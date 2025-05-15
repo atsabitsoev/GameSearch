@@ -5,6 +5,8 @@
 //  Created by Бабочиев Эдуард Таймуразович on 15.05.2025.
 //
 
+import SwiftUI
+
 extension Binding<Bool> {
   init(bindingOptional: Binding<(some Any)?>) {
     self.init(
