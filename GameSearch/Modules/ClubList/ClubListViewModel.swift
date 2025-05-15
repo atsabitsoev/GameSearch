@@ -8,6 +8,10 @@
 import Foundation
 import Combine
 
+enum Destination {
+    case details(_ club: ClubDetailsData)
+}
+
 final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListViewModelProtocol {
     private let interactor: Interactor
     
@@ -15,6 +19,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published private var clubs: [FullClubData] = []
     @Published var mapClubs: [MapClubData] = []
     @Published var clubListCards: [ClubListCardData] = []
+    @Published var destination: Destination?
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -27,6 +32,14 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     
     func onViewAppear() {
         fetchClubs()
+    }
+    
+    func routeToDetails(clubID: Int) {
+        guard let club = getClubDetails(by: clubID) else {
+            print("Club not found, need delete from Base")
+            return
+        }
+        destination = .details(club)
     }
 }
 
@@ -71,5 +84,10 @@ private extension ClubListViewModel {
     
     func updateClubListCards(by clubs: [FullClubData]) {
         clubListCards = clubs.getListCardData()
+    }
+    
+    func getClubDetails(by clubID: Int) -> ClubDetailsData? {
+        let club = clubs.first { $0.id == clubID }?.getDetailsData()
+        return club
     }
 }

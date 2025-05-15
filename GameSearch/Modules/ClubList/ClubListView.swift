@@ -55,7 +55,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                         .opacity(mapListButtonState.isMap ? 0 : 1)
                         .animation(.spring(duration: 0.3), value: mapListButtonState)
                 }
-                
+                .navigationDestination(isPresented: $viewModel.destination.mappedToBool()) {
+                    destination
+                }
                 MapListButton(buttonState: $mapListButtonState)
                     .padding(.bottom, 16)
             }
@@ -70,12 +72,25 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
         .setupNavigationBarAppearance()
     }
     
+    @ViewBuilder
+    var destination: some View {
+        if let destination = viewModel.destination {
+            switch destination {
+            case .details(let club):
+                Text("Экран с деталями клуба - \(club.name)")
+            }
+        }
+    }
+    
     var listView: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(viewModel.clubListCards, id: \.id) { card in
                     ClubListCell(data: card)
                         .padding(.horizontal, 16)
+                        .onTapGesture {
+                            viewModel.routeToDetails(clubID: card.id)
+                        }
                 }
             }
             .padding(.vertical, 16)
