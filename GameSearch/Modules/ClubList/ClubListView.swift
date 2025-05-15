@@ -39,8 +39,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     var navigationView: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                MapView(centerLocation: locationManager.location)
+                MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
                     .opacity(mapListButtonState.isMap ? 1 : 0)
+                
                 GeometryReader { geo in
                     listView
                         .searchable(
@@ -54,6 +55,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                         .opacity(mapListButtonState.isMap ? 0 : 1)
                         .animation(.spring(duration: 0.3), value: mapListButtonState)
                 }
+                
                 MapListButton(buttonState: $mapListButtonState)
                     .padding(.bottom, 16)
             }
