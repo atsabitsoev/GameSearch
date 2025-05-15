@@ -35,7 +35,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     }
     
     func routeToDetails(clubID: Int) {
-        guard let club = getClub(by: clubID) else {
+        guard let club = getClubDetails(by: clubID) else {
             print("Club not found, need delete from Base")
             return
         }
@@ -86,7 +86,7 @@ private extension ClubListViewModel {
         clubListCards = clubs.getListCardData()
     }
     
-    func getClub(by clubID: Int) -> ClubDetailsData? {
+    func getClubDetails(by clubID: Int) -> ClubDetailsData? {
         let club = clubs.first { $0.id == clubID }?.getDetailsData()
         return club
     }
