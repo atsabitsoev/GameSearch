@@ -10,7 +10,7 @@ import Combine
 
 protocol ClubListViewModelProtocol: ObservableObject {
     var searchText: String { get set }
-    var clubs: [FullClubData] { get }
+    var clubListCards: [ClubListCardData] { get }
     var mapClubs: [MapClubData] { get }
     
     func onViewAppear() -> Void

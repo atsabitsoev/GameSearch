@@ -73,8 +73,8 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     var listView: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
-                ForEach(viewModel.clubs, id: \.id) { club in
-                    ClubListCell(club: club)
+                ForEach(viewModel.clubListCards, id: \.id) { card in
+                    ClubListCell(data: card)
                         .padding(.horizontal, 16)
                 }
             }
