@@ -10,6 +10,7 @@ import SwiftUI
 struct MapListButton: View {
     @Binding var buttonState: MapListButtonState
     
+    
     var body: some View {
         Button {
             withAnimation {

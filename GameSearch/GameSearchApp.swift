@@ -11,17 +11,14 @@ import Firebase
 
 @main
 struct GameSearchApp: App {
-    
-    private let screenFactory = ScreenFactory()
-    
-    
     init() {
         FirebaseApp.configure()
     }
     
     var body: some Scene {
         WindowGroup {
-            screenFactory.makeClubListView()
+            RootView(factory: ScreenFactory())
+                .environmentObject(Router())
                 .preferredColorScheme(.dark)
         }
     }

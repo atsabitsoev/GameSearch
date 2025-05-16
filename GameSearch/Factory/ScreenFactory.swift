@@ -8,7 +8,7 @@
 import SwiftUICore
 
 
-final class ScreenFactory {
+final class ScreenFactory: ScreenFactoryProtocol {
     func makeClubListView() -> some View {
         let interactor = ClubListInteractor()
         let viewModel = ClubListViewModel(interactor: interactor)
