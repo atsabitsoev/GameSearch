@@ -33,9 +33,3 @@ extension FullClubData {
         ClubDetailsData(club: self)
     }
 }
-
-extension ClubDetailsData: Hashable {
-    static func == (lhs: ClubDetailsData, rhs: ClubDetailsData) -> Bool {
-        lhs.id == rhs.id
-    }
-}
