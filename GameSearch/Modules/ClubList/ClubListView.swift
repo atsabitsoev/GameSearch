@@ -10,12 +10,17 @@ import MapKit
 
 struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     @EnvironmentObject private var router: Router
-    @StateObject var viewModel: ViewModel
+    @StateObject private var viewModel: ViewModel
     @StateObject private var locationManager = LocationManager()
     
     @FocusState private var searchFocused
     @State private var viewDidAppear = false
     @State private var mapListButtonState: MapListButtonState = .list
+    
+    
+    init(viewModel: ViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     
     var body: some View {
