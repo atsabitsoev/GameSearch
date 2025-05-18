@@ -19,10 +19,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     }
     
     func requestLocation() {
-        DispatchQueue.main.async {
-            self.manager.requestWhenInUseAuthorization()
-            self.manager.requestAlwaysAuthorization()
-        }
+        self.manager.requestWhenInUseAuthorization()
+        self.manager.requestAlwaysAuthorization()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

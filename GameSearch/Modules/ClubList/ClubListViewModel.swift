@@ -43,7 +43,6 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
 private extension ClubListViewModel {
     func subscribeSearchText() {
         $searchText
-            .subscribe(on: DispatchQueue.global())
             .removeDuplicates()
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] text in
