@@ -8,10 +8,6 @@
 import Foundation
 import Combine
 
-enum Destination {
-    case details(_ club: ClubDetailsData)
-}
-
 final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListViewModelProtocol {
     private let interactor: Interactor
     
@@ -19,8 +15,8 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published private var clubs: [FullClubData] = []
     @Published var mapClubs: [MapClubData] = []
     @Published var clubListCards: [ClubListCardData] = []
-    @Published var destination: Destination?
     
+    private var lastSearchedText: String = ""
     private var cancellables = Set<AnyCancellable>()
     
     
@@ -34,12 +30,12 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
         fetchClubs()
     }
     
-    func routeToDetails(clubID: Int) {
+    func routeToDetails(clubID: Int, router: Router) {
         guard let club = getClubDetails(by: clubID) else {
             print("Club not found, need delete from Base")
             return
         }
-        destination = .details(club)
+        router.push(.details(club))
     }
 }
 
@@ -69,6 +65,8 @@ private extension ClubListViewModel {
     }
     
     func searchTextChanged(_ searchText: String) {
+        guard lastSearchedText != searchText else { return }
+        lastSearchedText = searchText
         fetchClubs(filter: searchText.isEmpty ? nil : .name(searchText))
     }
     

@@ -9,15 +9,25 @@ import SwiftUI
 import MapKit
 
 struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
-    @ObservedObject private(set) var viewModel: ViewModel
+    @EnvironmentObject private var router: Router
+    @StateObject private var viewModel: ViewModel
     @StateObject private var locationManager = LocationManager()
     
+    @FocusState private var searchFocused
+    @State private var viewDidAppear = false
     @State private var mapListButtonState: MapListButtonState = .list
+    
+    
+    init(viewModel: ViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     
     var body: some View {
         tabBar
             .onAppear {
+                guard !viewDidAppear else { return }
+                viewDidAppear = true
                 locationManager.requestLocation()
                 viewModel.onViewAppear()
             }
@@ -37,7 +47,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     }
     
     var navigationView: some View {
-        NavigationStack {
+        NavigationView {
             ZStack(alignment: .bottom) {
                 MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
                     .opacity(mapListButtonState.isMap ? 1 : 0)
@@ -46,20 +56,21 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                     listView
                         .searchable(
                             text: $viewModel.searchText,
-                            placement: .navigationBarDrawer(
-                                displayMode: .always
-                            ),
+                            placement: .navigationBarDrawer(displayMode: .always),
                             prompt: "Поиск"
                         )
+                        .background(Color(white: 0.1).ignoresSafeArea(.keyboard))
+                        .searchFocused($searchFocused)
                         .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
                         .opacity(mapListButtonState.isMap ? 0 : 1)
                         .animation(.spring(duration: 0.3), value: mapListButtonState)
                 }
-                .navigationDestination(isPresented: $viewModel.destination.mappedToBool()) {
-                    destination
+                VStack {
+                    Spacer()
+                    MapListButton(buttonState: $mapListButtonState)
+                        .padding(.bottom, 16)
                 }
-                MapListButton(buttonState: $mapListButtonState)
-                    .padding(.bottom, 16)
+                .ignoresSafeArea(.keyboard)
             }
             .navigationTitle("Ближайшие клубы")
             .toolbarVisibility(.visible, for: .navigationBar)
@@ -67,17 +78,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(white: 0.1))
         }
-        .toolbarVisibility(.visible, for: .tabBar)
-        .toolbarBackground(Color(white: 0.1), for: .tabBar)
-        .setupNavigationBarAppearance()
-    }
-    
-    @ViewBuilder
-    var destination: some View {
-        if let destination = viewModel.destination {
-            switch destination {
-            case .details(let club):
-                Text("Экран с деталями клуба - \(club.name)")
+        .onChange(of: searchFocused) { _, newValue in
+            if newValue {
+                mapListButtonState = .list
             }
         }
     }
@@ -89,7 +92,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                     ClubListCell(data: card)
                         .padding(.horizontal, 16)
                         .onTapGesture {
-                            viewModel.routeToDetails(clubID: card.id)
+                            viewModel.routeToDetails(clubID: card.id, router: router)
                         }
                 }
             }
