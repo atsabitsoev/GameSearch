@@ -83,6 +83,8 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                 mapListButtonState = .list
             }
         }
+        .toolbarVisibility(.visible, for: .tabBar)
+        .toolbarBackground(Color(white: 0.1), for: .tabBar)
     }
     
     var listView: some View {

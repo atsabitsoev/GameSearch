@@ -29,8 +29,6 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                     }
                 }
         }
-        .toolbarVisibility(.visible, for: .tabBar)
-        .toolbarBackground(Color(white: 0.1), for: .tabBar)
         .setupNavigationBarAppearance()
     }
 }
