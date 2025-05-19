@@ -30,7 +30,7 @@ struct MapView: View {
                 }
             }
         }
-        .onAppear {
+        .onChange(of: mapClubs) {
             updateCamera()
         }
         .mapControls {

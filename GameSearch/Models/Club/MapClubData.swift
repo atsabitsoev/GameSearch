@@ -9,11 +9,19 @@ import CoreLocation
 
 struct MapClubData {
     init(club: FullClubData) {
+        self.id = club.id
         self.name = club.name
         self.location = .init(latitude: club.addressData.latitude, longitude: club.addressData.longitude)
     }
-    var location: CLLocationCoordinate2D
-    var name: String
+    let id: Int
+    let location: CLLocationCoordinate2D
+    let name: String
+}
+
+extension MapClubData: Equatable {
+    static func == (lhs: MapClubData, rhs: MapClubData) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 extension FullClubData {
