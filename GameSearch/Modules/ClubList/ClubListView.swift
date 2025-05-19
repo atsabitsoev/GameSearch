@@ -49,8 +49,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     var navigationView: some View {
         NavigationView {
             ZStack(alignment: .bottom) {
-                MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
-                    .opacity(mapListButtonState.isMap ? 1 : 0)
+                mapView
                 
                 GeometryReader { geo in
                     listView
@@ -99,6 +98,17 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                 }
             }
             .padding(.vertical, 16)
+        }
+    }
+    
+    @ViewBuilder
+    var mapView: some View {
+        if !viewModel.mapClubs.isEmpty, mapListButtonState.isMap {
+            MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
+                .opacity(mapListButtonState.isMap ? 1 : 0)
+        } else {
+            MapView(centerLocation: locationManager.location, for: [])
+                .opacity(mapListButtonState.isMap ? 1 : 0)
         }
     }
 }
