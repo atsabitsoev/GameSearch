@@ -101,15 +101,9 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
         }
     }
     
-    @ViewBuilder
     var mapView: some View {
-        if !viewModel.mapClubs.isEmpty, mapListButtonState.isMap {
-            MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
-                .opacity(mapListButtonState.isMap ? 1 : 0)
-        } else {
-            MapView(centerLocation: locationManager.location, for: [])
-                .opacity(mapListButtonState.isMap ? 1 : 0)
-        }
+        MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
+            .opacity(mapListButtonState.isMap ? 1 : 0)
     }
 }
 

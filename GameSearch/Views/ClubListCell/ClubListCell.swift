@@ -52,6 +52,7 @@ struct ClubListCell: View {
                         .shadow(color: Color.black.opacity(0.5), radius: 7)
                 }
             }
+            .drawingGroup()
             .padding()
         }
     }
