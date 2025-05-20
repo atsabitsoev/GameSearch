@@ -5,7 +5,7 @@
 //  Created by Ацамаз on 16.05.2025.
 //
 
-import SwiftUICore
+import SwiftUI
 
 
 final class ScreenFactory: ScreenFactoryProtocol {
@@ -13,5 +13,12 @@ final class ScreenFactory: ScreenFactoryProtocol {
         let interactor = ClubListInteractor()
         let viewModel = ClubListViewModel(interactor: interactor)
         return ClubListView(viewModel: viewModel)
+    }
+    
+    
+    func makeClubDetailsView(_ data: ClubDetailsData) -> some View {
+        let interactor = ClubDetailsInteractor()
+        let viewModel = ClubDetailsViewModel(data: data, interactor: interactor)
+        return ClubDetailsView(viewModel: viewModel)
     }
 }

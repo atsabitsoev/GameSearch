@@ -5,9 +5,11 @@
 //  Created by Ацамаз on 16.05.2025.
 //
 
-import SwiftUICore
+import SwiftUI
 
 protocol ScreenFactoryProtocol {
-    associatedtype Screen: View
-    func makeClubListView() -> Screen
+    associatedtype List: View
+    associatedtype Details: View
+    func makeClubListView() -> List
+    func makeClubDetailsView(_ data: ClubDetailsData) -> Details
 }
