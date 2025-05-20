@@ -8,7 +8,7 @@
 import Combine
 
 
-final class ClubDetailsViewModel: ObservableObject {
+final class ClubDetailsViewModel: ClubDetailsViewModelProtocol {
     private let interactor: ClubDetailsInteractorProtocol
     
     @Published private var clubDetails: ClubDetailsData?

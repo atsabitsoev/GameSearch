@@ -8,9 +8,15 @@
 import SwiftUI
 
 
-struct ClubDetailsView: View {
-    @ObservedObject var viewModel: ClubDetailsViewModel
-    
+struct ClubDetailsView<ViewModel: ClubDetailsViewModelProtocol>: View {
+    @ObservedObject private var viewModel: ViewModel
+
+
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+    }
+
+
     var body: some View {
         Text("Club Details")
             .font(.largeTitle)
