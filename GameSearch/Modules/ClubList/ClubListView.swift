@@ -24,26 +24,13 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     
     
     var body: some View {
-        tabBar
+        navigationView
             .onAppear {
                 guard !viewDidAppear else { return }
                 viewDidAppear = true
                 locationManager.requestLocation()
                 viewModel.onViewAppear()
             }
-    }
-    
-    var tabBar: some View {
-        TabView {
-            Tab("Клубы", systemImage: "house") {
-                navigationView
-            }
-            Tab("Карта", systemImage: "map") {
-                Text("Тут был геннадий")
-            }
-        }
-        .tint(Color.purple)
-        .setupTabBarAppearance()
     }
     
     var navigationView: some View {

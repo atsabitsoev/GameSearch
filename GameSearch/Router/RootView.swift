@@ -19,16 +19,25 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
     
 
     var body: some View {
-        NavigationStack(path: $router.path) {
-            factory.makeClubListView()
-                .environmentObject(router)
-                .navigationDestination(for: Route.self) { route in
-                    switch route {
-                    case .details(let data):
-                        Text(data.name)
-                    }
+        TabView {
+            Tab("Клубы", systemImage: "house") {
+                NavigationStack(path: $router.path) {
+                    factory.makeClubListView()
+                        .environmentObject(router)
+                        .navigationDestination(for: Route.self) { route in
+                            switch route {
+                            case .details(let data):
+                                factory.makeClubDetailsView(data)
+                            }
+                        }
                 }
+                .setupNavigationBarAppearance()
+            }
+            Tab("Карта", systemImage: "map") {
+                Text("Тут был геннадий")
+            }
         }
-        .setupNavigationBarAppearance()
+        .tint(Color.purple)
+        .setupTabBarAppearance()
     }
 }
