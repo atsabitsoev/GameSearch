@@ -9,11 +9,11 @@ import SwiftUI
 
 
 struct ClubDetailsView<ViewModel: ClubDetailsViewModelProtocol>: View {
-    @ObservedObject private var viewModel: ViewModel
+    @StateObject private var viewModel: ViewModel
 
 
     init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+        self._viewModel = StateObject(wrappedValue: viewModel)
     }
 
 
