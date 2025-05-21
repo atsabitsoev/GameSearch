@@ -21,6 +21,7 @@ struct MapListButton: View {
                 buttonState.buttonData.title,
                 systemImage: buttonState.buttonData.systemImage
             )
+            .fontWeight(.bold)
             .padding()
             .background(.white)
             .clipShape(

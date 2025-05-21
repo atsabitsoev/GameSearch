@@ -1,13 +1,13 @@
 {
   "sourceLanguage" : "ru",
   "strings" : {
+    "" : {
+
+    },
     "%@" : {
 
     },
     "%lld м" : {
-
-    },
-    "Club Details" : {
 
     },
     "Ближайшие клубы" : {

@@ -12,4 +12,6 @@ protocol ClubDetailsInteractorProtocol {
 }
 
 protocol ClubDetailsViewModelProtocol: ObservableObject {
+    var clubDetails: ClubDetailsData { get set }
+    var sectionPickerState: DetailsSection { get set }
 }
