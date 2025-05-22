@@ -40,18 +40,19 @@ private extension ClubDetailsView {
                 "https://habrastorage.org/getpro/habr/comment_images/cb7/f7a/835/cb7f7a835a96567846ae29f7e759f01d.jpg"
             ])
             .frame(height: 220)
+            .dontBlockBackSwipe()
             headerView
             SwipeSegmentedView(
                 [.common, .specification],
                 initialSegment: $viewModel.sectionPickerState,
                 content: { segment in
-                    VStack {
-                        Text("Hello")
-                        Text("good bye")
-                    }
+                    Rectangle()
+                        .fill(Color.white)
+                        .frame(width: 300, height: 300)
 
                 }
             )
+            .dontBlockBackSwipe()
             Spacer()
         }
     }

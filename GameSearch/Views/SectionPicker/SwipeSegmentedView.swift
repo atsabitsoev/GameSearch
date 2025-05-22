@@ -33,7 +33,6 @@ struct SwipeSegmentedView<Content: View>: View {
                         .tag(segment)
                 }
             }
-            .padding(.horizontal, 16)
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.spring(duration: 0.3), value: selectedSegment)
         }
