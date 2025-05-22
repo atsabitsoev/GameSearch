@@ -30,6 +30,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                                 factory.makeClubDetailsView(data)
                             }
                         }
+                        .enableSwipeBack()
                 }
                 .setupNavigationBarAppearance()
             }

@@ -1,10 +1,3 @@
-//
-//  BackSwipeModifier.swift
-//  GameSearch
-//
-//  Created by Ацамаз on 21.05.2025.
-//
-
 import SwiftUI
 
 struct SwipeBackEnabled: ViewModifier {
@@ -12,26 +5,54 @@ struct SwipeBackEnabled: ViewModifier {
         content
             .background(SwipeBackHelper())
     }
-
-    // Внутренний хелпер для доступа к UINavigationController
-    struct SwipeBackHelper: UIViewControllerRepresentable {
-        func makeUIViewController(context: Context) -> UIViewController {
-            let controller = UIViewController()
-            DispatchQueue.main.async {
-                if let nav = controller.navigationController {
-                    nav.interactivePopGestureRecognizer?.delegate = nil
-                    nav.interactivePopGestureRecognizer?.isEnabled = true
-                }
-            }
-            return controller
-        }
-
-        func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
-    }
 }
 
 extension View {
     func enableSwipeBack() -> some View {
         self.modifier(SwipeBackEnabled())
+    }
+}
+
+struct SwipeBackHelper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return UIViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        DispatchQueue.main.async {
+            guard let nav = uiViewController.navigationController else { return }
+            guard let gesture = nav.interactivePopGestureRecognizer else { return }
+            context.coordinator.set(gesture: gesture, navigationController: nav)
+        }
+    }
+
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        private var swipeDelegate: SwipeBackDelegate?
+
+        func set(gesture: UIGestureRecognizer, navigationController: UINavigationController) {
+            let newDelegate = SwipeBackDelegate(navigationController: navigationController)
+            self.swipeDelegate = newDelegate
+            gesture.delegate = newDelegate
+            gesture.isEnabled = true
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        return Coordinator()
+    }
+}
+
+class SwipeBackDelegate: NSObject, UIGestureRecognizerDelegate {
+    private weak var navigationController: UINavigationController?
+
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
+
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let nav = navigationController else { return true }
+        let stackSize = nav.viewControllers.count
+        let isEnabled = stackSize > 1
+        return isEnabled
     }
 }
