@@ -15,7 +15,7 @@ struct TabViewBackSwipe: ViewModifier {
                 HStack {
                     Rectangle()
                         .fill(Color.black.opacity(0.0001))
-                        .frame(width: 24)
+                        .frame(width: 36)
                     Spacer()
                 }
             }
