@@ -1,13 +1,16 @@
 {
   "sourceLanguage" : "ru",
   "strings" : {
-    "" : {
-
-    },
     "%@" : {
 
     },
     "%lld м" : {
+
+    },
+    "good bye" : {
+
+    },
+    "Hello" : {
 
     },
     "Ближайшие клубы" : {

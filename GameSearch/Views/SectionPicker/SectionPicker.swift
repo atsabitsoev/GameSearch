@@ -8,39 +8,66 @@
 import SwiftUI
 
 
-// enum для пикера
-enum DetailsSection {
-    case common
-    case specification
-
-
-    var title: String {
-        switch self {
-        case .common:
-            return "Общая информация"
-        case .specification:
-            return "Характеристики"
-        }
-    }
-}
-
-
 struct SectionPicker: View {
-    @Binding var selectedSection: DetailsSection
     let sections: [DetailsSection]
-    
+    @Binding var selectedSection: DetailsSection
+
+
     var body: some View {
-        Picker("", selection: $selectedSection) {
-            ForEach(sections, id: \.self) { section in
-                Text(section.title).tag(section)
+        segmentsView
+        indicatorView
+    }
+
+
+    private var segmentsView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                ForEach(sections) { section in
+                    Button(action: {
+                        withAnimation(.easeInOut) {
+                            selectedSection = section
+                        }
+                    }) {
+                        Text(section.title)
+                            .foregroundColor(selectedSection == section ? .purple : .gray)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+
+                }
             }
+            .background(Color.purple.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(.top)
         }
-        .pickerStyle(SegmentedPickerStyle())
-        .padding()
+    }
+
+    private var indicatorView: some View {
+        GeometryReader { geometry in
+            let itemWidth = geometry.size.width / CGFloat(sections.count)
+            RoundedRectangle(cornerRadius: 1)
+                .fill(Color.purple)
+                .frame(width: itemWidth - 32, height: 2)
+                .offset(x: itemWidth * CGFloat(selectedIndex) + 16, y: 0)
+                .animation(.easeInOut(duration: 0.3), value: selectedIndex)
+        }
+        .frame(height: 2)
+    }
+
+    private var selectedIndex: Int {
+        get {
+            sections.firstIndex(of: selectedSection) ?? 0
+        }
+        set {
+            selectedSection = sections[newValue]
+        }
     }
 }
 
-
-#Preview {
-    SectionPicker(selectedSection: .constant(.common), sections: [.common, .specification])
+struct AnimatedPicker_Previews: PreviewProvider {
+    static var previews: some View {
+        SectionPicker(sections: [.common, .specification], selectedSection: .constant(.common))
+            .padding()
+    }
 }
