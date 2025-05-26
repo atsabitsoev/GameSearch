@@ -11,14 +11,20 @@ struct ClubListCardData {
         self.name = club.name
         self.rating = club.rating
         self.ratingString = String(format: "%.1f", club.rating)
-        self.price = "от \(club.configurations.getMinPrice()) ₽/час"
+        self.price = "\(club.configurations.getMinPrice())"
+        self.addressString = club.addressData.address
+        self.tags = club.tags
+        self.logo = club.logo
     }
     
-    var id: Int
-    var name: String
-    var rating: Double
-    var ratingString: String
-    var price: String
+    let id: String
+    let name: String
+    let rating: Double
+    let ratingString: String
+    let price: String
+    let addressString: String
+    let tags: [String]
+    let logo: String
 }
 
 

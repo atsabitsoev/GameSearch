@@ -17,7 +17,7 @@ struct ClubMapAnnotation: View {
         VStack {
             ZStack {
                 Circle()
-                    .fill(Color.purple)
+                    .fill(EAColor.accent)
                     .frame(width: 25, height: 25)
                     .shadow(radius: 2)
                 
@@ -38,7 +38,7 @@ struct ClubMapAnnotation: View {
                 .padding(2)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                        .fill(Color.purple.opacity(0.9))
+                        .fill(EAColor.accent.opacity(0.9))
                         .shadow(radius: 2)
                 )
                 .offset(y: -5)

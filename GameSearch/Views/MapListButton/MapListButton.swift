@@ -13,7 +13,7 @@ struct MapListButton: View {
     
     var body: some View {
         Button {
-            withAnimation {
+            withAnimation(.spring(duration: 0.3)) {
                 buttonState.toggle()
             }
         } label: {

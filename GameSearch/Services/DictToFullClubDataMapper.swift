@@ -9,30 +9,31 @@ import Foundation
 import FirebaseFirestore
 
 protocol DataMapperProtocol {
-    func mapToFullClubData(_ dict: [String: Any]) -> FullClubData
+    func mapToFullClubData(id: String, _ dict: [String: Any]) -> FullClubData
 }
 
 
 final class DataMapper: DataMapperProtocol {
-    func mapToFullClubData(_ dict: [String: Any]) -> FullClubData {
-        FullClubData(dictionary: dict)
+    func mapToFullClubData(id: String, _ dict: [String: Any]) -> FullClubData {
+        FullClubData(id: id, dictionary: dict)
     }
 }
 
 
 fileprivate extension FullClubData {
-    init(dictionary: [String: Any]) {
+    init(id: String, dictionary: [String: Any]) {
         let additionalInfo = dictionary["additionalInfo"] as? String ?? ""
         let addressDict = dictionary["addressData"] as? [String: Any] ?? [:]
         let commentsArray = dictionary["comments"] as? [[String: Any]] ?? []
         let configsArray = dictionary["configurations"] as? [[String: Any]] ?? []
         let description = dictionary["description"] as? String ?? ""
-        let id = dictionary["id"] as? Int ?? 0
         let images = dictionary["images"] as? [String] ?? []
         let name = dictionary["name"] as? String ?? ""
-        let nameLowercase = dictionary["name_lowercase"] as? String ?? ""
+        let nameLowercase = dictionary["nameLowercase"] as? String ?? ""
         let rating = dictionary["rating"] as? Double ?? 0
         let subscribers = dictionary["subscribers"] as? Int ?? 0
+        let tags = dictionary["tags"] as? [String] ?? []
+        let logo = dictionary["logo"] as? String ?? ""
 
         self.additionalInfo = additionalInfo
         self.description = description
@@ -46,6 +47,8 @@ fileprivate extension FullClubData {
         self.addressData = AddressData(dictionary: addressDict)
         self.comments = commentsArray.compactMap { Comment(dictionary: $0) }
         self.configurations = configsArray.compactMap { RoomConfiguration(dictionary: $0) }
+        self.tags = tags
+        self.logo = logo
     }
 }
 
@@ -113,7 +116,7 @@ fileprivate extension PCConfiguration {
             let mouse = dictionary["mouse"] as? String,
             let ram = dictionary["ram"] as? Int,
             let roomName = dictionary["roomName"] as? String,
-            let stationCount = dictionary["stationsCount"] as? Int,
+            let stationCount = dictionary["stationCount"] as? Int,
             let type = dictionary["type"] as? String,
             let videoCard = dictionary["videocard"] as? String
         else { return nil }

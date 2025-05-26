@@ -29,7 +29,7 @@ struct SectionPicker: View {
                         }
                     }) {
                         Text(section.title)
-                            .foregroundColor(selectedSection == section ? .purple : .gray)
+                            .foregroundColor(selectedSection == section ? EAColor.accent : EAColor.textSecondary)
                             .frame(maxWidth: .infinity)
                     }
                     .padding(.horizontal, 16)
@@ -37,7 +37,7 @@ struct SectionPicker: View {
 
                 }
             }
-            .background(Color.purple.opacity(0.1))
+            .background(EAColor.accent.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .padding(.top)
         }
@@ -47,7 +47,7 @@ struct SectionPicker: View {
         GeometryReader { geometry in
             let itemWidth = geometry.size.width / CGFloat(sections.count)
             RoundedRectangle(cornerRadius: 1)
-                .fill(Color.purple)
+                .fill(EAColor.accent)
                 .frame(width: itemWidth - 32, height: 2)
                 .offset(x: itemWidth * CGFloat(selectedIndex) + 16, y: 0)
                 .animation(.easeInOut(duration: 0.3), value: selectedIndex)

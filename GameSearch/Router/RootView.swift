@@ -38,7 +38,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 Text("Тут был геннадий")
             }
         }
-        .tint(Color.purple)
+        .tint(EAColor.accent)
         .setupTabBarAppearance()
     }
 }

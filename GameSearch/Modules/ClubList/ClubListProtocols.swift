@@ -14,7 +14,7 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var mapClubs: [MapClubData] { get }
     
     func onViewAppear() -> Void
-    func routeToDetails(clubID: Int, router: Router)
+    func routeToDetails(clubID: String, router: Router)
 }
 
 

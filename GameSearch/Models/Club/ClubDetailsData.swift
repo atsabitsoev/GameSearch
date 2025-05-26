@@ -17,7 +17,7 @@ struct ClubDetailsData {
         self.additionalInfo = club.additionalInfo
     }
     
-    let id: Int
+    let id: String
     let name: String
     let rating: Double
     let ratingString: String

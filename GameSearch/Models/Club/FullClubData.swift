@@ -15,12 +15,14 @@ struct FullClubData {
     let comments: [Comment]
     let configurations: [RoomConfiguration]
     let description: String
-    let id: Int
+    let id: String
     let images: [String]
     let name: String
     let nameLowercase: String
     let rating: Double
     let subscribers: Int
+    let tags: [String]
+    let logo: String
 }
 
 struct AddressData {
@@ -108,12 +110,14 @@ extension FullClubData {
                 )
             ],
             description: "Лучший киберспорт центр Москвы",
-            id: 1,
+            id: "1",
             images: ["https://example.com/image1.jpg"],
             name: "Кибер-Арена",
             nameLowercase: "кибер-арена",
             rating: 4.8,
-            subscribers: 1500
+            subscribers: 1500,
+            tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
+            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg"
         ),
 
         FullClubData(
@@ -144,12 +148,14 @@ extension FullClubData {
                 )
             ],
             description: "Консольный клуб с турнирами",
-            id: 2,
+            id: "2",
             images: ["https://example.com/image2.jpg"],
             name: "PS Lounge",
             nameLowercase: "ps lounge",
             rating: 4.3,
-            subscribers: 900
+            subscribers: 900,
+            tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
+            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg"
         )
     ]
 }

@@ -19,7 +19,7 @@ struct ClubDetailsView<ViewModel: ClubDetailsViewModelProtocol>: View {
 
     var body: some View {
         contentView
-            .background(Color(white: 0.1))
+            .background(EAColor.background)
             .ignoresSafeArea()
             .navigationBarBackButtonHidden()
             .customBackButton()
@@ -65,15 +65,15 @@ private extension ClubDetailsView {
                 .foregroundColor(.white)
             Spacer()
             Label("\(viewModel.clubDetails.ratingString)", systemImage: "star.fill")
-                .foregroundStyle(Color.yellow)
+                .foregroundStyle(EAColor.yellow)
                 .fontWeight(.bold)
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
         .background {
             RoundedRectangle(cornerRadius: 0)
-                .fill(Color(white: 0.1))
-                .shadow(color: Color(white: 0.1), radius: 10, x: 0, y: -16)
+                .fill(EAColor.background)
+                .shadow(color: EAColor.background, radius: 10, x: 0, y: -16)
                 .padding(.horizontal, -16)
         }
     }
