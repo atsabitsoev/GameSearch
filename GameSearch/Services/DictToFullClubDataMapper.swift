@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 protocol DataMapperProtocol {
     func mapToFullClubData(_ dict: [String: Any]) -> FullClubData
@@ -14,64 +15,143 @@ protocol DataMapperProtocol {
 
 final class DataMapper: DataMapperProtocol {
     func mapToFullClubData(_ dict: [String: Any]) -> FullClubData {
-        let id = dict["id"] as? Int ?? 0
-        let name = dict["name"] as? String ?? ""
-        let description = dict["description"] as? String ?? ""
-        let image = dict["image"] as? String ?? ""
-        let rating = dict["rating"] as? Double ?? 0.0
-        let prices = dict["prices"] as? String ?? ""
-        let promos = dict["promos"] as? String ?? ""
-        let comments = dict["comments"] as? [String] ?? []
-        let additionalInfo = dict["additionalInfo"] as? String ?? ""
-        let subscribers = dict["subscribers"] as? Int ?? 0
+        FullClubData(dictionary: dict)
+    }
+}
 
-        // Address data
-        let addressDict = dict["addressData"] as? [String: Any] ?? [:]
-        let address = addressDict["address"] as? String ?? ""
-        let latitude = addressDict["latitude"] as? Double ?? 0.0
-        let longitude = addressDict["longitude"] as? Double ?? 0.0
-        let addressData = ClubAddressData(
-            address: address,
-            latitude: latitude,
-            longitude: longitude
-        )
 
-        // Configuration data
-        let configDict = dict["configuration"] as? [String: Any] ?? [:]
-        let mouse = configDict["mouse"] as? String ?? ""
-        let keyboard = configDict["keyboard"] as? String ?? ""
-        let monitor = configDict["monitor"] as? String ?? ""
-        let videocard = configDict["videocard"] as? String ?? ""
-        let hz = configDict["hz"] as? String ?? ""
+fileprivate extension FullClubData {
+    init(dictionary: [String: Any]) {
+        let additionalInfo = dictionary["additionalInfo"] as? String ?? ""
+        let addressDict = dictionary["addressData"] as? [String: Any] ?? [:]
+        let commentsArray = dictionary["comments"] as? [[String: Any]] ?? []
+        let configsArray = dictionary["configurations"] as? [[String: Any]] ?? []
+        let description = dictionary["description"] as? String ?? ""
+        let id = dictionary["id"] as? Int ?? 0
+        let images = dictionary["images"] as? [String] ?? []
+        let name = dictionary["name"] as? String ?? ""
+        let nameLowercase = dictionary["name_lowercase"] as? String ?? ""
+        let rating = dictionary["rating"] as? Double ?? 0
+        let subscribers = dictionary["subscribers"] as? Int ?? 0
 
-        let gamesArray = configDict["games"] as? [[String: Any]] ?? []
-        let games: [ClubGame] = gamesArray.compactMap { gameDict in
-            guard let name = gameDict["name"] as? String else { return nil }
-            return ClubGame(name: name)
+        self.additionalInfo = additionalInfo
+        self.description = description
+        self.id = id
+        self.images = images
+        self.name = name
+        self.nameLowercase = nameLowercase
+        self.rating = rating
+        self.subscribers = subscribers
+
+        self.addressData = AddressData(dictionary: addressDict)
+        self.comments = commentsArray.compactMap { Comment(dictionary: $0) }
+        self.configurations = configsArray.compactMap { RoomConfiguration(dictionary: $0) }
+    }
+}
+
+
+fileprivate extension AddressData {
+    init(dictionary: [String: Any]) {
+        self.address = dictionary["address"] as? String ?? ""
+        let geopoint = dictionary["geopoint"] as? GeoPoint
+        self.longitude = geopoint?.longitude ?? 0
+        self.latitude = geopoint?.latitude ?? 0
+    }
+}
+
+fileprivate extension RoomConfiguration {
+    init?(dictionary: [String: Any]) {
+        guard let type = dictionary["type"] as? String else { return nil }
+
+        switch type {
+        case "pc":
+            if let pc = PCConfiguration(dictionary: dictionary) {
+                self = .pc(pc)
+            } else {
+                return nil
+            }
+        case "playstation":
+            if let console = ConsoleConfiguration(dictionary: dictionary) {
+                self = .playstation(console)
+            } else {
+                return nil
+            }
+        default:
+            return nil
         }
+    }
+}
 
-        let configuration = ClubConfiguration(
-            mouse: mouse,
-            keyboard: keyboard,
-            monitor: monitor,
-            videocard: videocard,
-            hz: hz,
-            games: games
-        )
+fileprivate extension Comment {
+    init?(dictionary: [String: Any]) {
+        guard
+            let authorName = dictionary["authorName"] as? String,
+            let likesCount = dictionary["likesCount"] as? Int,
+            let rate = dictionary["rate"] as? Double,
+            let text = dictionary["text"] as? String
+        else { return nil }
 
-        return FullClubData(
-            id: id,
-            name: name,
-            description: description,
-            image: image,
-            rating: rating,
-            configuration: configuration,
-            prices: prices,
-            promos: promos,
-            comments: comments,
-            additionalInfo: additionalInfo,
-            subscribers: subscribers,
-            addressData: addressData
-        )
+        self.authorName = authorName
+        self.likesCount = likesCount
+        self.rate = rate
+        self.text = text
+    }
+}
+
+fileprivate extension PCConfiguration {
+    init?(dictionary: [String: Any]) {
+        guard
+            let chip = dictionary["chip"] as? String,
+            let games = dictionary["games"] as? [String],
+            let headphones = dictionary["headphones"] as? String,
+            let hz = dictionary["hz"] as? Int,
+            let keyboard = dictionary["keyboard"] as? String,
+            let maxPriceForHour = dictionary["maxPriceForHour"] as? Int,
+            let minPriceForHour = dictionary["minPriceForHour"] as? Int,
+            let monitor = dictionary["monitor"] as? String,
+            let monitorDiag = dictionary["monitorDiag"] as? Int,
+            let mouse = dictionary["mouse"] as? String,
+            let ram = dictionary["ram"] as? Int,
+            let roomName = dictionary["roomName"] as? String,
+            let stationCount = dictionary["stationsCount"] as? Int,
+            let type = dictionary["type"] as? String,
+            let videoCard = dictionary["videocard"] as? String
+        else { return nil }
+
+        self.chip = chip
+        self.games = games
+        self.headphones = headphones
+        self.hz = hz
+        self.keyboard = keyboard
+        self.maxPriceForHour = maxPriceForHour
+        self.minPriceForHour = minPriceForHour
+        self.monitor = monitor
+        self.monitorDiag = monitorDiag
+        self.mouse = mouse
+        self.ram = ram
+        self.roomName = roomName
+        self.stationCount = stationCount
+        self.type = type
+        self.videoCard = videoCard
+    }
+}
+
+fileprivate extension ConsoleConfiguration {
+    init?(dictionary: [String: Any]) {
+        guard
+            let games = dictionary["games"] as? [String],
+            let maxPriceForHour = dictionary["maxPriceForHour"] as? Int,
+            let minPriceForHour = dictionary["minPriceForHour"] as? Int,
+            let roomName = dictionary["roomName"] as? String,
+            let tvDiag = dictionary["tvDiag"] as? Int,
+            let type = dictionary["type"] as? String
+        else { return nil }
+
+        self.games = games
+        self.maxPriceForHour = maxPriceForHour
+        self.minPriceForHour = minPriceForHour
+        self.roomName = roomName
+        self.tvDiag = tvDiag
+        self.type = type
     }
 }

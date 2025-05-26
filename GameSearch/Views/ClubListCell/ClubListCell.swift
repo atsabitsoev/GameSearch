@@ -33,15 +33,6 @@ struct ClubListCell: View {
                 Spacer()
                     .frame(height: 16)
                 HStack {
-                    Label(data.videocard, systemImage: "cpu.fill")
-                        .font(.subheadline)
-                        .foregroundStyle(Color.red)
-                        .shadow(color: Color.black.opacity(0.5), radius: 7)
-                    Spacer()
-                }
-                Spacer()
-                    .frame(height: 4)
-                HStack {
                     Label(data.price, systemImage: "banknote.fill")
                         .font(.subheadline)
                         .foregroundStyle(Color.green)

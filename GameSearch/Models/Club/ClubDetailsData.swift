@@ -12,9 +12,8 @@ struct ClubDetailsData {
         self.rating = club.rating
         self.ratingString = String(format: "%.1f", club.rating)
         self.description = club.description
-        self.image = club.image
-        self.prices = club.prices
-        self.promos = club.promos
+        self.images = club.images
+        self.prices = "цена тут"
         self.additionalInfo = club.additionalInfo
     }
     
@@ -23,9 +22,8 @@ struct ClubDetailsData {
     let rating: Double
     let ratingString: String
     let description: String
-    let image: String
+    let images: [String]
     let prices: String
-    let promos: String
     let additionalInfo: String
 }
 
