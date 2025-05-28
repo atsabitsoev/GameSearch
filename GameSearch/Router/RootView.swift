@@ -30,6 +30,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                                 factory.makeClubDetailsView(data)
                             }
                         }
+                        .enableSwipeBack()
                 }
                 .setupNavigationBarAppearance()
             }
@@ -37,7 +38,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 Text("Тут был геннадий")
             }
         }
-        .tint(Color.purple)
+        .tint(EAColor.accent)
         .setupTabBarAppearance()
     }
 }

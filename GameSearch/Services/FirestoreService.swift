@@ -34,7 +34,7 @@ final class FirestoreService: NetworkServiceProtocol {
                             print("FirestoreService выгрузился из памяти")
                             return nil
                         }
-                        return self.mapper.mapToFullClubData(docSnapshot.data())
+                        return self.mapper.mapToFullClubData(id: docSnapshot.documentID, docSnapshot.data())
                     }
             })
             .eraseToAnyPublisher()
@@ -46,8 +46,8 @@ private extension FirestoreService {
         switch filter {
         case .name(let name):
             return db.collection("clubs")
-                .whereField("name_lowercase", isGreaterThanOrEqualTo: name.lowercased())
-                .whereField("name_lowercase", isLessThan: name.lowercased() + "\u{f8ff}")
+                .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
+                .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
                 .getDocuments()
         case nil:
             return db.collection("clubs").getDocuments()

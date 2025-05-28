@@ -13,7 +13,7 @@ struct MapListButton: View {
     
     var body: some View {
         Button {
-            withAnimation {
+            withAnimation(.spring(duration: 0.3)) {
                 buttonState.toggle()
             }
         } label: {
@@ -21,6 +21,7 @@ struct MapListButton: View {
                 buttonState.buttonData.title,
                 systemImage: buttonState.buttonData.systemImage
             )
+            .fontWeight(.bold)
             .padding()
             .background(.white)
             .clipShape(

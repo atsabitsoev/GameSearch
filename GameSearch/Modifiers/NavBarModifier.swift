@@ -13,6 +13,9 @@ struct NavBarModifier: ViewModifier {
             .onAppear {
                 let appearance = UINavigationBarAppearance()
                 appearance.configureWithOpaqueBackground()
+                let backButtonAppearance = UIBarButtonItemAppearance()
+                backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+                appearance.backButtonAppearance = backButtonAppearance
                 UINavigationBar.appearance().standardAppearance = appearance
                 UINavigationBar.appearance().compactAppearance = appearance
                 UINavigationBar.appearance().scrollEdgeAppearance = appearance

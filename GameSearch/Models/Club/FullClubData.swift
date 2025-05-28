@@ -7,182 +7,154 @@
 
 import Foundation
 
+
 struct FullClubData {
-    let id: Int
-    let name: String
-    let description: String
-    let image: String
-    let rating: Double
-    let configuration: ClubConfiguration
-    let prices: String
-    let promos: String
-    let comments: [String]
     let additionalInfo: String
-    let subscribers: Int
-    let addressData: ClubAddressData
-}
-
-struct ClubAddressData {
-    let address: String
-    let latitude: Double
-    let longitude: Double
-}
-
-struct ClubConfiguration {
-    let mouse: String
-    let keyboard: String
-    let monitor: String
-    let videocard: String
-    let hz: String
-    let games: [ClubGame]
-}
-
-struct ClubGame {
+    let addressData: AddressData
+    let comments: [Comment]
+    let configurations: [RoomConfiguration]
+    let description: String
+    let id: String
+    let images: [String]
     let name: String
+    let nameLowercase: String
+    let rating: Double
+    let subscribers: Int
+    let tags: [String]
+    let logo: String
 }
+
+struct AddressData {
+    let address: String
+    let longitude: Double
+    let latitude: Double
+}
+
+struct Comment {
+    let authorName: String
+    let likesCount: Int
+    let rate: Double
+    let text: String
+}
+
+enum RoomConfiguration {
+    case pc(PCConfiguration)
+    case playstation(ConsoleConfiguration)
+}
+
+struct PCConfiguration {
+    let chip: String
+    let games: [String]
+    let headphones: String
+    let hz: Int
+    let keyboard: String
+    let maxPriceForHour: Int
+    let minPriceForHour: Int
+    let monitor: String
+    let monitorDiag: Int
+    let mouse: String
+    let ram: Int
+    let roomName: String
+    let stationCount: Int
+    let type: String
+    let videoCard: String
+}
+
+struct ConsoleConfiguration {
+    let games: [String]
+    let maxPriceForHour: Int
+    let minPriceForHour: Int
+    let roomName: String
+    let tvDiag: Int
+    let type: String
+}
+
 
 extension FullClubData {
     static let mock: [FullClubData] = [
         FullClubData(
-            id: 1,
-            name: "CyberZone",
-            description: "Современный киберклуб с топовым железом.",
-            image: "cyberzone.jpg",
+            additionalInfo: "Тренировки и командные игры",
+            addressData: AddressData(
+                address: "ул. Тверская, д. 20",
+                longitude: 37,
+                latitude: 55
+            ),
+            comments: [
+                Comment(
+                    authorName: "Геймер1",
+                    likesCount: 10,
+                    rate: 4.5,
+                    text: "Отличный клуб, играю в доту"
+                )
+            ],
+            configurations: [
+                .pc(
+                    PCConfiguration(
+                        chip: "Intel Core i5 12400F",
+                        games: ["Dota 2", "CS2", "PUBG"],
+                        headphones: "HyperX Cloud II",
+                        hz: 144,
+                        keyboard: "SteelSeries Apex",
+                        maxPriceForHour: 200,
+                        minPriceForHour: 100,
+                        monitor: "AOC 27G2",
+                        monitorDiag: 27,
+                        mouse: "Logitech G Pro",
+                        ram: 32,
+                        roomName: "Standard",
+                        stationCount: 10,
+                        type: "pc",
+                        videoCard: "RTX 3070"
+                    )
+                )
+            ],
+            description: "Лучший киберспорт центр Москвы",
+            id: "1",
+            images: ["https://example.com/image1.jpg"],
+            name: "Кибер-Арена",
+            nameLowercase: "кибер-арена",
             rating: 4.8,
-            configuration: ClubConfiguration(
-                mouse: "Logitech G Pro",
-                keyboard: "SteelSeries Apex Pro",
-                monitor: "ASUS ROG Swift PG259QN",
-                videocard: "NVIDIA RTX 4090",
-                hz: "360Hz",
-                games: [
-                    ClubGame(name: "CS2"),
-                    ClubGame(name: "Valorant"),
-                    ClubGame(name: "Dota 2")
-                ]
-            ),
-            prices: "от 150 ₽/час",
-            promos: "10% скидка в будни до 15:00",
-            comments: ["Лучшее место!", "Очень комфортно и мощно."],
-            additionalInfo: "Открыто 24/7, бесплатный Wi-Fi",
-            subscribers: 1200,
-            addressData: ClubAddressData(
-                address: "йуцйуц",
-                latitude: 55.775349,
-                longitude: 37.588686
-            )
+            subscribers: 1500,
+            tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
+            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg"
         ),
+
         FullClubData(
-            id: 2,
-            name: "GameHouse",
-            description: "Идеальное место для геймеров всех возрастов.",
-            image: "gamehouse.png",
-            rating: 4.5,
-            configuration: ClubConfiguration(
-                mouse: "Razer DeathAdder",
-                keyboard: "HyperX Alloy",
-                monitor: "Acer Predator XB273",
-                videocard: "NVIDIA RTX 3080",
-                hz: "240Hz",
-                games: [
-                    ClubGame(name: "Fortnite"),
-                    ClubGame(name: "Overwatch 2")
-                ]
+            additionalInfo: "PlayStation 5 + турниры",
+            addressData: AddressData(
+                address: "пр. Ленина, д. 1",
+                longitude: 30,
+                latitude: 59
             ),
-            prices: "от 120 ₽/час",
-            promos: "Каждый 5-й час бесплатно",
-            comments: ["Уютная атмосфера.", "Персонал дружелюбный."],
-            additionalInfo: "Есть зона отдыха и кафе",
-            subscribers: 850,
-            addressData: ClubAddressData(
-                address: "цукцук",
-                latitude: 55.790897,
-                longitude: 37.530479
-            )
-        ),
-        FullClubData(
-            id: 3,
-            name: "Arena Play",
-            description: "Площадка для настоящих киберспортсменов.",
-            image: "arena_play.jpg",
-            rating: 4.9,
-            configuration: ClubConfiguration(
-                mouse: "Zowie EC2",
-                keyboard: "Corsair K95",
-                monitor: "BenQ Zowie XL2546",
-                videocard: "NVIDIA RTX 4080",
-                hz: "240Hz",
-                games: [
-                    ClubGame(name: "PUBG"),
-                    ClubGame(name: "Apex Legends")
-                ]
-            ),
-            prices: "от 200 ₽/час",
-            promos: "Счастливые часы с 12:00 до 16:00",
-            comments: ["Много места и крутая техника."],
-            additionalInfo: "Проводятся турниры каждую субботу",
-            subscribers: 2300,
-            addressData: ClubAddressData(
-                address: "укеуке",
-                latitude: 55.820086,
-                longitude: 37.431330
-            )
-        ),
-        FullClubData(
-            id: 4,
-            name: "Pixel Point",
-            description: "Уютный клуб в центре города.",
-            image: "pixelpoint.png",
-            rating: 4.2,
-            configuration: ClubConfiguration(
-                mouse: "Glorious Model O",
-                keyboard: "Razer Huntsman",
-                monitor: "MSI Optix MAG",
-                videocard: "NVIDIA RTX 3070",
-                hz: "165Hz",
-                games: [
-                    ClubGame(name: "Minecraft"),
-                    ClubGame(name: "GTA V")
-                ]
-            ),
-            prices: "от 100 ₽/час",
-            promos: "1 час в подарок при первом визите",
-            comments: ["Хорошо для вечернего отдыха."],
-            additionalInfo: "Работает до полуночи",
-            subscribers: 600,
-            addressData: ClubAddressData(
-                address: "фвыафыв",
-                latitude: 55.849986,
-                longitude: 37.436999
-            )
-        ),
-        FullClubData(
-            id: 5,
-            name: "NextLevel",
-            description: "Следующий уровень игрового опыта.",
-            image: "nextlevel.jpg",
-            rating: 4.7,
-            configuration: ClubConfiguration(
-                mouse: "Razer Viper Ultimate",
-                keyboard: "Logitech G915",
-                monitor: "LG UltraGear",
-                videocard: "NVIDIA RTX 4060 Ti",
-                hz: "144Hz",
-                games: [
-                    ClubGame(name: "League of Legends"),
-                    ClubGame(name: "Warzone")
-                ]
-            ),
-            prices: "от 130 ₽/час",
-            promos: "3 часа — по цене 2-х",
-            comments: ["Крутая атмосфера и звук."],
-            additionalInfo: "Поддержка VR, гарнитуры включены",
-            subscribers: 950,
-            addressData: ClubAddressData(
-                address: "чмсчсмчсм",
-                latitude: 55.821923,
-                longitude: 37.435432
-            )
+            comments: [
+                Comment(
+                    authorName: "Фанат FIFA",
+                    likesCount: 5,
+                    rate: 4.0,
+                    text: "Хорошее место для друзей и FIFA"
+                )
+            ],
+            configurations: [
+                .playstation(
+                    ConsoleConfiguration(
+                        games: ["FIFA 23", "Mortal Kombat"],
+                        maxPriceForHour: 160,
+                        minPriceForHour: 100,
+                        roomName: "PlayZone",
+                        tvDiag: 48,
+                        type: "playstation"
+                    )
+                )
+            ],
+            description: "Консольный клуб с турнирами",
+            id: "2",
+            images: ["https://example.com/image2.jpg"],
+            name: "PS Lounge",
+            nameLowercase: "ps lounge",
+            rating: 4.3,
+            subscribers: 900,
+            tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
+            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg"
         )
     ]
 }

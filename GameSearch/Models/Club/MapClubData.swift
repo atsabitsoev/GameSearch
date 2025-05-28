@@ -13,7 +13,7 @@ struct MapClubData {
         self.name = club.name
         self.location = .init(latitude: club.addressData.latitude, longitude: club.addressData.longitude)
     }
-    let id: Int
+    let id: String
     let location: CLLocationCoordinate2D
     let name: String
 }

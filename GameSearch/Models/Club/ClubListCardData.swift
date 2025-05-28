@@ -8,19 +8,23 @@
 struct ClubListCardData {
     init(club: FullClubData) {
         self.id = club.id
-        self.videocard = club.configuration.videocard
         self.name = club.name
         self.rating = club.rating
         self.ratingString = String(format: "%.1f", club.rating)
-        self.price = club.prices
+        self.price = "\(club.configurations.getMinPrice())"
+        self.addressString = club.addressData.address
+        self.tags = club.tags
+        self.logo = club.logo
     }
     
-    var id: Int
-    var name: String
-    var rating: Double
-    var ratingString: String
-    var videocard: String
-    var price: String
+    let id: String
+    let name: String
+    let rating: Double
+    let ratingString: String
+    let price: String
+    let addressString: String
+    let tags: [String]
+    let logo: String
 }
 
 
@@ -33,5 +37,20 @@ extension FullClubData {
 extension Array where Element == FullClubData {
     func getListCardData() -> [ClubListCardData] {
         self.map{ $0.getListCardData() }
+    }
+}
+
+
+fileprivate extension Array where Element == RoomConfiguration {
+    func getMinPrice() -> Int {
+        compactMap({ configuration in
+            switch configuration {
+            case .pc(let pCConfiguration):
+                return pCConfiguration.minPriceForHour
+            case .playstation:
+                return nil
+            }
+        })
+        .min() ?? 0
     }
 }

@@ -10,21 +10,21 @@ struct ClubDetailsData {
         self.id = club.id
         self.name = club.name
         self.rating = club.rating
+        self.ratingString = String(format: "%.1f", club.rating)
         self.description = club.description
-        self.image = club.image
-        self.prices = club.prices
-        self.promos = club.promos
+        self.images = club.images
+        self.prices = "цена тут"
         self.additionalInfo = club.additionalInfo
     }
     
-    var id: Int
-    var name: String
-    var rating: Double
-    var description: String
-    var image: String
-    var prices: String
-    var promos: String
-    var additionalInfo: String
+    let id: String
+    let name: String
+    let rating: Double
+    let ratingString: String
+    let description: String
+    let images: [String]
+    let prices: String
+    let additionalInfo: String
 }
 
 
