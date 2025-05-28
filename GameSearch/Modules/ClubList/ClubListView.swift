@@ -18,61 +18,69 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
 
     var body: some View {
         NavigationView {
-            ZStack(alignment: .bottom) {
-                mapView
-                GeometryReader { geo in
-                    listView
-                        .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
-                        .opacity(mapListButtonState.isMap ? 0 : 1)
-                }
-
-                VStack {
-                    Spacer()
-                    MapListButton(buttonState: $mapListButtonState)
-                        .padding(.bottom, 16)
-                }
-                .ignoresSafeArea(.keyboard)
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(EAColor.background, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Ближайшие клубы")
-                        .font(EAFont.navigationBarTitle)
-                        .foregroundStyle(EAColor.textPrimary)
-                }
-            }
-            .toolbarVisibility(.visible, for: .navigationBar)
-            .toolbarVisibility(.visible, for: .tabBar)
-            .toolbarBackground(EAColor.background, for: .tabBar)
-            .background(EAColor.background)
-            .onAppear {
-                guard !viewDidAppear else { return }
-                viewDidAppear = true
-                locationManager.requestLocation()
-                viewModel.onViewAppear()
-            }
-            .onChange(of: searchFocused) { _, newValue in
-                if newValue && mapListButtonState == .map {
-                    withAnimation(.spring(duration: 0.3)) {
-                        mapListButtonState = .list
+            contentView
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(EAColor.background, for: .navigationBar)
+                .toolbarVisibility(.visible, for: .navigationBar)
+                .toolbarVisibility(.visible, for: .tabBar)
+                .toolbarBackground(EAColor.background, for: .tabBar)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("Ближайшие клубы")
+                            .font(EAFont.navigationBarTitle)
+                            .foregroundStyle(EAColor.textPrimary)
                     }
+                }
+        }
+    }
+}
+
+
+private extension ClubListView {
+    var contentView: some View {
+        ZStack(alignment: .bottom) {
+            mapView
+            GeometryReader { listView($0) }
+            mapListButton
+        }
+        .background(EAColor.background)
+        .onAppear {
+            guard !viewDidAppear else { return }
+            viewDidAppear = true
+            locationManager.requestLocation()
+            viewModel.onViewAppear()
+        }
+        .onChange(of: searchFocused) { _, newValue in
+            if newValue && mapListButtonState == .map {
+                withAnimation(.spring(duration: 0.3)) {
+                    mapListButtonState = .list
                 }
             }
         }
     }
 
-    private var listView: some View {
+    var mapView: some View {
+        MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
+            .opacity(mapListButtonState.isMap ? 1 : 0)
+    }
+
+    var mapListButton: some View {
+        VStack {
+            Spacer()
+            MapListButton(buttonState: $mapListButtonState)
+                .padding(.bottom, 16)
+        }
+        .ignoresSafeArea(.keyboard)
+    }
+
+
+    func listView(_ geo: GeometryProxy) -> some View {
         List(viewModel.clubListCards, id: \.id) { card in
-            ClubListCell(data: card)
-                .listRowSeparator(.hidden)
-                .listRowBackground(EAColor.background)
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .onTapGesture {
-                    viewModel.routeToDetails(clubID: card.id, router: router)
-                }
+            clubListCell(card)
         }
         .background(EAColor.background.ignoresSafeArea(.keyboard))
+        .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
+        .opacity(mapListButtonState.isMap ? 0 : 1)
         .scrollContentBackground(.hidden)
         .listStyle(.plain)
         .searchable(
@@ -95,11 +103,17 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
         }
     }
 
-    private var mapView: some View {
-        MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
-            .opacity(mapListButtonState.isMap ? 1 : 0)
+    func clubListCell(_ card: ClubListCardData) -> some View {
+        ClubListCell(data: card)
+            .listRowSeparator(.hidden)
+            .listRowBackground(EAColor.background)
+            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            .onTapGesture {
+                viewModel.routeToDetails(clubID: card.id, router: router)
+            }
     }
 }
+
 
 #Preview {
     ClubListView(viewModel: ClubListViewModel(interactor: ClubListInteractor()))
