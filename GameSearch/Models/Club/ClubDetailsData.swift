@@ -15,6 +15,7 @@ struct ClubDetailsData {
         self.images = club.images
         self.prices = "цена тут"
         self.additionalInfo = club.additionalInfo
+        self.phoneNumber = club.phoneNumber
     }
     
     let id: String
@@ -25,6 +26,7 @@ struct ClubDetailsData {
     let images: [String]
     let prices: String
     let additionalInfo: String
+    let phoneNumber: Int?
 }
 
 

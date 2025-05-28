@@ -22,6 +22,7 @@ struct FullClubData {
     let subscribers: Int
     let tags: [String]
     let logo: String
+    let phoneNumber: Int?
 }
 
 struct AddressData {
@@ -108,7 +109,7 @@ extension FullClubData {
                     )
                 )
             ],
-            description: "Лучший киберспорт центр Москвы",
+            description: "Лучший киберспорт центр Москвы. Самое мощное железо в вашем городе по доступной цене!",
             id: "1",
             images: ["https://example.com/image1.jpg"],
             name: "Кибер-Арена",
@@ -116,7 +117,8 @@ extension FullClubData {
             rating: 4.8,
             subscribers: 1500,
             tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
-            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg"
+            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg",
+            phoneNumber: 89284983000
         ),
 
         FullClubData(
@@ -154,7 +156,8 @@ extension FullClubData {
             rating: 4.3,
             subscribers: 900,
             tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
-            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg"
+            logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg",
+            phoneNumber: 89604012886
         )
     ]
 }

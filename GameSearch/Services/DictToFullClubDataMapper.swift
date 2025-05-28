@@ -34,6 +34,7 @@ fileprivate extension FullClubData {
         let subscribers = dictionary["subscribers"] as? Int ?? 0
         let tags = dictionary["tags"] as? [String] ?? []
         let logo = dictionary["logo"] as? String ?? ""
+        let phoneNumber = dictionary["phoneNumber"] as? Int
 
         self.additionalInfo = additionalInfo
         self.description = description
@@ -49,6 +50,7 @@ fileprivate extension FullClubData {
         self.configurations = configsArray.compactMap { RoomConfiguration(dictionary: $0) }
         self.tags = tags
         self.logo = logo
+        self.phoneNumber = phoneNumber
     }
 }
 

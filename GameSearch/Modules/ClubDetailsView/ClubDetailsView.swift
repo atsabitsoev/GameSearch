@@ -41,18 +41,26 @@ private extension ClubDetailsView {
     }
 
     var imageCarousel: some View {
-        ImageCarouselView(images: [
-            "https://static.mk.ru/upload/entities/2024/08/12/15/articles/facebookPicture/f2/bb/9d/af/d6b604fd8193701908ebe1253b033194.jpg",
-            "https://avatars.mds.yandex.net/get-altay/5101995/2a00000181ae41cb1d9a224eda8204e57870/XXXL",
-            "https://habrastorage.org/getpro/habr/comment_images/cb7/f7a/835/cb7f7a835a96567846ae29f7e759f01d.jpg"
-        ])
-        .frame(height: 220)
-        .dontBlockBackSwipe()
+        ImageCarouselView(images: viewModel.clubDetails.images)
+            .frame(height: 220)
+            .dontBlockBackSwipe()
     }
 
     var headerView: some View {
-        HStack {
-            Spacer()
+        HStack(alignment: .center) {
+            if let phoneNumber = viewModel.clubDetails.phoneNumber,
+                let phoneUrl = URL(string: "tel://\(phoneNumber)") {
+                Button {
+                    UIApplication.shared.open(phoneUrl)
+                } label: {
+                    Image(systemName: "phone.fill")
+                        .symbolRenderingMode(.multicolor)
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                }
+            } else {
+                Spacer()
+            }
             Spacer()
             Text(viewModel.clubDetails.name)
                 .font(.system(size: 24, weight: .bold))
@@ -77,13 +85,45 @@ private extension ClubDetailsView {
             [.common, .specification],
             initialSegment: $viewModel.sectionPickerState,
             content: { segment in
-                Rectangle()
-                    .fill(Color.white)
-                    .frame(width: 300, height: 300)
-
+                switch segment {
+                case .common:
+                    infoSection
+                case .specification:
+                    Rectangle()
+                        .fill(Color.white)
+                        .frame(width: 300, height: 300)
+                }
             }
         )
         .dontBlockBackSwipe()
+    }
+
+    var infoSection: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                if !viewModel.clubDetails.description.isEmpty {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Описание")
+                                .font(.headline)
+                                .foregroundColor(EAColor.info2)
+                            Text(viewModel.clubDetails.description)
+                                .font(.body)
+                                .foregroundColor(EAColor.textPrimary)
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 16)
+                    .background(EAColor.info1)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+            .padding(.top, 24)
+        }
+        .background(EAColor.background)
     }
 }
 
