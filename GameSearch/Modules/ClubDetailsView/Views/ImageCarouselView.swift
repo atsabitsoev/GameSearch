@@ -20,20 +20,11 @@ struct ImageCarouselView: View {
                         AsyncImage(url: URL(string: imageURL)) { phase in
                             switch phase {
                             case .empty:
-                                ProgressView()
-                                    .frame(width: geometry.size.width, height: geometry.size.height)
+                                proggressView(geometry)
                             case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: geometry.size.width, height: geometry.size.height)
-                                    .clipped()
+                                successImage(image, geometry)
                             case .failure:
-                                Image(systemName: "exclamationmark.triangle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 50)
-                                    .foregroundColor(.red)
+                                errorView()
                             @unknown default:
                                 EmptyView()
                             }
@@ -45,6 +36,27 @@ struct ImageCarouselView: View {
             }
             .tabViewStyle(PageTabViewStyle())
         }
+    }
+}
+
+private extension ImageCarouselView {
+    func successImage(_ image: Image, _ geo: GeometryProxy) -> some View {
+        image
+            .resizable()
+            .scaledToFill()
+            .frame(width: geo.size.width, height: geo.size.height)
+            .clipped()
+    }
+    
+    func proggressView(_ geo: GeometryProxy) -> some View {
+        ProgressView()
+            .frame(width: geo.size.width, height: geo.size.height)
+    }
+    
+    func errorView() -> some View {
+        Text("Ошибка загрузки картинки")
+            .foregroundStyle(.red)
+            .font(EAFont.infoBig)
     }
 }
 

@@ -17,6 +17,7 @@ struct ClubDetailsData {
         self.additionalInfo = club.additionalInfo
         self.phoneNumber = club.phoneNumber
         self.rooms = club.configurations
+        self.logo = club.logo
     }
     
     let id: String
@@ -29,6 +30,7 @@ struct ClubDetailsData {
     let additionalInfo: String
     let phoneNumber: Int?
     let rooms: [RoomConfiguration]
+    let logo: String
 }
 
 

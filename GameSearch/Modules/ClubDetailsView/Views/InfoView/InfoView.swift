@@ -9,16 +9,19 @@ import SwiftUI
 
 
 struct InfoView: View {
-    let title: String
-    let description: String
+    let info: InfoData
+    
+    init(_ info: InfoData) {
+        self.info = info
+    }
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
-                Text(title)
+                Text(info.title)
                     .font(.headline)
                     .foregroundStyle(EAColor.info2)
-                Text(description)
+                Text(info.desc)
                     .font(.body)
                     .foregroundStyle(EAColor.textPrimary)
             }

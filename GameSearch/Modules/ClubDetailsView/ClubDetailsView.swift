@@ -33,23 +33,52 @@ struct ClubDetailsView<ViewModel: ClubDetailsViewModelProtocol>: View {
 private extension ClubDetailsView {
     var contentView: some View {
         VStack(spacing: 0) {
-            imageCarousel
+            topView
             headerView
             segmentedView
             Spacer()
         }
     }
 
+    var topView: some View {
+        ZStack(alignment: .bottomLeading) {
+            imageCarousel
+            logoView
+        }
+    }
+
     var imageCarousel: some View {
-        ImageCarouselView(images: viewModel.clubDetails.images)
+        ImageCarouselView(images: viewModel.output?.images ?? [])
             .frame(height: 220)
             .dontBlockBackSwipe()
     }
 
     var headerView: some View {
-        HStack(alignment: .center) {
-            if let phoneNumber = viewModel.clubDetails.phoneNumber,
-                let phoneUrl = URL(string: "tel://\(phoneNumber)") {
+        HStack {
+            phoneButton
+                .frame(maxWidth: 60, alignment: .leading)
+            Spacer()
+            Text(viewModel.output?.name ?? "")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(.white)
+            Spacer()
+            ratingView
+                .frame(maxWidth: 60, alignment: .trailing)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background {
+            RoundedRectangle(cornerRadius: 0)
+                .fill(EAColor.background)
+                .shadow(color: EAColor.background, radius: 10, x: 0, y: -16)
+                .padding(.horizontal, -16)
+        }
+    }
+
+    var phoneButton: some View {
+        Group {
+            if let phoneNumber = viewModel.output?.phone,
+               let phoneUrl = URL(string: "tel://\(phoneNumber)") {
                 Button {
                     UIApplication.shared.open(phoneUrl)
                 } label: {
@@ -61,23 +90,28 @@ private extension ClubDetailsView {
             } else {
                 Spacer()
             }
-            Spacer()
-            Text(viewModel.clubDetails.name)
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            Spacer()
-            Label("\(viewModel.clubDetails.ratingString)", systemImage: "star.fill")
-                .foregroundStyle(EAColor.yellow)
-                .fontWeight(.bold)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
-        .background {
-            RoundedRectangle(cornerRadius: 0)
+    }
+
+    var ratingView: some View {
+        Label(viewModel.output?.rating ?? "0", systemImage: "star.fill")
+            .foregroundStyle(EAColor.yellow)
+            .fontWeight(.bold)
+    }
+
+    var logoView: some View {
+        AsyncImage(url: URL(string: viewModel.output?.logo ?? "")) { image in
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 60, height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        } placeholder: {
+            RoundedRectangle(cornerRadius: 10)
                 .fill(EAColor.background)
-                .shadow(color: EAColor.background, radius: 10, x: 0, y: -16)
-                .padding(.horizontal, -16)
+                .frame(width: 60, height: 60)
         }
+        .padding()
     }
 
     var segmentedView: some View {
@@ -101,11 +135,11 @@ private extension ClubDetailsView {
     var infoSection: some View {
         ScrollView {
             VStack(spacing: 16) {
-                if !viewModel.clubDetails.description.isEmpty {
-                    InfoView(title: "Описание", description: viewModel.clubDetails.description)
+                if let info = viewModel.output?.info {
+                    InfoView(info)
                 }
-                if !viewModel.clubDetails.rooms.isEmpty {
-                    PriceInfoView(rooms: viewModel.clubDetails.rooms)
+                if let priceInfo = viewModel.output?.priceInfo {
+                    PriceInfoView(priceInfo)
                 }
             }
             .padding(.horizontal, 16)
