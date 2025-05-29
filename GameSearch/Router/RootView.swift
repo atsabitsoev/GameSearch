@@ -37,6 +37,9 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
             Tab("Карта", systemImage: "map") {
                 Text("Тут был геннадий")
             }
+            Tab("Новости", systemImage: "newspaper") {
+                NewsView()
+            }
         }
         .tint(EAColor.accent)
         .setupTabBarAppearance()
