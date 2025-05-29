@@ -16,6 +16,7 @@ struct ClubDetailsData {
         self.prices = "цена тут"
         self.additionalInfo = club.additionalInfo
         self.phoneNumber = club.phoneNumber
+        self.rooms = club.configurations
     }
     
     let id: String
@@ -27,6 +28,7 @@ struct ClubDetailsData {
     let prices: String
     let additionalInfo: String
     let phoneNumber: Int?
+    let rooms: [RoomConfiguration]
 }
 
 

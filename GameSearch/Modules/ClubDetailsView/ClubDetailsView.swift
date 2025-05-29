@@ -102,21 +102,10 @@ private extension ClubDetailsView {
         ScrollView {
             VStack(spacing: 16) {
                 if !viewModel.clubDetails.description.isEmpty {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Описание")
-                                .font(.headline)
-                                .foregroundColor(EAColor.info2)
-                            Text(viewModel.clubDetails.description)
-                                .font(.body)
-                                .foregroundColor(EAColor.textPrimary)
-                        }
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 16)
-                    .background(EAColor.info1)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    InfoView(title: "Описание", description: viewModel.clubDetails.description)
+                }
+                if !viewModel.clubDetails.rooms.isEmpty {
+                    PriceInfoView(rooms: viewModel.clubDetails.rooms)
                 }
             }
             .padding(.horizontal, 16)

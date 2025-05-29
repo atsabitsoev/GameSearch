@@ -38,12 +38,20 @@ struct Comment {
     let text: String
 }
 
-enum RoomConfiguration {
+enum RoomConfiguration: Identifiable {
+    var id: UUID {
+        switch self {
+        case let .pc(room): return room.id
+        case let .playstation(room): return room.id
+        }
+    }
+
     case pc(PCConfiguration)
     case playstation(ConsoleConfiguration)
 }
 
-struct PCConfiguration {
+struct PCConfiguration: Identifiable {
+    let id = UUID()
     let chip: String
     let games: [String]
     let headphones: String
@@ -61,7 +69,8 @@ struct PCConfiguration {
     let videoCard: String
 }
 
-struct ConsoleConfiguration {
+struct ConsoleConfiguration: Identifiable {
+    let id = UUID()
     let games: [String]
     let maxPriceForHour: Int
     let minPriceForHour: Int
@@ -103,6 +112,25 @@ extension FullClubData {
                         mouse: "Logitech G Pro",
                         ram: 32,
                         roomName: "Standard",
+                        stationCount: 10,
+                        type: "pc",
+                        videoCard: "RTX 3070"
+                    )
+                ),
+                .pc(
+                    PCConfiguration(
+                        chip: "Intel Core i5 12400F",
+                        games: ["Dota 2", "CS2", "PUBG"],
+                        headphones: "HyperX Cloud II",
+                        hz: 144,
+                        keyboard: "SteelSeries Apex",
+                        maxPriceForHour: 300,
+                        minPriceForHour: 150,
+                        monitor: "AOC 27G2",
+                        monitorDiag: 27,
+                        mouse: "Logitech G Pro",
+                        ram: 32,
+                        roomName: "VIP",
                         stationCount: 10,
                         type: "pc",
                         videoCard: "RTX 3070"
