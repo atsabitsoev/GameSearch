@@ -35,7 +35,9 @@ private extension ClubListCell {
             clubLogo
             VStack(alignment: .leading, spacing: 4) {
                 titleAndRating
-                addressRow
+                LocationLabel(address: data.addressString)
+                    .font(EAFont.description)
+                    .foregroundStyle(EAColor.textSecondary)
             }
         }
     }
@@ -72,16 +74,6 @@ private extension ClubListCell {
         }
         .foregroundStyle(EAColor.yellow)
         .font(EAFont.infoBig)
-    }
-    
-    var addressRow: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Image(systemName: "mappin.and.ellipse")
-            Text(data.addressString)
-        }
-        .symbolRenderingMode(.multicolor)
-        .font(EAFont.description)
-        .foregroundStyle(EAColor.textSecondary)
     }
     
     // MARK: - Tags Row (Price + Tags)

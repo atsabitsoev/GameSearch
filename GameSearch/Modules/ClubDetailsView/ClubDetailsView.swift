@@ -138,6 +138,9 @@ private extension ClubDetailsView {
                 if let info = viewModel.output?.info {
                     InfoView(info)
                 }
+                if let locationInfo = viewModel.output?.locationInfo {
+                    LocationInfoView(data: locationInfo)
+                }
                 if let priceInfo = viewModel.output?.priceInfo {
                     PriceInfoView(priceInfo)
                 }
@@ -146,6 +149,7 @@ private extension ClubDetailsView {
             .padding(.bottom, 16)
             .padding(.top, 24)
         }
+        .scrollIndicators(.hidden)
         .background(EAColor.background)
     }
 }

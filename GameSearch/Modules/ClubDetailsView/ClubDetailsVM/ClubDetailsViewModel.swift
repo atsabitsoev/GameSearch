@@ -29,10 +29,12 @@ private extension ClubDetailsViewModel {
     func setupOutput() {
         let priceInfo = makePriceInfoData()
         let info = makeInfoData()
-        
+        let locationInfo = makeLocationInfoData()
+
         output = .init(
             priceInfo: priceInfo,
             info: info,
+            locationInfo: locationInfo,
             images: clubDetails.images,
             phone: clubDetails.phoneNumber,
             name: clubDetails.name,
@@ -77,6 +79,10 @@ private extension ClubDetailsViewModel {
             title: Constants.infoTitle,
             desc: clubDetails.description
         )
+    }
+
+    func makeLocationInfoData() -> LocationInfoData {
+        clubDetails.addressData
     }
 }
 

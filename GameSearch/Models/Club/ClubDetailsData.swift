@@ -18,6 +18,7 @@ struct ClubDetailsData {
         self.phoneNumber = club.phoneNumber
         self.rooms = club.configurations
         self.logo = club.logo
+        self.addressData = LocationInfoData(address: club.addressData.address, long: club.addressData.longitude, lat: club.addressData.latitude)
     }
     
     let id: String
@@ -31,6 +32,7 @@ struct ClubDetailsData {
     let phoneNumber: Int?
     let rooms: [RoomConfiguration]
     let logo: String
+    let addressData: LocationInfoData
 }
 
 
