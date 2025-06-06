@@ -103,7 +103,7 @@ private extension ClubDetailsViewModel {
                     ram: pcRoom.ram,
                     monitorBrand: pcRoom.monitor,
                     monitorDiag: pcRoom.monitorDiag,
-                    hz: pcRoom.hz,
+                    hz: pcRoom.hz
                 )
             default:
                 return nil
