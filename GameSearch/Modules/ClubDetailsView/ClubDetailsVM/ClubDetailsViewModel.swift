@@ -15,6 +15,7 @@ final class ClubDetailsViewModel: ClubDetailsViewModelProtocol {
     
     @Published var sectionPickerState: DetailsSection = .common
     @Published var output: ClubDetailsVMOutput?
+    @Published var selectedSpecId: UUID?
 
 
     init(data: ClubDetailsData, interactor: ClubDetailsInteractorProtocol) {
@@ -30,11 +31,13 @@ private extension ClubDetailsViewModel {
         let priceInfo = makePriceInfoData()
         let info = makeInfoData()
         let locationInfo = makeLocationInfoData()
+        let specsData = makeSpecsData()
 
         output = .init(
             priceInfo: priceInfo,
             info: info,
             locationInfo: locationInfo,
+            specsData: specsData,
             images: clubDetails.images,
             phone: clubDetails.phoneNumber,
             name: clubDetails.name,
@@ -83,6 +86,31 @@ private extension ClubDetailsViewModel {
 
     func makeLocationInfoData() -> LocationInfoData {
         clubDetails.addressData
+    }
+
+    func makeSpecsData() -> [RoomSpecsData] {
+        let data = clubDetails.rooms.compactMap { room in
+            switch room {
+            case let .pc(pcRoom):
+                return RoomSpecsData(
+                    roomName: pcRoom.roomName,
+                    stationCount: pcRoom.stationCount,
+                    videocard: pcRoom.videoCard,
+                    chip: pcRoom.chip,
+                    mouse: pcRoom.mouse,
+                    keyboard: pcRoom.keyboard,
+                    headphones: pcRoom.headphones,
+                    ram: pcRoom.ram,
+                    monitorBrand: pcRoom.monitor,
+                    monitorDiag: pcRoom.monitorDiag,
+                    hz: pcRoom.hz
+                )
+            default:
+                return nil
+            }
+        }
+        selectedSpecId = data.last?.id
+        return data
     }
 }
 

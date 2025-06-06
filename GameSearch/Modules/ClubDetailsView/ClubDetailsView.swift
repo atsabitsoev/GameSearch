@@ -123,9 +123,7 @@ private extension ClubDetailsView {
                 case .common:
                     infoSection
                 case .specification:
-                    Rectangle()
-                        .fill(Color.white)
-                        .frame(width: 300, height: 300)
+                    specsSection
                 }
             }
         )
@@ -151,6 +149,38 @@ private extension ClubDetailsView {
         }
         .scrollIndicators(.hidden)
         .background(EAColor.background)
+    }
+
+    var specsSection: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                if let specs = viewModel.output?.specsData {
+                    ForEach(specs) { spec in
+                        RoomSpecsView(
+                            isSelected: specsSectionBinding(for: spec.id),
+                            data: spec)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+            .padding(.top, 24)
+        }
+        .scrollIndicators(.hidden)
+        .background(EAColor.background)
+    }
+
+    func specsSectionBinding(for id: UUID) -> Binding<Bool> {
+        Binding<Bool>(
+            get: { viewModel.selectedSpecId == id },
+            set: { newValue in
+                if newValue {
+                    viewModel.selectedSpecId = id
+                } else {
+                    viewModel.selectedSpecId = nil
+                }
+            }
+        )
     }
 }
 
