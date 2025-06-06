@@ -9,6 +9,8 @@ import SwiftUI
 
 
 struct PriceInfoView: View {
+    @State private var showSheet = false
+
     private let priceInfo: PriceInfoData
 
 
@@ -30,6 +32,11 @@ struct PriceInfoView: View {
         .padding(.vertical, 16)
         .background(EAColor.info1)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .sheet(isPresented: $showSheet) {
+            PriceImageSheet(imageURL: /*priceInfo.priceImageURL*/ URL(string: "https://www.meme-arsenal.com/memes/21662cb121acc89629e99887f997be99.jpg")!)
+                .presentationBackground(EAColor.background)
+                .presentationDragIndicator(.visible)
+        }
     }
 }
 
@@ -65,7 +72,7 @@ private extension PriceInfoView {
 
     var showFullPriceButton: some View {
         Button {
-            print("hello")
+            showSheet.toggle()
         } label: {
             HStack {
                 Spacer()
