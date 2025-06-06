@@ -16,7 +16,6 @@ struct RoomSpecsView: View {
     var body: some View {
         VStack {
             headerView
-                .zIndex(100)
             if isSelected {
                 specsView
             }
