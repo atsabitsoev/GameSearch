@@ -71,7 +71,8 @@ private extension ClubDetailsViewModel {
         return PriceInfoData(
             headerText: Constants.priceInfoHeader,
             roomsData: roomsData,
-            buttonText: Constants.priceInfoButton
+            buttonText: Constants.priceInfoButton,
+            priceImage: clubDetails.allPricesImage
         )
     }
     

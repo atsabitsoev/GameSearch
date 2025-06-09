@@ -24,7 +24,7 @@ struct PriceInfoView: View {
             VStack(alignment: .leading, spacing: 8) {
                 headerView
                 pricesView
-                showFullPriceButton
+                allPricesButton
             }
             Spacer()
         }
@@ -33,9 +33,7 @@ struct PriceInfoView: View {
         .background(EAColor.info1)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .sheet(isPresented: $showSheet) {
-            PriceImageSheet(imageURL: /*priceInfo.priceImageURL*/ URL(string: "https://www.meme-arsenal.com/memes/21662cb121acc89629e99887f997be99.jpg")!)
-                .presentationBackground(EAColor.background)
-                .presentationDragIndicator(.visible)
+            priceImage
         }
     }
 }
@@ -70,23 +68,32 @@ private extension PriceInfoView {
         }
     }
 
-    var showFullPriceButton: some View {
-        Button {
-            showSheet.toggle()
-        } label: {
-            HStack {
-                Spacer()
-                Text(priceInfo.buttonText)
-                    .foregroundStyle(EAColor.textPrimary)
-                    .font(EAFont.infoBold)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(EAColor.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                Spacer()
+    @ViewBuilder
+    var allPricesButton: some View {
+        if let _ = priceInfo.priceImage {
+            Button {
+                showSheet.toggle()
+            } label: {
+                HStack {
+                    Spacer()
+                    Text(priceInfo.buttonText)
+                        .foregroundStyle(EAColor.textPrimary)
+                        .font(EAFont.infoBold)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(EAColor.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    Spacer()
+                }
             }
+            .padding(.top, 12)
         }
-        .padding(.top, 12)
+    }
+
+    var priceImage: some View {
+        PriceImageSheet(imageURL: priceInfo.priceImage)
+            .presentationBackground(EAColor.background)
+            .presentationDragIndicator(.visible)
     }
 }
 

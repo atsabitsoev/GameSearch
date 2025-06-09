@@ -5,6 +5,8 @@
 //  Created by Бабочиев Эдуард Таймуразович on 13.05.2025.
 //
 
+import Foundation
+
 struct ClubDetailsData {
     init(club: FullClubData) {
         self.id = club.id
@@ -19,6 +21,7 @@ struct ClubDetailsData {
         self.rooms = club.configurations
         self.logo = club.logo
         self.addressData = LocationInfoData(address: club.addressData.address, long: club.addressData.longitude, lat: club.addressData.latitude)
+        self.allPricesImage = club.allPricesImage
     }
     
     let id: String
@@ -33,6 +36,7 @@ struct ClubDetailsData {
     let rooms: [RoomConfiguration]
     let logo: String
     let addressData: LocationInfoData
+    let allPricesImage: URL?
 }
 
 
