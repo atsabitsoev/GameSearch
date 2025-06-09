@@ -23,6 +23,7 @@ struct FullClubData {
     let tags: [String]
     let logo: String
     let phoneNumber: Int?
+    let allPricesImage: URL?
 }
 
 struct AddressData {
@@ -146,7 +147,8 @@ extension FullClubData {
             subscribers: 1500,
             tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
             logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg",
-            phoneNumber: 89284983000
+            phoneNumber: 89284983000,
+            allPricesImage: URL(string: "https://avatars.mds.yandex.net/get-tycoon/9716557/2a000001884e1239fe2b74f364da5c5e149d/M_height")
         ),
 
         FullClubData(
@@ -185,7 +187,8 @@ extension FullClubData {
             subscribers: 900,
             tags: ["VIP-zone", "VR", "Турниры", "Напитки", "Кондиционер"],
             logo: "https://www.beboss.pro/listings/fr/3397/frPcVGLu.jpg",
-            phoneNumber: 89604012886
+            phoneNumber: 89604012886,
+            allPricesImage: URL(string: "https://avatars.mds.yandex.net/get-tycoon/9716557/2a000001884e1239fe2b74f364da5c5e149d/M_height")
         )
     ]
 }

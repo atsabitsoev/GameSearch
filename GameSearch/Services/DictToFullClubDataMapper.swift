@@ -35,6 +35,7 @@ fileprivate extension FullClubData {
         let tags = dictionary["tags"] as? [String] ?? []
         let logo = dictionary["logo"] as? String ?? ""
         let phoneNumber = dictionary["phoneNumber"] as? Int
+        let allPricesImage = dictionary["allPricesImage"] as? String
 
         self.additionalInfo = additionalInfo
         self.description = description
@@ -51,6 +52,7 @@ fileprivate extension FullClubData {
         self.tags = tags
         self.logo = logo
         self.phoneNumber = phoneNumber
+        self.allPricesImage = URL(string: allPricesImage ?? "")
     }
 }
 

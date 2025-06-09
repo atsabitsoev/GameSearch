@@ -71,7 +71,8 @@ private extension ClubDetailsViewModel {
         return PriceInfoData(
             headerText: Constants.priceInfoHeader,
             roomsData: roomsData,
-            buttonText: Constants.priceInfoButton
+            buttonText: Constants.priceInfoButton,
+            priceImage: clubDetails.allPricesImage
         )
     }
     
@@ -118,8 +119,8 @@ private extension ClubDetailsViewModel {
 private enum Constants {
     
     static let priceInfoHeader = "Стоимость"
-    static let priceInfoButton = "Открыть прайс"
-    
+    static let priceInfoButton = "Все тарифы"
+
     
     static let infoTitle = "Описание"
 }

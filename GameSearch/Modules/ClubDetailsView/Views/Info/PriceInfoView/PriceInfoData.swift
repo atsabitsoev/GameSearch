@@ -12,6 +12,7 @@ struct PriceInfoData {
     let headerText: String
     let roomsData: [RoomUniversalData]
     let buttonText: String
+    let priceImage: URL?
 }
 
 struct RoomUniversalData: Identifiable {
