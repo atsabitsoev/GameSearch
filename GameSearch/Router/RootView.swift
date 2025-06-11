@@ -34,11 +34,11 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 }
                 .setupNavigationBarAppearance()
             }
-            Tab("Карта", systemImage: "map") {
-                Text("Тут был геннадий")
+            Tab("Акции", systemImage: "text.badge.star") {
+                factory.makePromosListView()
             }
             Tab("Новости", systemImage: "newspaper") {
-                NewsView()
+                factory.makeNewsView()
             }
         }
         .tint(EAColor.accent)
