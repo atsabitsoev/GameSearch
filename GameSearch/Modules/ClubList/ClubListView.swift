@@ -42,6 +42,7 @@ private extension ClubListView {
             mapView
             GeometryReader { listView($0) }
             mapListButton
+            mapPopupView
         }
         .background(EAColor.background)
         .onAppear {
@@ -60,8 +61,26 @@ private extension ClubListView {
     }
 
     var mapView: some View {
-        MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
-            .opacity(mapListButtonState.isMap ? 1 : 0)
+        MapView(
+            centerLocation: locationManager.location,
+            for: viewModel.mapClubs,
+            selectedClub: $viewModel.mapPopupClub
+        )
+        .opacity(mapListButtonState.isMap ? 1 : 0)
+    }
+    
+    @ViewBuilder
+    var mapPopupView: some View {
+        if let clubData = viewModel.mapPopupClub {
+            MapPopup(clubData: clubData) {
+                viewModel.mapPopupClub = nil
+            } onTap: {
+                viewModel.routeToDetails(clubID: clubData.id, router: router)
+            }
+            .padding(.bottom, 32)
+            .transition(.move(edge: .bottom))
+            .animation(.spring(), value: clubData)
+        }
     }
 
     var mapListButton: some View {
