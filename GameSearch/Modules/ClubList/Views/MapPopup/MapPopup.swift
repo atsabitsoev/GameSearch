@@ -167,13 +167,16 @@ private extension MapPopup {
     
     var shadowPlaceholder: some View {
         ZStack {
-            VStack {
+            VStack(spacing: 0){
                 Text(Constants.emptyLabel)
                     .foregroundStyle(.textPrimary)
                 Image("ghost")
                     .resizable()
                     .frame(width: 64, height: 64)
             }
+            .frame(maxWidth: .infinity, maxHeight: 147)
+            .background(EAColor.background)
+          
             LinearGradient(
                 gradient: Gradient(
                     colors: [
