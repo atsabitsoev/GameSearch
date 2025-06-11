@@ -21,4 +21,14 @@ final class ScreenFactory: ScreenFactoryProtocol {
         let viewModel = ClubDetailsViewModel(data: data, interactor: interactor)
         return ClubDetailsView(viewModel: viewModel)
     }
+    
+    
+    func makePromosListView() -> some View {
+        PromosListView()
+    }
+    
+    
+    func makeNewsView() -> some View {
+        NewsView()
+    }
 }
