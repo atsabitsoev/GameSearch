@@ -10,13 +10,19 @@ import MapKit
 
 struct MapView: View {
     @State private var location: MapCameraPosition = .automatic
+    @Binding private var selectedClub: MapClubData?
     
     private let centerLocation: CLLocationCoordinate2D
     private let mapClubs: [MapClubData]
     
-    init(centerLocation: CLLocationCoordinate2D? = nil, for clubs: [MapClubData]) {
+    init(
+        centerLocation: CLLocationCoordinate2D? = nil,
+        for clubs: [MapClubData],
+        selectedClub: Binding<MapClubData?>
+    ) {
         self.centerLocation = centerLocation ?? Constants.defaultCenterLocation
         self.mapClubs = clubs
+        self._selectedClub = selectedClub
     }
     
     var body: some View {
@@ -26,6 +32,7 @@ struct MapView: View {
                 Annotation("", coordinate: clubMapData.location) {
                     ClubMapAnnotation(clubMapName: clubMapData.name) {
                         location = .camera(.init(centerCoordinate: clubMapData.location, distance: 3000))
+                        selectedClub = clubMapData
                     }
                 }
             }
@@ -95,5 +102,5 @@ private enum Constants {
 }
 
 #Preview {
-    MapView(centerLocation: nil, for: [])
+    MapView(centerLocation: nil, for: [], selectedClub: Binding<MapClubData?>.constant(nil))
 }

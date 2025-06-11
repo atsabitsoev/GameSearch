@@ -15,6 +15,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published private var clubs: [FullClubData] = []
     @Published var mapClubs: [MapClubData] = []
     @Published var clubListCards: [ClubListCardData] = []
+    @Published var mapPopupClub: MapClubData?
     
     private var lastSearchedText: String = ""
     private var cancellables = Set<AnyCancellable>()

@@ -12,10 +12,18 @@ struct MapClubData {
         self.id = club.id
         self.name = club.name
         self.location = .init(latitude: club.addressData.latitude, longitude: club.addressData.longitude)
+        self.logo = URL(string: club.logo)
+        self.address = club.addressData.address
+        self.rating = String(club.rating)
+        self.image = URL(string: club.images.first ?? "")
     }
     let id: String
     let location: CLLocationCoordinate2D
     let name: String
+    let logo: URL?
+    let address: String?
+    let rating: String?
+    let image: URL?
 }
 
 extension MapClubData: Equatable {
