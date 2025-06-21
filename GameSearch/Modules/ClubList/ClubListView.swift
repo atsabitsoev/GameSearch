@@ -51,10 +51,16 @@ private extension ClubListView {
             locationManager.requestLocation()
             viewModel.onViewAppear()
         }
-        .onChange(of: searchFocused) { _, newValue in
-            if newValue && mapListButtonState == .map {
+        .onChange(of: searchFocused) { _, isFocused in
+            if isFocused, mapListButtonState == .map {
                 withAnimation(.spring(duration: 0.3)) {
+                    viewModel.clearMapPopupClub()
                     mapListButtonState = .list
+                }
+            }
+            if !isFocused, viewModel.mapPopupClub != nil {
+                withAnimation(.spring(duration: 0.3)) {
+                    viewModel.clearMapPopupClub()
                 }
             }
         }
@@ -71,15 +77,19 @@ private extension ClubListView {
     
     @ViewBuilder
     var mapPopupView: some View {
-        if let clubData = viewModel.mapPopupClub {
-            MapPopup(clubData: clubData) {
-                viewModel.mapPopupClub = nil
-            } onTap: {
-                viewModel.routeToDetails(clubID: clubData.id, router: router)
-            }
+        if let mapPopupClub = viewModel.mapPopupClub, mapListButtonState.isMap {
+            MapPopup(
+                data: mapPopupClub,
+                onTap: {
+                    viewModel.routeToDetails(clubID: mapPopupClub.selectedClub.id, router: router)
+                },
+                onDismiss: {
+                    viewModel.clearMapPopupClub()
+                }
+            )
             .padding(.bottom, 32)
             .transition(.move(edge: .bottom))
-            .animation(.spring(), value: clubData)
+            .animation(.spring(), value: mapPopupClub)
         }
     }
 

@@ -12,9 +12,9 @@ struct MapPopup: View {
     @State var dragOffset: CGFloat = 0
     
     
-    let clubData: MapClubData?
-    let onDismiss: () -> Void
+    let data: MapPopupData
     let onTap: () -> Void
+    let onDismiss: () -> Void
     
     
     var body: some View {
@@ -39,9 +39,13 @@ struct MapPopup: View {
 
 private extension MapPopup {
     var content: some View {
-        VStack(spacing: 0) {
-            topView
-            bottomContent
+        VStack {
+            switch data.state {
+            case .full:
+                fullView
+            case .min:
+                minView
+            }
         }
         .drawingGroup()
         .padding(.horizontal, 16)
@@ -50,15 +54,38 @@ private extension MapPopup {
             buttonsOverlay
         }
     }
+    
+    var fullView: some View {
+        VStack(spacing: 0) {
+            topView
+            bottomContent
+        }
+    }
+    
+    var minView: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(EAColor.info1)
+            HStack {
+                logoView
+                Spacer()
+                titleView
+                    .padding(.bottom, 4)
+                Spacer()
+                ratingView
+                    .padding(.trailing, 12)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: Constants.popupMinHeight)
+    }
+    
     var topView: some View {
         ZStack(alignment: .bottom) {
             imageView
                 .overlay(alignment: .topLeading) {
                     logoView
                 }
-            Text(clubData?.name ?? "")
-                .foregroundStyle(EAColor.textPrimary)
-                .font(EAFont.title)
+            titleView
         }
     }
     
@@ -73,6 +100,12 @@ private extension MapPopup {
         }
         .cornersRadius(bottom: 20)
         .frame(maxHeight: 111)
+    }
+    
+    var titleView: some View {
+        Text(data.selectedClub.name)
+            .foregroundStyle(EAColor.textPrimary)
+            .font(EAFont.title)
     }
     
     var buttonsOverlay: some View {
@@ -115,7 +148,7 @@ private extension MapPopup {
     
     var addressPriceView: some View {
         VStack {
-            Text(clubData?.address ?? "")
+            Text(data.selectedClub.address ?? "")
                 .font(.body)
                 .foregroundStyle(EAColor.textPrimary)
             Group {
@@ -135,14 +168,14 @@ private extension MapPopup {
                 .resizable()
                 .frame(width: 16, height: 16)
                 .foregroundStyle(.yellow)
-            Text(clubData?.rating ?? "")
+            Text(data.selectedClub.rating ?? "")
                 .font(.body)
                 .foregroundStyle(.textPrimary)
         }
     }
     
     var logoView: some View {
-        AsyncImage(url: clubData?.logo) { image in
+        AsyncImage(url: data.selectedClub.logo) { image in
             image
                 .resizable()
                 .aspectRatio(contentMode: .fill)
@@ -157,7 +190,7 @@ private extension MapPopup {
     }
     
     var imageView: some View {
-        AsyncImage(url: clubData?.image) { image in
+        AsyncImage(url: data.selectedClub.image) { image in
             shadowImage(image)
         } placeholder: {
             shadowPlaceholder
@@ -174,7 +207,7 @@ private extension MapPopup {
                     .resizable()
                     .frame(width: 64, height: 64)
             }
-            .frame(maxWidth: .infinity, maxHeight: 147)
+            .frame(maxWidth: .infinity, maxHeight: Constants.popupFullHeight)
             .background(EAColor.background)
           
             LinearGradient(
@@ -188,7 +221,7 @@ private extension MapPopup {
                 startPoint: .bottom,
                 endPoint: .top
             )
-            .frame(maxWidth: .infinity, maxHeight: 147)
+            .frame(maxWidth: .infinity, maxHeight: Constants.popupFullHeight)
         }
     }
     
@@ -197,7 +230,7 @@ private extension MapPopup {
             image
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: 147)
+                .frame(maxWidth: .infinity, maxHeight: Constants.popupFullHeight)
                 .clipped()
                 .cornerRadius(16)
             LinearGradient(
@@ -211,16 +244,20 @@ private extension MapPopup {
                 startPoint: .bottom,
                 endPoint: .top
             )
-            .frame(maxWidth: .infinity, maxHeight: 147)
+            .frame(maxWidth: .infinity, maxHeight: Constants.popupFullHeight)
         }
     }
     
     enum Constants {
         static let emptyLabel = "Фото нет"
         static let detailButtonTitle = "Подробнее"
+        
+        
+        static let popupFullHeight = 140.0
+        static let popupMinHeight = 70.0
     }
 }
 
 #Preview {
-    MapPopup(clubData: nil, onDismiss: {}, onTap: {})
+    MapPopup(data: .init(selectedClub: .init(club: FullClubData.mock[0]), state: .full), onTap: {}, onDismiss: {})
 }
