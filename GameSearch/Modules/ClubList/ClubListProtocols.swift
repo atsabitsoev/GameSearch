@@ -12,8 +12,10 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var searchText: String { get set }
     var clubListCards: [ClubListCardData] { get }
     var mapClubs: [MapClubData] { get }
+    var mapPopupClub: MapPopupData? { get set }
     
-    func onViewAppear() -> Void
+    func onViewAppear()
+    func clearMapPopupClub()
     func routeToDetails(clubID: String, router: Router)
 }
 

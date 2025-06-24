@@ -10,13 +10,19 @@ import MapKit
 
 struct MapView: View {
     @State private var location: MapCameraPosition = .automatic
+    @Binding private var selectedClub: MapPopupData?
     
     private let centerLocation: CLLocationCoordinate2D
     private let mapClubs: [MapClubData]
     
-    init(centerLocation: CLLocationCoordinate2D? = nil, for clubs: [MapClubData]) {
+    init(
+        centerLocation: CLLocationCoordinate2D? = nil,
+        for clubs: [MapClubData],
+        selectedClub: Binding<MapPopupData?>
+    ) {
         self.centerLocation = centerLocation ?? Constants.defaultCenterLocation
         self.mapClubs = clubs
+        self._selectedClub = selectedClub
     }
     
     var body: some View {
@@ -26,12 +32,19 @@ struct MapView: View {
                 Annotation("", coordinate: clubMapData.location) {
                     ClubMapAnnotation(clubMapName: clubMapData.name) {
                         location = .camera(.init(centerCoordinate: clubMapData.location, distance: 3000))
+                        selectedClub = MapPopupData(selectedClub: clubMapData, state: .full)
                     }
                 }
             }
         }
         .onChange(of: mapClubs) {
             updateCamera()
+        }
+        .onMapCameraChange(frequency: .continuous) {
+            setPopupState(.min)
+        }
+        .onMapCameraChange(frequency: .onEnd) {
+            setPopupState(.full)
         }
         .mapControls {
             MapUserLocationButton()
@@ -41,6 +54,14 @@ struct MapView: View {
 
 
 private extension MapView {
+    func setPopupState(_ state: MapPopupState) {
+        if selectedClub != nil {
+            withAnimation {
+                selectedClub?.state = state
+            }
+        }
+    }
+    
     func updateCamera() {
         if let closestClub = closestPoint(to: centerLocation, from: mapClubs.map(\.location)) {
             let region = regionThatFits(points: [centerLocation, closestClub])
@@ -95,5 +116,5 @@ private enum Constants {
 }
 
 #Preview {
-    MapView(centerLocation: nil, for: [])
+    MapView(centerLocation: nil, for: [], selectedClub: Binding<MapPopupData?>.constant(nil))
 }

@@ -42,6 +42,7 @@ private extension ClubListView {
             mapView
             GeometryReader { listView($0) }
             mapListButton
+            mapPopupView
         }
         .background(EAColor.background)
         .onAppear {
@@ -50,18 +51,46 @@ private extension ClubListView {
             locationManager.requestLocation()
             viewModel.onViewAppear()
         }
-        .onChange(of: searchFocused) { _, newValue in
-            if newValue && mapListButtonState == .map {
+        .onChange(of: searchFocused) { _, isFocused in
+            if isFocused, mapListButtonState == .map {
                 withAnimation(.spring(duration: 0.3)) {
+                    viewModel.clearMapPopupClub()
                     mapListButtonState = .list
+                }
+            }
+            if !isFocused, viewModel.mapPopupClub != nil {
+                withAnimation(.spring(duration: 0.3)) {
+                    viewModel.clearMapPopupClub()
                 }
             }
         }
     }
 
     var mapView: some View {
-        MapView(centerLocation: locationManager.location, for: viewModel.mapClubs)
-            .opacity(mapListButtonState.isMap ? 1 : 0)
+        MapView(
+            centerLocation: locationManager.location,
+            for: viewModel.mapClubs,
+            selectedClub: $viewModel.mapPopupClub
+        )
+        .opacity(mapListButtonState.isMap ? 1 : 0)
+    }
+    
+    @ViewBuilder
+    var mapPopupView: some View {
+        if let mapPopupClub = viewModel.mapPopupClub, mapListButtonState.isMap {
+            MapPopup(
+                data: mapPopupClub,
+                onTap: {
+                    viewModel.routeToDetails(clubID: mapPopupClub.selectedClub.id, router: router)
+                },
+                onDismiss: {
+                    viewModel.clearMapPopupClub()
+                }
+            )
+            .padding(.bottom, 32)
+            .transition(.move(edge: .bottom))
+            .animation(.spring(), value: mapPopupClub)
+        }
     }
 
     var mapListButton: some View {
