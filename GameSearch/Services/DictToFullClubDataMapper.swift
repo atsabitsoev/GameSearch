@@ -34,7 +34,7 @@ fileprivate extension FullClubData {
         let subscribers = dictionary["subscribers"] as? Int ?? 0
         let tags = dictionary["tags"] as? [String] ?? []
         let logo = dictionary["logo"] as? String ?? ""
-        let phoneNumber = dictionary["phoneNumber"] as? Int
+        let phoneNumber = dictionary["phoneNumber"] as? String
         let allPricesImage = dictionary["allPricesImage"] as? String
 
         self.additionalInfo = additionalInfo
@@ -118,7 +118,7 @@ fileprivate extension PCConfiguration {
             let monitor = dictionary["monitor"] as? String,
             let monitorDiag = dictionary["monitorDiag"] as? Int,
             let mouse = dictionary["mouse"] as? String,
-            let ram = dictionary["ram"] as? Int,
+            let ram = dictionary["ram"] as? String,
             let roomName = dictionary["roomName"] as? String,
             let stationCount = dictionary["stationCount"] as? Int,
             let type = dictionary["type"] as? String,

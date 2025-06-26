@@ -12,7 +12,7 @@ struct ClubDetailsVMOutput {
     let locationInfo: LocationInfoData
     let specsData: [RoomSpecsData]
     let images: [String]
-    let phone: Int?
+    let phone: String?
     let name: String
     let rating: String
     let logo: String?

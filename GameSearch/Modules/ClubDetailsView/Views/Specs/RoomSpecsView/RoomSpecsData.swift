@@ -16,7 +16,7 @@ struct RoomSpecsData: Identifiable, Hashable {
     let mouse: String
     let keyboard: String
     let headphones: String
-    let ram: Int
+    let ram: String
     let monitorBrand: String
     let monitorDiag: Int
     let hz: Int

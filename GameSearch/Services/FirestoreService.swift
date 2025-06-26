@@ -42,15 +42,18 @@ final class FirestoreService: NetworkServiceProtocol {
 }
 
 private extension FirestoreService {
-    func getClubsPublisher(filter: ClubsFilter?) -> Future<QuerySnapshot, any Error> {
+    func getClubsPublisher(filter: ClubsFilter?, startFrom: Int = 0, limit: Int = 15) -> Future<QuerySnapshot, any Error> {
         switch filter {
         case .name(let name):
             return db.collection("clubs")
                 .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
                 .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
+                .limit(to: 15)
                 .getDocuments()
         case nil:
-            return db.collection("clubs").getDocuments()
+            return db.collection("clubs")
+                .limit(to: limit)
+                .getDocuments()
         }
     }
 }
