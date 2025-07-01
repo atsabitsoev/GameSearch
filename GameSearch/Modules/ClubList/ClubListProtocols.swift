@@ -15,7 +15,7 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var mapPopupClub: MapPopupData? { get set }
     
     func onViewAppear()
-    func onScrollToEnd()
+    func onScrollToEnd(with cardID: String)
     func clearMapPopupClub()
     func routeToDetails(clubID: String, router: Router)
 }
