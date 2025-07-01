@@ -9,69 +9,103 @@ import Combine
 import FirebaseFirestore
 import FirebaseFirestoreCombineSwift
 
+// MARK: - Pagination Models
+struct PaginationState {
+    let lastDocument: DocumentSnapshot?
+    let hasMoreData: Bool
+    
+    static let initial = PaginationState(lastDocument: nil, hasMoreData: true)
+}
 
+struct PaginatedResult<T> {
+    let items: [T]
+    let paginationState: PaginationState
+}
+
+// MARK: - Updated Protocol
 protocol NetworkServiceProtocol {
-    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[FullClubData], any Error>
+    func fetchClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
+    func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
+    func fetchNextPageClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
 }
 
 extension NetworkServiceProtocol {
-    func fetchClubs() -> AnyPublisher<[FullClubData], any Error> {
-        fetchClubs(filter: nil)
+    func fetchFirstPageClubs() -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
+        fetchFirstPageClubs(filter: nil)
+    }
+    
+    func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
+        fetchClubs(filter: filter, paginationState: .initial)
+    }
+    
+    func fetchNextPageClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
+        fetchClubs(filter: filter, paginationState: paginationState)
     }
 }
 
-
+// MARK: - Updated Service
 final class FirestoreService: NetworkServiceProtocol {
     private let db = Firestore.firestore()
     private let mapper: DataMapperProtocol = DataMapper()
+    private let pageSize: Int = 15
     
-    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[FullClubData], any Error> {
-        return Future<[FullClubData], Error> { promise in
-            ClubParserService.parse(
-                clubLinks: [
-                    URL(string: "https://langame.ru/799451573_computerniy_club_altpc_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799449913_computerniy_club_true-gamers-zelenograd_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799451215_computerniy_club_colizeum-zelenograd_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/682344255_computerniy_club_cyber-arena-storm-v-k1640_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799449748_computerniy_club_black-zelenograd_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799452588_computerniy_club_kiber-kub_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799450982_computerniy_club_cyberx-zelenograd-317_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799450215_computerniy_club_cyberx-zelenograd-georgievskii_moskva_zelenograd")!,
-                    URL(string: "https://langame.ru/799449380_computerniy_club_black-star-gaming-zelenograd_moskva_zelenograd")!
-                ]
-            ) { result in
-                promise(.success(result))
-            }
-        }
-                .eraseToAnyPublisher()
-//        getClubsPublisher(filter: filter)
-//            .map({ collectionSnapshot in
-//                collectionSnapshot.documents
-//                    .compactMap { [weak self] docSnapshot in
-//                        guard let self else {
-//                            print("FirestoreService выгрузился из памяти")
-//                            return nil
-//                        }
-//                        return self.mapper.mapToFullClubData(id: docSnapshot.documentID, docSnapshot.data())
-//                    }
-//            })
-//            .eraseToAnyPublisher()
+    func fetchClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
+        getClubsPublisher(filter: filter, paginationState: paginationState)
+            .map({ [weak self] collectionSnapshot in
+                guard let self = self else {
+                    print("FirestoreService выгрузился из памяти")
+                    return PaginatedResult(items: [], paginationState: PaginationState(lastDocument: nil, hasMoreData: false))
+                }
+                
+                let clubs = collectionSnapshot.documents
+                    .compactMap { docSnapshot in
+                        self.mapper.mapToFullClubData(id: docSnapshot.documentID, docSnapshot.data())
+                    }
+                
+                // Определяем, есть ли еще данные
+                let hasMoreData = collectionSnapshot.documents.count == self.pageSize
+                let lastDocument = collectionSnapshot.documents.last
+                
+                let newPaginationState = PaginationState(
+                    lastDocument: lastDocument,
+                    hasMoreData: hasMoreData
+                )
+                
+                return PaginatedResult(items: clubs, paginationState: newPaginationState)
+            })
+            .eraseToAnyPublisher()
     }
 }
 
+// MARK: - Private Extensions
 private extension FirestoreService {
-    func getClubsPublisher(filter: ClubsFilter?, startFrom: Int = 0, limit: Int = 15) -> Future<QuerySnapshot, any Error> {
+    func getClubsPublisher(filter: ClubsFilter?, paginationState: PaginationState) -> Future<QuerySnapshot, any Error> {
+        let baseQuery = buildBaseQuery(filter: filter)
+        let paginatedQuery = applyPagination(to: baseQuery, paginationState: paginationState)
+        
+        return paginatedQuery.getDocuments()
+    }
+    
+    func buildBaseQuery(filter: ClubsFilter?) -> Query {
         switch filter {
         case .name(let name):
             return db.collection("clubs")
                 .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
                 .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
-                .limit(to: 15)
-                .getDocuments()
+                .order(by: "nameLowercase") // Важно для пагинации с фильтрами
         case nil:
             return db.collection("clubs")
-                .limit(to: limit)
-                .getDocuments()
+                .order(by: FieldPath.documentID()) // Сортировка по ID для стабильной пагинации
         }
+    }
+    
+    func applyPagination(to query: Query, paginationState: PaginationState) -> Query {
+        var paginatedQuery = query.limit(to: pageSize)
+        
+        if let lastDocument = paginationState.lastDocument {
+            paginatedQuery = paginatedQuery.start(afterDocument: lastDocument)
+        }
+        
+        return paginatedQuery
     }
 }

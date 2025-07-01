@@ -15,17 +15,23 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var mapPopupClub: MapPopupData? { get set }
     
     func onViewAppear()
+    func onScrollToEnd()
     func clearMapPopupClub()
     func routeToDetails(clubID: String, router: Router)
 }
 
 
 protocol ClubListInteractorProtocol {
-    func fetchClubs(filter: ClubsFilter?) -> AnyPublisher<[FullClubData], Error>
+    func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
+    func fetchNextPageClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
 }
 
 extension ClubListInteractorProtocol {
-    func fetchClubs() -> AnyPublisher<[FullClubData], Error> {
-        fetchClubs(filter: nil)
+    func fetchFirstPageClubs() -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
+        fetchFirstPageClubs(filter: nil)
+    }
+    
+    func fetchNextPageClubs(paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
+        fetchNextPageClubs(filter: nil, paginationState: paginationState)
     }
 }

@@ -16,8 +16,11 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published var mapClubs: [MapClubData] = []
     @Published var clubListCards: [ClubListCardData] = []
     @Published var mapPopupClub: MapPopupData?
+    @Published var isLoading = false
+    @Published var hasMoreData = true
     
     private var lastSearchedText: String = ""
+    private var currentPaginationState = PaginationState.initial
     private var cancellables = Set<AnyCancellable>()
     
     
@@ -28,7 +31,11 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     
     
     func onViewAppear() {
-        fetchClubs()
+        loadFirstPage()
+    }
+    
+    func onScrollToEnd() {
+        loadNextPage()
     }
     
     func routeToDetails(clubID: String, router: Router) {
@@ -56,23 +63,55 @@ private extension ClubListViewModel {
             .store(in: &cancellables)
     }
     
-    func fetchClubs(filter: ClubsFilter? = nil) {
-        interactor.fetchClubs(filter: filter)
-            .receive(on: RunLoop.main)
-            .sink { completion in
-                if case let .failure(error) = completion {
-                    print(error.localizedDescription)
-                }
-            } receiveValue: { clubs in
-                self.updateClubs(clubs)
-            }
-            .store(in: &cancellables)
-    }
+    func loadFirstPage(filter: ClubsFilter? = nil) {
+            isLoading = true
+            
+        interactor.fetchFirstPageClubs(filter: filter)
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        self?.isLoading = false
+                        if case .failure(let error) = completion {
+                            print(error.localizedDescription)
+                        }
+                    },
+                    receiveValue: { [weak self] result in
+                        self?.updateClubs(result.items)
+                        self?.currentPaginationState = result.paginationState
+                        self?.hasMoreData = result.paginationState.hasMoreData
+                    }
+                )
+                .store(in: &cancellables)
+        }
+        
+        // Загрузка следующей страницы
+        func loadNextPage() {
+            guard hasMoreData && !isLoading else { return }
+            
+            isLoading = true
+            
+            interactor.fetchNextPageClubs(filter: searchText.isEmpty ? nil : .name(searchText), paginationState: currentPaginationState)
+                .receive(on: DispatchQueue.main)
+                .sink(
+                    receiveCompletion: { [weak self] completion in
+                        self?.isLoading = false
+                        if case .failure(let error) = completion {
+                            print(error.localizedDescription)
+                        }
+                    },
+                    receiveValue: { [weak self] result in
+                        self?.addClubs(result.items)
+                        self?.currentPaginationState = result.paginationState
+                        self?.hasMoreData = result.paginationState.hasMoreData
+                    }
+                )
+                .store(in: &cancellables)
+        }
     
     func searchTextChanged(_ searchText: String) {
         guard lastSearchedText != searchText else { return }
         lastSearchedText = searchText
-        fetchClubs(filter: searchText.isEmpty ? nil : .name(searchText))
+        loadFirstPage(filter: searchText.isEmpty ? nil : .name(searchText))
     }
     
     func updateClubs(_ clubs: [FullClubData]) {
@@ -87,6 +126,20 @@ private extension ClubListViewModel {
     
     func updateClubListCards(by clubs: [FullClubData]) {
         clubListCards = clubs.getListCardData()
+    }
+    
+    func addClubs(_ clubs: [FullClubData]) {
+        self.clubs.append(contentsOf: clubs)
+        addMapClubs(by: clubs)
+        addClubListCards(by: clubs)
+    }
+    
+    func addMapClubs(by clubs: [FullClubData]) {
+        mapClubs.append(contentsOf: clubs.getMapClubData())
+    }
+    
+    func addClubListCards(by clubs: [FullClubData]) {
+        clubListCards.append(contentsOf: clubs.getListCardData())
     }
     
     func getClubDetails(by clubID: String) -> ClubDetailsData? {
