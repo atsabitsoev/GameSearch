@@ -127,8 +127,6 @@ private enum SpecBlockType {
         case .ram: return "\(data.ram) ГБ"
         case .monitor:
             return data.monitorBrand
-            + "\n\(data.monitorDiag)'' "
-            + "\(data.hz) Hz"
         case .headphones: return "HyperX Cloud II"
         }
     }
@@ -146,7 +144,7 @@ private enum SpecBlockType {
             mouse: "Logitech G502",
             keyboard: "Logitech G Pro",
             headphones: "HyperX Cloud II",
-            ram: 32,
+            ram: "32",
             monitorBrand: "AOC 27G2",
             monitorDiag: 27,
             hz: 144

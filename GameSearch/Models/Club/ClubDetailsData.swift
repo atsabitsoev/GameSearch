@@ -32,7 +32,7 @@ struct ClubDetailsData {
     let images: [String]
     let prices: String
     let additionalInfo: String
-    let phoneNumber: Int?
+    let phoneNumber: String?
     let rooms: [RoomConfiguration]
     let logo: String
     let addressData: LocationInfoData

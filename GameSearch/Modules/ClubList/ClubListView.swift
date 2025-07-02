@@ -140,6 +140,9 @@ private extension ClubListView {
             .onTapGesture {
                 viewModel.routeToDetails(clubID: card.id, router: router)
             }
+            .onAppear {
+                viewModel.onScrollToEnd(with: card.id)
+            }
     }
 }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC03C71F2E0B1D9F0044A607 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = AC03C71E2E0B1D9F0044A607 /* SwiftSoup */; };
 		ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				AC03C71F2E0B1D9F0044A607 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +73,7 @@
 			name = GameSearch;
 			packageProductDependencies = (
 				ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */,
+				AC03C71E2E0B1D9F0044A607 /* SwiftSoup */,
 			);
 			productName = GameSearch;
 			productReference = ACD377732DCE48F0003874AA /* GameSearch.app */;
@@ -101,6 +104,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				ACDF4B042DD5097300DE3332 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = ACD377742DCE48F0003874AA /* Products */;
@@ -350,6 +354,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.8;
+			};
+		};
 		ACDF4B042DD5097300DE3332 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -361,6 +373,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AC03C71E2E0B1D9F0044A607 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
 		ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = ACDF4B042DD5097300DE3332 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
