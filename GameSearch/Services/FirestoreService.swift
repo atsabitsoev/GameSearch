@@ -46,7 +46,6 @@ final class FirestoreService: NetworkServiceProtocol {
                         self.mapper.mapToFullClubData(id: docSnapshot.documentID, docSnapshot.data())
                     }
                 
-                // Определяем, есть ли еще данные
                 let hasMoreData = collectionSnapshot.documents.count == self.pageSize
                 let lastDocument = collectionSnapshot.documents.last
                 
@@ -76,10 +75,9 @@ private extension FirestoreService {
             return db.collection("clubs")
                 .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
                 .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
-                .order(by: "nameLowercase") // Важно для пагинации с фильтрами
+                .order(by: "nameLowercase")
         case nil:
             return db.collection("clubs")
-                .order(by: FieldPath.documentID()) // Сортировка по ID для стабильной пагинации
         }
     }
     

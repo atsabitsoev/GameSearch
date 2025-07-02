@@ -36,7 +36,6 @@ final class ClubParser {
     }
     
     private func fetchClubs(page: Int, completion: @escaping ([FullClubData], Bool) -> Void) {
-        // URL с параметрами запроса
         let urlString = "\(baseUrl)/computerniy_club_rossiya?page=\(page)&search=&order=rating&order_key=desc&show=list"
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
