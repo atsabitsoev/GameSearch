@@ -34,8 +34,10 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
         loadFirstPage()
     }
     
-    func onScrollToEnd() {
-        loadNextPage()
+    func onScrollToEnd(with cardID: String) {
+        if cardID == clubListCards.last?.id {
+            loadNextPage()
+        }
     }
     
     func routeToDetails(clubID: String, router: Router) {
@@ -64,49 +66,49 @@ private extension ClubListViewModel {
     }
     
     func loadFirstPage(filter: ClubsFilter? = nil) {
-            isLoading = true
-            
-        interactor.fetchFirstPageClubs(filter: filter)
-                .receive(on: DispatchQueue.main)
-                .sink(
-                    receiveCompletion: { [weak self] completion in
-                        self?.isLoading = false
-                        if case .failure(let error) = completion {
-                            print(error.localizedDescription)
-                        }
-                    },
-                    receiveValue: { [weak self] result in
-                        self?.updateClubs(result.items)
-                        self?.currentPaginationState = result.paginationState
-                        self?.hasMoreData = result.paginationState.hasMoreData
-                    }
-                )
-                .store(in: &cancellables)
-        }
+        isLoading = true
         
-        // Загрузка следующей страницы
-        func loadNextPage() {
-            guard hasMoreData && !isLoading else { return }
-            
-            isLoading = true
-            
-            interactor.fetchNextPageClubs(filter: searchText.isEmpty ? nil : .name(searchText), paginationState: currentPaginationState)
-                .receive(on: DispatchQueue.main)
-                .sink(
-                    receiveCompletion: { [weak self] completion in
-                        self?.isLoading = false
-                        if case .failure(let error) = completion {
-                            print(error.localizedDescription)
-                        }
-                    },
-                    receiveValue: { [weak self] result in
-                        self?.addClubs(result.items)
-                        self?.currentPaginationState = result.paginationState
-                        self?.hasMoreData = result.paginationState.hasMoreData
+        interactor.fetchFirstPageClubs(filter: filter)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    self?.isLoading = false
+                    if case .failure(let error) = completion {
+                        print(error.localizedDescription)
                     }
-                )
-                .store(in: &cancellables)
-        }
+                },
+                receiveValue: { [weak self] result in
+                    self?.updateClubs(result.items)
+                    self?.currentPaginationState = result.paginationState
+                    self?.hasMoreData = result.paginationState.hasMoreData
+                }
+            )
+            .store(in: &cancellables)
+    }
+    
+    // Загрузка следующей страницы
+    func loadNextPage() {
+        guard hasMoreData && !isLoading else { return }
+
+        isLoading = true
+        
+        interactor.fetchNextPageClubs(filter: searchText.isEmpty ? nil : .name(searchText), paginationState: currentPaginationState)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    self?.isLoading = false
+                    if case .failure(let error) = completion {
+                        print(error.localizedDescription)
+                    }
+                },
+                receiveValue: { [weak self] result in
+                    self?.addClubs(result.items)
+                    self?.currentPaginationState = result.paginationState
+                    self?.hasMoreData = result.paginationState.hasMoreData
+                }
+            )
+            .store(in: &cancellables)
+    }
     
     func searchTextChanged(_ searchText: String) {
         guard lastSearchedText != searchText else { return }

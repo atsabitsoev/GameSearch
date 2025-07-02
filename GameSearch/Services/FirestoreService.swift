@@ -9,18 +9,6 @@ import Combine
 import FirebaseFirestore
 import FirebaseFirestoreCombineSwift
 
-// MARK: - Pagination Models
-struct PaginationState {
-    let lastDocument: DocumentSnapshot?
-    let hasMoreData: Bool
-    
-    static let initial = PaginationState(lastDocument: nil, hasMoreData: true)
-}
-
-struct PaginatedResult<T> {
-    let items: [T]
-    let paginationState: PaginationState
-}
 
 // MARK: - Updated Protocol
 protocol NetworkServiceProtocol {
@@ -30,10 +18,6 @@ protocol NetworkServiceProtocol {
 }
 
 extension NetworkServiceProtocol {
-    func fetchFirstPageClubs() -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
-        fetchFirstPageClubs(filter: nil)
-    }
-    
     func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
         fetchClubs(filter: filter, paginationState: .initial)
     }

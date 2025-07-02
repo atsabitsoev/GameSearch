@@ -106,11 +106,6 @@ private extension ClubListView {
     func listView(_ geo: GeometryProxy) -> some View {
         List(viewModel.clubListCards, id: \.id) { card in
             clubListCell(card)
-                .onAppear {
-                    if card.id == viewModel.clubListCards.last?.id {
-                        viewModel.onScrollToEnd()
-                    }
-                }
         }
         .background(EAColor.background.ignoresSafeArea(.keyboard))
         .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
@@ -144,6 +139,9 @@ private extension ClubListView {
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             .onTapGesture {
                 viewModel.routeToDetails(clubID: card.id, router: router)
+            }
+            .onAppear {
+                viewModel.onScrollToEnd(with: card.id)
             }
     }
 }
