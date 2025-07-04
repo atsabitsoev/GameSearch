@@ -6,6 +6,7 @@
 //
 
 import Combine
+import CoreLocation
 
 
 protocol ClubListViewModelProtocol: ObservableObject {
@@ -13,25 +14,27 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var clubListCards: [ClubListCardData] { get }
     var mapClubs: [MapClubData] { get }
     var mapPopupClub: MapPopupData? { get set }
+    var locationManager: LocationManager { get set }
+    var cameraRegion: CameraRegion { get set }
+    var mapListButtonState: MapListButtonState { get set }
+    var geoApplied: Bool { get }
     
+    func onGeoButtonTap()
     func onViewAppear()
-    func onScrollToEnd(with cardID: String)
     func clearMapPopupClub()
     func routeToDetails(clubID: String, router: Router)
 }
 
 
 protocol ClubListInteractorProtocol {
-    func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
-    func fetchNextPageClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error>
 }
 
 extension ClubListInteractorProtocol {
-    func fetchFirstPageClubs() -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
-        fetchFirstPageClubs(filter: nil)
+    func fetchClubs(filter: ClubsFilter) -> AnyPublisher<[FullClubData], any Error> {
+        fetchClubs(filter: filter, radius: nil)
     }
-    
-    func fetchNextPageClubs(paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
-        fetchNextPageClubs(filter: nil, paginationState: paginationState)
+    func fetchClubs(radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
+        fetchClubs(filter: nil, radius: radius)
     }
 }

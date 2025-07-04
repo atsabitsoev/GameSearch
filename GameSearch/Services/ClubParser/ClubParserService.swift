@@ -38,7 +38,7 @@ final class ClubParserService {
                 print(clubLink.absoluteString)
                 let images = try document.select("div.club__images-wrapper.d-none.d-lg-block").select("img").map{ try $0.attr("data-src")}
                 let correctedImages = images.map { imageLink in
-                    if imageLink.hasPrefix("https://langame.ru") {
+                    if imageLink.hasPrefix(coreUrl) {
                         return imageLink
                     } else {
                         return "https://langame.ru" + imageLink
@@ -50,7 +50,9 @@ final class ClubParserService {
                 let rating = Double(try document.select("p.rating__value.text-regular.ps-3.mb-0").text()) ?? 0
                 let tags = try document.select("ul.club__services-list.w-100.mb-2").select("li.d-flex.align-items-center").map{ try $0.text() }
                 let phone = try document.select("a.d-flex.align-items-center").select("b").text()
-                let priceImage = URL(string: coreUrl + (try document.select("section.club__price.mb-5").select("a").map({ try $0.attr("data-src") }).first ?? ""))
+                let priceImageLink = try document.select("section.club__price.mb-5").select("a").map({ try $0.attr("data-src") }).first ?? ""
+                let addingCoreUrl = priceImageLink.hasPrefix(coreUrl) ? "" : coreUrl
+                let priceImage = URL(string: addingCoreUrl + priceImageLink)
                 let tableHead = try document.select("thead.club__configuration-table-thead").select("th")
                 let roomNames = try tableHead.compactMap{ try $0.select("p").first()?.text() }
                 let pcCounts = try tableHead.map{ try Int($0.select("p").last()?.text().split(separator: " ").first ?? "") ?? 0 }

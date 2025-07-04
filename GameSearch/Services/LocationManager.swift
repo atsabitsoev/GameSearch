@@ -9,6 +9,8 @@ import MapKit
 
 final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     let manager = CLLocationManager()
+    private var locationGot = false
+    var onLocationGot: () -> () = {}
     
     @Published var location: CLLocationCoordinate2D?
     
@@ -25,5 +27,9 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         location = locations.first?.coordinate
+        if !locationGot {
+            onLocationGot()
+            locationGot = true
+        }
     }
 }

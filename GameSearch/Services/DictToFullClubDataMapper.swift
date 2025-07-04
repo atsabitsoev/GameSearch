@@ -60,9 +60,8 @@ fileprivate extension FullClubData {
 fileprivate extension AddressData {
     init(dictionary: [String: Any]) {
         self.address = dictionary["address"] as? String ?? ""
-        let geopoint = dictionary["geopoint"] as? GeoPoint
-        self.longitude = geopoint?.longitude ?? 0
-        self.latitude = geopoint?.latitude ?? 0
+        self.latitude = dictionary["latitude"] as? Double ?? 0
+        self.longitude = dictionary["longitude"] as? Double ?? 0
     }
 }
 

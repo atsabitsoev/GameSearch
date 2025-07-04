@@ -4,12 +4,10 @@ import MapKit
 struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     @EnvironmentObject private var router: Router
     @StateObject private var viewModel: ViewModel
-    @StateObject private var locationManager = LocationManager()
 
     @FocusState private var searchFocused
     @State private var searchActive = false
     @State private var viewDidAppear = false
-    @State private var mapListButtonState: MapListButtonState = .list
 
 
     init(viewModel: ViewModel) {
@@ -41,21 +39,24 @@ private extension ClubListView {
         ZStack(alignment: .bottom) {
             mapView
             GeometryReader { listView($0) }
-            mapListButton
+            HStack {
+                mapListButton
+                geoButton
+            }
             mapPopupView
         }
         .background(EAColor.background)
         .onAppear {
             guard !viewDidAppear else { return }
             viewDidAppear = true
-            locationManager.requestLocation()
+            viewModel.locationManager.requestLocation()
             viewModel.onViewAppear()
         }
         .onChange(of: searchFocused) { _, isFocused in
-            if isFocused, mapListButtonState == .map {
+            if isFocused && viewModel.mapListButtonState.isMap {
                 withAnimation(.spring(duration: 0.3)) {
                     viewModel.clearMapPopupClub()
-                    mapListButtonState = .list
+                    viewModel.mapListButtonState = .list
                 }
             }
             if !isFocused, viewModel.mapPopupClub != nil {
@@ -68,16 +69,17 @@ private extension ClubListView {
 
     var mapView: some View {
         MapView(
-            centerLocation: locationManager.location,
+            centerLocation: viewModel.locationManager.location,
             for: viewModel.mapClubs,
-            selectedClub: $viewModel.mapPopupClub
+            selectedClub: $viewModel.mapPopupClub,
+            cameraRegion: $viewModel.cameraRegion
         )
-        .opacity(mapListButtonState.isMap ? 1 : 0)
+        .opacity(viewModel.mapListButtonState.isMap ? 1 : 0)
     }
     
     @ViewBuilder
     var mapPopupView: some View {
-        if let mapPopupClub = viewModel.mapPopupClub, mapListButtonState.isMap {
+        if let mapPopupClub = viewModel.mapPopupClub, viewModel.mapListButtonState.isMap {
             MapPopup(
                 data: mapPopupClub,
                 onTap: {
@@ -96,10 +98,32 @@ private extension ClubListView {
     var mapListButton: some View {
         VStack {
             Spacer()
-            MapListButton(buttonState: $mapListButtonState)
+            MapListButton(buttonState: $viewModel.mapListButtonState)
                 .padding(.bottom, 16)
         }
         .ignoresSafeArea(.keyboard)
+    }
+    
+    @ViewBuilder
+    var geoButton: some View {
+        if !viewModel.geoApplied {
+            VStack {
+                Spacer()
+                Button {
+                    viewModel.onGeoButtonTap()
+                } label: {
+                    Image(systemName: "location")
+                        .fontWeight(.bold)
+                        .padding()
+                        .background(.white)
+                        .clipShape(
+                            Circle()
+                        )
+                }
+                .padding(.bottom, 16)
+            }
+            .ignoresSafeArea(.keyboard)
+        }
     }
 
 
@@ -108,8 +132,8 @@ private extension ClubListView {
             clubListCell(card)
         }
         .background(EAColor.background.ignoresSafeArea(.keyboard))
-        .offset(y: mapListButtonState.isMap ? geo.size.height : 0)
-        .opacity(mapListButtonState.isMap ? 0 : 1)
+        .offset(y: viewModel.mapListButtonState.isMap ? geo.size.height : 0)
+        .opacity(viewModel.mapListButtonState.isMap ? 0 : 1)
         .scrollContentBackground(.hidden)
         .listStyle(.plain)
         .searchable(
@@ -139,9 +163,6 @@ private extension ClubListView {
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             .onTapGesture {
                 viewModel.routeToDetails(clubID: card.id, router: router)
-            }
-            .onAppear {
-                viewModel.onScrollToEnd(with: card.id)
             }
     }
 }

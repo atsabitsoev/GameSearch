@@ -8,23 +8,12 @@
 import Combine
 import FirebaseFirestore
 import FirebaseFirestoreCombineSwift
+import CoreLocation
 
 
 // MARK: - Updated Protocol
 protocol NetworkServiceProtocol {
-    func fetchClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
-    func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
-    func fetchNextPageClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error>
-}
-
-extension NetworkServiceProtocol {
-    func fetchFirstPageClubs(filter: ClubsFilter?) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
-        fetchClubs(filter: filter, paginationState: .initial)
-    }
-    
-    func fetchNextPageClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
-        fetchClubs(filter: filter, paginationState: paginationState)
-    }
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error>
 }
 
 // MARK: - Updated Service
@@ -33,12 +22,12 @@ final class FirestoreService: NetworkServiceProtocol {
     private let mapper: DataMapperProtocol = DataMapper()
     private let pageSize: Int = 15
     
-    func fetchClubs(filter: ClubsFilter?, paginationState: PaginationState) -> AnyPublisher<PaginatedResult<FullClubData>, any Error> {
-        getClubsPublisher(filter: filter, paginationState: paginationState)
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error> {
+        getClubsPublisher(filter: filter, radius: radius)
             .map({ [weak self] collectionSnapshot in
                 guard let self = self else {
                     print("FirestoreService выгрузился из памяти")
-                    return PaginatedResult(items: [], paginationState: PaginationState(lastDocument: nil, hasMoreData: false))
+                    return []
                 }
                 
                 let clubs = collectionSnapshot.documents
@@ -46,15 +35,7 @@ final class FirestoreService: NetworkServiceProtocol {
                         self.mapper.mapToFullClubData(id: docSnapshot.documentID, docSnapshot.data())
                     }
                 
-                let hasMoreData = collectionSnapshot.documents.count == self.pageSize
-                let lastDocument = collectionSnapshot.documents.last
-                
-                let newPaginationState = PaginationState(
-                    lastDocument: lastDocument,
-                    hasMoreData: hasMoreData
-                )
-                
-                return PaginatedResult(items: clubs, paginationState: newPaginationState)
+                return clubs
             })
             .eraseToAnyPublisher()
     }
@@ -62,32 +43,40 @@ final class FirestoreService: NetworkServiceProtocol {
 
 // MARK: - Private Extensions
 private extension FirestoreService {
-    func getClubsPublisher(filter: ClubsFilter?, paginationState: PaginationState) -> Future<QuerySnapshot, any Error> {
-        let baseQuery = buildBaseQuery(filter: filter)
-        let paginatedQuery = applyPagination(to: baseQuery, paginationState: paginationState)
-        
-        return paginatedQuery.getDocuments()
-    }
-    
-    func buildBaseQuery(filter: ClubsFilter?) -> Query {
-        switch filter {
-        case .name(let name):
-            return db.collection("clubs")
-                .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
-                .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
-                .order(by: "nameLowercase")
-        case nil:
-            return db.collection("clubs")
-        }
-    }
-    
-    func applyPagination(to query: Query, paginationState: PaginationState) -> Query {
-        var paginatedQuery = query.limit(to: pageSize)
-        
-        if let lastDocument = paginationState.lastDocument {
-            paginatedQuery = paginatedQuery.start(afterDocument: lastDocument)
+    func getClubsPublisher(filter: ClubsFilter?, radius: QueryRadiusData?) -> Future<QuerySnapshot, any Error> {
+        var baseQuery = buildBaseQuery()
+        if let filter, case let ClubsFilter.name(name) = filter {
+            baseQuery = applySearch(to: baseQuery, name: name)
+        } else if let radius {
+            baseQuery = applyRadius(to: baseQuery, radius: radius)
         }
         
-        return paginatedQuery
+        return baseQuery.getDocuments()
     }
+    
+    func buildBaseQuery() -> Query {
+        db.collection("clubs")
+            .limit(to: 150)
+    }
+    
+    func applySearch(to query: Query, name: String) -> Query {
+        query
+            .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
+            .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
+            .order(by: "nameLowercase")
+    }
+    
+    func applyRadius(to query: Query, radius: QueryRadiusData) -> Query {
+        query
+            .whereField("addressData.latitude", isGreaterThan: radius.center.latitude - radius.delta.latitude)
+            .whereField("addressData.latitude", isLessThan: radius.center.latitude + radius.delta.latitude)
+            .whereField("addressData.longitude", isGreaterThan: radius.center.longitude - radius.delta.longitude)
+            .whereField("addressData.longitude", isLessThan: radius.center.longitude + radius.delta.longitude)
+    }
+}
+
+
+struct QueryRadiusData: Equatable {
+    let center: CLLocationCoordinate2D
+    let delta: CLLocationCoordinate2D
 }

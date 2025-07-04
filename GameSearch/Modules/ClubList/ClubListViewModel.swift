@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreLocation
 
 final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListViewModelProtocol {
     private let interactor: Interactor
@@ -17,26 +18,26 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published var clubListCards: [ClubListCardData] = []
     @Published var mapPopupClub: MapPopupData?
     @Published var isLoading = false
-    @Published var hasMoreData = true
+    @Published var locationManager = LocationManager()
+    @Published var cameraRegion: CameraRegion = CameraRegion(center: CLLocationCoordinate2D(latitude: 55, longitude: 37), delta: CLLocationCoordinate2D(latitude: 0.1, longitude: 0.1))
+    @Published var mapListButtonState: MapListButtonState = .list
+    @Published var geoApplied: Bool = true
     
+    private var shouldHideGeoButton = false
     private var lastSearchedText: String = ""
-    private var currentPaginationState = PaginationState.initial
     private var cancellables = Set<AnyCancellable>()
     
     
     init(interactor: Interactor) {
         self.interactor = interactor
         subscribeSearchText()
+        subscribeCameraDelta()
     }
     
     
     func onViewAppear() {
-        loadFirstPage()
-    }
-    
-    func onScrollToEnd(with cardID: String) {
-        if cardID == clubListCards.last?.id {
-            loadNextPage()
+        locationManager.onLocationGot = { [weak self] in
+            self?.loadWithDefaultDelta()
         }
     }
     
@@ -51,6 +52,11 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     func clearMapPopupClub() {
         mapPopupClub = nil
     }
+    
+    func onGeoButtonTap() {
+        loadWithDefaultDelta()
+        shouldHideGeoButton = true
+    }
 }
 
 
@@ -58,17 +64,50 @@ private extension ClubListViewModel {
     func subscribeSearchText() {
         $searchText
             .removeDuplicates()
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .sink { [weak self] text in
                 self?.searchTextChanged(text)
             }
             .store(in: &cancellables)
     }
     
-    func loadFirstPage(filter: ClubsFilter? = nil) {
+    func subscribeCameraDelta() {
+        $cameraRegion
+            .removeDuplicates(by: { region1, region2 in
+                region1.center.latitude == region2.center.latitude && region1.center.longitude == region2.center.longitude
+            })
+            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .sink { [weak self] delta in
+                guard let self = self, mapListButtonState.isMap else { return }
+                let radius = QueryRadiusData(center: cameraRegion.center, delta: cameraRegion.delta)
+                if shouldHideGeoButton {
+                    geoApplied = true
+                } else {
+                    geoApplied = radius == defaultRadius()
+                }
+                shouldHideGeoButton = false
+                self.loadClubsByRadius(radius: radius)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func loadWithDefaultDelta() {
         isLoading = true
-        
-        interactor.fetchFirstPageClubs(filter: filter)
+        let radius = defaultRadius()
+        cameraRegion = .init(center: radius.center, delta: radius.delta)
+        loadClubsByRadius(radius: radius)
+    }
+    
+    func defaultRadius() -> QueryRadiusData {
+        guard let location = locationManager.location else { return QueryRadiusData(center: CLLocationCoordinate2D(), delta: CLLocationCoordinate2D()) }
+        return QueryRadiusData(
+            center: location,
+            delta: CLLocationCoordinate2D(latitude: 0.1, longitude: 0.1)
+        )
+    }
+    
+    func loadClubsByRadius(radius: QueryRadiusData) {
+        interactor.fetchClubs(radius: radius)
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
@@ -78,21 +117,14 @@ private extension ClubListViewModel {
                     }
                 },
                 receiveValue: { [weak self] result in
-                    self?.updateClubs(result.items)
-                    self?.currentPaginationState = result.paginationState
-                    self?.hasMoreData = result.paginationState.hasMoreData
+                    self?.updateClubs(result)
                 }
             )
             .store(in: &cancellables)
     }
     
-    // Загрузка следующей страницы
-    func loadNextPage() {
-        guard hasMoreData && !isLoading else { return }
-
-        isLoading = true
-        
-        interactor.fetchNextPageClubs(filter: searchText.isEmpty ? nil : .name(searchText), paginationState: currentPaginationState)
+    func loadClubsBySearchText(_ name: String) {
+        interactor.fetchClubs(filter: .name(name))
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
@@ -102,9 +134,7 @@ private extension ClubListViewModel {
                     }
                 },
                 receiveValue: { [weak self] result in
-                    self?.addClubs(result.items)
-                    self?.currentPaginationState = result.paginationState
-                    self?.hasMoreData = result.paginationState.hasMoreData
+                    self?.updateClubs(result)
                 }
             )
             .store(in: &cancellables)
@@ -113,13 +143,22 @@ private extension ClubListViewModel {
     func searchTextChanged(_ searchText: String) {
         guard lastSearchedText != searchText else { return }
         lastSearchedText = searchText
-        loadFirstPage(filter: searchText.isEmpty ? nil : .name(searchText))
+        if searchText.isEmpty {
+            loadWithDefaultDelta()
+        } else {
+            loadClubsBySearchText(searchText)
+        }
     }
     
     func updateClubs(_ clubs: [FullClubData]) {
-        self.clubs = clubs
-        updateMapClubs(by: clubs)
-        updateClubListCards(by: clubs)
+        self.clubs = clubs.sorted(by: { [weak self] data1, data2 in
+            guard let location = self?.locationManager.location else { return true }
+            let distance1 =  CLLocation(latitude: data1.addressData.latitude, longitude: data1.addressData.longitude).distance(from: CLLocation(latitude: location.latitude, longitude: location.longitude))
+            let distance2 =  CLLocation(latitude: data2.addressData.latitude, longitude: data2.addressData.longitude).distance(from: CLLocation(latitude: location.latitude, longitude: location.longitude))
+            return distance1 < distance2
+        })
+        updateMapClubs(by: self.clubs)
+        updateClubListCards(by: self.clubs)
     }
     
     func updateMapClubs(by clubs: [FullClubData]) {

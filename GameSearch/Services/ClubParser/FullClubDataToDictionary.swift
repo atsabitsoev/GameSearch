@@ -42,7 +42,8 @@ extension AddressData {
     func toDictionary() -> [String: Any] {
         return [
             "address": address,
-            "geopoint": GeoPoint(latitude: latitude, longitude: longitude)
+            "latitude": latitude,
+            "longitude": longitude
         ]
     }
 }
