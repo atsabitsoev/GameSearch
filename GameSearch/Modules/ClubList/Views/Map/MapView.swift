@@ -64,9 +64,6 @@ struct MapView: View {
                 cameraRegionChangesFromIn = true
                 self.cameraRegion = CameraRegion(center: region.center, delta: delta)
             })
-        .mapControls {
-            MapUserLocationButton()
-        }
     }
 }
 

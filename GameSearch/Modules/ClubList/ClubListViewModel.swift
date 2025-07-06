@@ -23,7 +23,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published var mapListButtonState: MapListButtonState = .list
     @Published var geoApplied: Bool = true
     
-    private var shouldHideGeoButton = false
+    private var shouldHideGeoButton = true
     private var lastSearchedText: String = ""
     private var cancellables = Set<AnyCancellable>()
     
@@ -86,7 +86,6 @@ private extension ClubListViewModel {
                     geoApplied = radius == defaultRadius()
                 }
                 shouldHideGeoButton = false
-                guard mapListButtonState.isMap else { return }
                 if searchText.isEmpty {
                     loadClubsByRadius(radius: radius)
                 } else {
