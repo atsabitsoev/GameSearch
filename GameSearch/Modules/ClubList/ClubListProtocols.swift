@@ -27,13 +27,10 @@ protocol ClubListViewModelProtocol: ObservableObject {
 
 
 protocol ClubListInteractorProtocol {
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error>
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error>
 }
 
 extension ClubListInteractorProtocol {
-    func fetchClubs(filter: ClubsFilter) -> AnyPublisher<[FullClubData], any Error> {
-        fetchClubs(filter: filter, radius: nil)
-    }
     func fetchClubs(radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
         fetchClubs(filter: nil, radius: radius)
     }

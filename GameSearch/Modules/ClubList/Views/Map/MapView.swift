@@ -10,9 +10,10 @@ import MapKit
 
 struct MapView: View {
     @State private var location: MapCameraPosition = .automatic
+    @State private var cameraRegionChangesFromIn = false
+    
     @Binding private var cameraRegion: CameraRegion
     @Binding private var selectedClub: MapPopupData?
-    @State private var cameraRegionChangesFromIn = false
     
     private let centerLocation: CLLocationCoordinate2D
     private let mapClubs: [MapClubData]

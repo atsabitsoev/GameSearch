@@ -11,7 +11,7 @@ import Combine
 final class ClubListInteractor: ClubListInteractorProtocol {
     private let service: NetworkServiceProtocol = FirestoreService()
     
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error> {
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
         service.fetchClubs(filter: filter, radius: radius)
     }
 }

@@ -13,7 +13,7 @@ import CoreLocation
 
 // MARK: - Updated Protocol
 protocol NetworkServiceProtocol {
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error>
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error>
 }
 
 // MARK: - Updated Service
@@ -22,7 +22,7 @@ final class FirestoreService: NetworkServiceProtocol {
     private let mapper: DataMapperProtocol = DataMapper()
     private let pageSize: Int = 15
     
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData?) -> AnyPublisher<[FullClubData], any Error> {
+    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
         getClubsPublisher(filter: filter, radius: radius)
             .map({ [weak self] collectionSnapshot in
                 guard let self = self else {
@@ -43,11 +43,12 @@ final class FirestoreService: NetworkServiceProtocol {
 
 // MARK: - Private Extensions
 private extension FirestoreService {
-    func getClubsPublisher(filter: ClubsFilter?, radius: QueryRadiusData?) -> Future<QuerySnapshot, any Error> {
+    func getClubsPublisher(filter: ClubsFilter?, radius: QueryRadiusData) -> Future<QuerySnapshot, any Error> {
         var baseQuery = buildBaseQuery()
         if let filter, case let ClubsFilter.name(name) = filter {
             baseQuery = applySearch(to: baseQuery, name: name)
-        } else if let radius {
+            baseQuery = applyRadius(to: baseQuery, radius: radius)
+        } else {
             baseQuery = applyRadius(to: baseQuery, radius: radius)
         }
         

@@ -86,7 +86,11 @@ private extension ClubListViewModel {
                     geoApplied = radius == defaultRadius()
                 }
                 shouldHideGeoButton = false
-                self.loadClubsByRadius(radius: radius)
+                if searchText.isEmpty {
+                    loadClubsByRadius(radius: radius)
+                } else {
+                    loadClubsBySearchText(searchText)
+                }
             }
             .store(in: &cancellables)
     }
@@ -102,7 +106,7 @@ private extension ClubListViewModel {
         guard let location = locationManager.location else { return QueryRadiusData(center: CLLocationCoordinate2D(), delta: CLLocationCoordinate2D()) }
         return QueryRadiusData(
             center: location,
-            delta: CLLocationCoordinate2D(latitude: 0.1, longitude: 0.1)
+            delta: CLLocationCoordinate2D(latitude: 0.04, longitude: 0.04)
         )
     }
     
@@ -124,7 +128,7 @@ private extension ClubListViewModel {
     }
     
     func loadClubsBySearchText(_ name: String) {
-        interactor.fetchClubs(filter: .name(name))
+        interactor.fetchClubs(filter: .name(name), radius: .init(center: cameraRegion.center, delta: cameraRegion.delta))
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
