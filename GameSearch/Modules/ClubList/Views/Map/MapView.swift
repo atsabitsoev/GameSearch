@@ -37,7 +37,7 @@ struct MapView: View {
             ForEach(mapClubs, id: \.name) { clubMapData in
                 Annotation("", coordinate: clubMapData.location) {
                     ClubMapAnnotation(clubMapName: clubMapData.name) {
-//                        location = .camera(.init(centerCoordinate: clubMapData.location, distance: 3000))
+                        location = .camera(.init(centerCoordinate: clubMapData.location, distance: 3000))
                         selectedClub = MapPopupData(selectedClub: clubMapData, state: .full)
                     }
                 }

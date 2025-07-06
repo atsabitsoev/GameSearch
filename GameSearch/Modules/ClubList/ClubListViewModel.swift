@@ -78,7 +78,7 @@ private extension ClubListViewModel {
             })
             .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
             .sink { [weak self] delta in
-                guard let self = self, mapListButtonState.isMap else { return }
+                guard let self = self else { return }
                 let radius = QueryRadiusData(center: cameraRegion.center, delta: cameraRegion.delta)
                 if shouldHideGeoButton {
                     geoApplied = true
@@ -86,6 +86,7 @@ private extension ClubListViewModel {
                     geoApplied = radius == defaultRadius()
                 }
                 shouldHideGeoButton = false
+                guard mapListButtonState.isMap else { return }
                 if searchText.isEmpty {
                     loadClubsByRadius(radius: radius)
                 } else {
