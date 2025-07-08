@@ -50,8 +50,8 @@ private extension MapPopup {
         .drawingGroup()
         .padding(.horizontal, 16)
         .shadow(color: .background, radius: 4, x: 0, y: 4)
-        .overlay(alignment: .bottom) {
-            buttonsOverlay
+        .onTapGesture {
+            onTap()
         }
     }
     
@@ -83,7 +83,11 @@ private extension MapPopup {
         ZStack(alignment: .bottom) {
             imageView
                 .overlay(alignment: .topLeading) {
-                    logoView
+                    HStack {
+                        logoView
+                        Spacer()
+                        phoneButton
+                    }
                 }
             titleView
         }
@@ -108,30 +112,6 @@ private extension MapPopup {
             .font(EAFont.title)
     }
     
-    var buttonsOverlay: some View {
-        HStack {
-            toDetailsButton
-            phoneButton
-        }
-        .offset(x: 20, y: 20)
-    }
-    
-    var toDetailsButton: some View {
-        Button {
-            onTap()
-        } label: {
-            Text(Constants.detailButtonTitle)
-                .foregroundStyle(EAColor.textPrimary)
-                .font(EAFont.infoBold)
-                .padding(.horizontal, 56)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(EAColor.accent)
-                )
-        }
-    }
-    
     var phoneButton: some View {
         Button {
             UIApplication.shared.open(URL(string: "tel://89604012886")!)
@@ -144,6 +124,7 @@ private extension MapPopup {
                         .fill(EAColor.textPrimary)
                 )
         }
+        .padding(12)
     }
     
     var addressPriceView: some View {
@@ -229,7 +210,6 @@ private extension MapPopup {
         ZStack(alignment: .bottom) {
             image
                 .resizable()
-                .aspectRatio(contentMode: .fill)
                 .frame(maxWidth: .infinity, maxHeight: Constants.popupFullHeight)
                 .clipped()
                 .cornerRadius(16)

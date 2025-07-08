@@ -89,7 +89,7 @@ private extension ClubListView {
                     viewModel.clearMapPopupClub()
                 }
             )
-            .padding(.bottom, 32)
+            .padding(.bottom, 16)
             .transition(.move(edge: .bottom))
             .animation(.spring(), value: mapPopupClub)
         }
