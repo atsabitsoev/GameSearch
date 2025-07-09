@@ -12,7 +12,8 @@ struct ClubListCardData {
         self.rating = club.rating
         self.ratingString = String(format: "%.1f", club.rating)
         self.price = "\(club.configurations.getMinPrice())"
-        self.addressString = club.addressData.address
+        let addressComponents = club.addressData.address.split(separator: ", ")
+        self.addressString = addressComponents.dropLast(addressComponents.count - 2).joined(separator: ", ")
         self.tags = club.tags
         self.logo = club.logo
     }

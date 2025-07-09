@@ -44,6 +44,7 @@ final class ClubParserService {
                         return "https://langame.ru" + imageLink
                     }
                 }
+                let id = String(clubLink.absoluteString.split(separator: "/").last?.split(separator: "_").first ?? "")
                 let addressString = try document.select("div.club__location.d-flex.align-items-center").select("span").first?.text() ?? "Адрес не указан"
                 let coordinates = try document.select("div.card.bg-white").attr("data-coords").split(separator: ", ").compactMap{ Double($0) }
                 let description = try document.select("div.club__description.my-5.pt-4").select("p").text()
@@ -55,29 +56,32 @@ final class ClubParserService {
                 let priceImage = URL(string: addingCoreUrl + priceImageLink)
                 let tableHead = try document.select("thead.club__configuration-table-thead").select("th")
                 let roomNames = try tableHead.compactMap{ try $0.select("p").first()?.text() }
-                let pcCounts = try tableHead.map{ try Int($0.select("p").last()?.text().split(separator: " ").first ?? "") ?? 0 }
+                let pcCounts = try tableHead.dropFirst().map{ try Int($0.select("p").last()?.text().split(separator: " ").first ?? "") ?? 0 }
                 let minPrice = Int(try document.select("section.club__price.mb-5").select("p").first()?.text().split(separator: " ").filter({ $0.allSatisfy({ $0.isNumber }) }).first ?? "") ?? 0
                 let configurationsData = try document.select("table.table.club__configuration-table").select("tbody").first?.children().map{ try $0.children().map{ try $0.text() } } ?? []
                 let configurations = getConfigurationsFromData(configurationsData, names: roomNames, pcCounts: pcCounts, minPrice: minPrice)
-                let data = FullClubData(
-                    additionalInfo: "",
-                    addressData: AddressData(address: addressString, longitude: coordinates.last ?? 0, latitude: coordinates.first ?? 0),
-                    comments: [],
-                    configurations: configurations,
-                    description: description,
-                    id: UUID().uuidString,
-                    images: correctedImages,
-                    name: name,
-                    nameLowercase: name.lowercased(),
-                    rating: rating,
-                    subscribers: 0,
-                    tags: tags,
-                    logo: "",
-                    phoneNumber: phone,
-                    allPricesImage: priceImage
-                )
-                DispatchQueue.main.async {
-                    completion(data)
+                
+                parseLogo(name: name, address: addressString) { logoLink in
+                    let data = FullClubData(
+                        additionalInfo: "",
+                        addressData: AddressData(address: addressString, longitude: coordinates.last ?? 0, latitude: coordinates.first ?? 0),
+                        comments: [],
+                        configurations: configurations,
+                        description: description,
+                        id: id,
+                        images: correctedImages,
+                        name: name,
+                        nameLowercase: name.lowercased(),
+                        rating: rating,
+                        subscribers: 0,
+                        tags: tags,
+                        logo: logoLink,
+                        phoneNumber: phone,
+                        allPricesImage: priceImage
+                    )
+                    DispatchQueue.main.async {
+                        completion(data)
+                    }
                 }
             } catch let error {
                 print("Error: \(error)")
@@ -86,6 +90,30 @@ final class ClubParserService {
         }
     }
     
+    static func parseLogo(name: String, address: String, _ completion: @escaping (String) -> Void) {
+        let nameCorrected = name.filter{ $0.isLetter || $0.isNumber || $0.isWhitespace }
+        let addressComponents = address.split(separator: ", ")
+        let addressCorrected = addressComponents.dropLast(addressComponents.count - 2).joined(separator: ", ")
+        let query = "\(nameCorrected) \(addressCorrected)"
+        let charSet = CharacterSet.urlQueryAllowed
+        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: charSet),
+              let url = URL(string: "https://yandex.ru/maps/?text=\(encodedQuery)") else {
+            completion("")
+            return
+        }
+        guard let myHTMLString = try? String(contentsOf: url, encoding: .utf8) else {
+            completion("")
+            return
+        }
+        do {
+            let document = try SwiftSoup.parse(myHTMLString)
+            let logoLink = try document.select("div.card-header-media-view__logo").select("img").attr("src")
+            completion(logoLink)
+        } catch {
+            print(error.localizedDescription)
+            completion("")
+        }
+    }
     
     private static func getConfigurationsFromData(_ data: [[String]], names: [String], pcCounts: [Int], minPrice: Int) -> [RoomConfiguration] {
         var chips: [String] = []
