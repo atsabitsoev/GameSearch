@@ -39,13 +39,8 @@ struct PriceImageSheet: View {
 
 private extension PriceImageSheet {
     func successImage(_ image: Image) -> some View {
-        image
-            .resizable()
-            .scaledToFit()
+        ZoomAndPanImage(image: image)
             .cornerRadius(20)
-            .padding(16)
-            .transition(.scale.combined(with: .opacity))
-
     }
 
     var titleView: some View {
