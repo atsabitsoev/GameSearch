@@ -23,7 +23,7 @@ struct PriceInfoView: View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
                 headerView
-                pricesView
+                commonPriceView
                 allPricesButton
             }
             Spacer()
@@ -32,7 +32,7 @@ struct PriceInfoView: View {
         .padding(.vertical, 16)
         .background(EAColor.info1)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .sheet(isPresented: $showSheet) {
+        .fullScreenCover(isPresented: $showSheet) {
             priceImage
         }
     }
@@ -45,26 +45,25 @@ private extension PriceInfoView {
             .font(.headline)
             .foregroundStyle(EAColor.info2)
     }
-
-    var pricesView: some View {
-        Group {
-            ForEach(priceInfo.roomsData) { room in
-                HStack {
-                    Text(room.roomName)
-                        .font(.body)
-                        .bold()
-                        .foregroundStyle(EAColor.textPrimary)
-                    Spacer()
-                    Group {
-                        Text("от ")
-                        + Text("\(room.minPriceForHour)").bold()
-                            .fontWidth(.expanded)
-                        + Text(" ₽/час")
-                    }
-                    .font(.body)
-                    .foregroundStyle(EAColor.textPrimary)
-                }
+    
+    var commonPriceView: some View {
+        // Берём minPriceForHour с любой комнаты тк сейчас у всех комнат одинаковое значение
+        let minPriceForHour = priceInfo.roomsData.first?.minPriceForHour ?? 0
+        
+        return HStack {
+            Text("Все тарифы")
+                .font(.body)
+                .bold()
+                .foregroundStyle(EAColor.textPrimary)
+            Spacer()
+            Group {
+                Text("от ")
+                + Text("\(minPriceForHour)").bold()
+                    .fontWidth(.expanded)
+                + Text(" ₽/час")
             }
+            .font(.body)
+            .foregroundStyle(EAColor.textPrimary)
         }
     }
 

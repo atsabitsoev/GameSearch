@@ -9,6 +9,7 @@ import SwiftUI
 
 
 struct PriceImageSheet: View {
+    @Environment(\.dismiss) var dismiss
     let imageURL: URL?
 
     var body: some View {
@@ -20,10 +21,11 @@ struct PriceImageSheet: View {
                 case .empty:
                     progressView
                 case .success(let image):
-                    VStack {
-                        titleView
+                    VStack(spacing: 4) {
+                        topView
                         successImage(image)
                     }
+                    .padding(.top, 40)
                 case .failure:
                     errorImage
                 @unknown default:
@@ -38,14 +40,25 @@ struct PriceImageSheet: View {
 }
 
 private extension PriceImageSheet {
+    var topView: some View {
+        HStack {
+            Spacer()
+            Spacer()
+            titleView
+            Spacer()
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.largeTitle)
+                    .foregroundColor(EAColor.accentGradient)
+                    .padding()
+            }
+        }
+    }
+    
     func successImage(_ image: Image) -> some View {
-        image
-            .resizable()
-            .scaledToFit()
-            .cornerRadius(20)
-            .padding(16)
-            .transition(.scale.combined(with: .opacity))
-
+        ZoomAndPanImage(image: image)
     }
 
     var titleView: some View {

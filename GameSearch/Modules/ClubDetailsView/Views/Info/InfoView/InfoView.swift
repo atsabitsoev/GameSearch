@@ -21,9 +21,11 @@ struct InfoView: View {
                 Text(info.title)
                     .font(.headline)
                     .foregroundStyle(EAColor.info2)
-                Text(info.desc)
-                    .font(.body)
-                    .foregroundStyle(EAColor.textPrimary)
+                ExpandableText(
+                    text: info.desc,
+                    lineLimit: 5,
+                    font: .body
+                )
             }
             Spacer()
         }

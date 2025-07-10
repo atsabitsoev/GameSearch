@@ -119,7 +119,7 @@ private extension ClubDetailsViewModel {
 private enum Constants {
     
     static let priceInfoHeader = "Стоимость"
-    static let priceInfoButton = "Все тарифы"
+    static let priceInfoButton = "Подробнее"
 
     
     static let infoTitle = "Описание"
