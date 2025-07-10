@@ -38,7 +38,7 @@ private extension ClubListView {
     var contentView: some View {
         ZStack(alignment: .bottom) {
             mapView
-            GeometryReader { listView($0) }
+            GeometryReader { scrollClubView($0) }
             HStack {
                 mapListButton
                 geoButton
@@ -127,15 +127,13 @@ private extension ClubListView {
     }
 
 
-    func listView(_ geo: GeometryProxy) -> some View {
-        List(viewModel.clubListCards, id: \.id) { card in
-            clubListCell(card)
+    func scrollClubView(_ geo: GeometryProxy) -> some View {
+        ScrollView {
+            clubListContent
         }
         .background(EAColor.background.ignoresSafeArea(.keyboard))
         .offset(y: viewModel.mapListButtonState.isMap ? geo.size.height : 0)
         .opacity(viewModel.mapListButtonState.isMap ? 0 : 1)
-        .scrollContentBackground(.hidden)
-        .listStyle(.plain)
         .searchable(
             text: $viewModel.searchText,
             isPresented: $searchActive,
@@ -144,8 +142,8 @@ private extension ClubListView {
         )
         .searchFocused($searchFocused)
         .ignoresSafeArea(.keyboard)
-        .onScrollPhaseChange { _, newPhase in
-            if newPhase == .interacting {
+        .simultaneousGesture(
+            DragGesture().onChanged { _ in
                 if viewModel.searchText.isEmpty {
                     searchActive = false
                 } else {
@@ -153,14 +151,38 @@ private extension ClubListView {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
             }
+        )
+    }
+    
+    @ViewBuilder
+    var clubListContent: some View {
+        if viewModel.clubListCards.isEmpty {
+            emptyListView
+        } else {
+            LazyVStack(spacing: 0) {
+                ForEach(viewModel.clubListCards, id: \.id) { card in
+                    clubListCell(card)
+                }
+            }
         }
     }
+    
+    var emptyListView: some View {
+        EmptyListView(
+            title: "Здесь пока пусто",
+            subtitle: "Попробуйте изменить фильтры или расширить радиус поиска",
+            isLoading: viewModel.isLoading
+        )
+        .frame(maxWidth: .infinity)
+        .padding(.top, 100)
+        .padding(.horizontal, 16)
+    }
+    
 
     func clubListCell(_ card: ClubListCardData) -> some View {
         ClubListCell(data: card)
-            .listRowSeparator(.hidden)
-            .listRowBackground(EAColor.background)
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+            .background(EAColor.background)
             .onTapGesture {
                 viewModel.routeToDetails(clubID: card.id, router: router)
             }
