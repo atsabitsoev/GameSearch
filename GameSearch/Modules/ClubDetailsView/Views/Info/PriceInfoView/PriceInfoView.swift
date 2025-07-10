@@ -32,7 +32,7 @@ struct PriceInfoView: View {
         .padding(.vertical, 16)
         .background(EAColor.info1)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .sheet(isPresented: $showSheet) {
+        .fullScreenCover(isPresented: $showSheet) {
             priceImage
         }
     }
