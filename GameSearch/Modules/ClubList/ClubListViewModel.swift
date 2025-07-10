@@ -39,6 +39,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
         locationManager.onLocationGot = { [weak self] in
             self?.loadWithDefaultDelta()
         }
+        locationManager.onLocationChange = self.onLocationChange
     }
     
     func routeToDetails(clubID: String, router: Router) {
@@ -65,6 +66,7 @@ private extension ClubListViewModel {
         $searchText
             .removeDuplicates()
             .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+            .dropFirst()
             .sink { [weak self] text in
                 self?.searchTextChanged(text)
             }
@@ -77,6 +79,7 @@ private extension ClubListViewModel {
                 region1.center.latitude == region2.center.latitude && region1.center.longitude == region2.center.longitude
             })
             .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .dropFirst()
             .sink { [weak self] delta in
                 guard let self = self else { return }
                 let radius = QueryRadiusData(center: cameraRegion.center, delta: cameraRegion.delta)
@@ -93,6 +96,10 @@ private extension ClubListViewModel {
                 }
             }
             .store(in: &cancellables)
+    }
+    
+    func onLocationChange() {
+        geoApplied = false
     }
     
     func loadWithDefaultDelta() {

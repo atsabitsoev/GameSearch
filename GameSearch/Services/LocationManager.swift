@@ -11,6 +11,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     let manager = CLLocationManager()
     private var locationGot = false
     var onLocationGot: () -> () = {}
+    var onLocationChange: () -> () = {}
     
     @Published var location: CLLocationCoordinate2D?
     
@@ -30,6 +31,8 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         if !locationGot {
             onLocationGot()
             locationGot = true
+        } else {
+            onLocationChange()
         }
     }
 }
