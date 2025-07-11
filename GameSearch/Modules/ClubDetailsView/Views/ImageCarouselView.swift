@@ -54,9 +54,21 @@ private extension ImageCarouselView {
     }
     
     func errorView() -> some View {
-        Text("Ошибка загрузки картинки")
-            .foregroundStyle(.red)
-            .font(EAFont.infoBig)
+        VStack(alignment: .center) {
+            Spacer()
+            errorImage
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+    }
+    
+    var errorImage: some View {
+        Image(systemName: "xmark.octagon")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 60, height: 60)
+            .foregroundColor(.gray)
+            .padding()
     }
 }
 
