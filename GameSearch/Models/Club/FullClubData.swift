@@ -82,6 +82,22 @@ struct ConsoleConfiguration: Identifiable {
 }
 
 
+extension Array where Element == RoomConfiguration {
+    func getMinPrice() -> Int {
+        compactMap({ configuration in
+            switch configuration {
+            case .pc(let pCConfiguration):
+                return pCConfiguration.minPriceForHour
+            case .playstation:
+                return nil
+            }
+        })
+        .min() ?? 0
+    }
+}
+
+
+
 extension FullClubData {
     static let mock: [FullClubData] = [
         FullClubData(
