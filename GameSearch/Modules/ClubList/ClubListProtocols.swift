@@ -18,6 +18,7 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var cameraRegion: CameraRegion { get set }
     var mapListButtonState: MapListButtonState { get set }
     var geoApplied: Bool { get }
+    var isLoading: Bool { get }
     
     func onGeoButtonTap()
     func onViewAppear()

@@ -135,6 +135,7 @@ private extension ClubListViewModel {
     }
     
     func loadClubsBySearchText(_ name: String) {
+        isLoading = true
         interactor.fetchClubs(filter: .name(name), radius: .init(center: cameraRegion.center, delta: cameraRegion.delta))
             .receive(on: DispatchQueue.main)
             .sink(
