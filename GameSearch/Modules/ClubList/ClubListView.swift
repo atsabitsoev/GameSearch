@@ -142,8 +142,8 @@ private extension ClubListView {
         )
         .searchFocused($searchFocused)
         .ignoresSafeArea(.keyboard)
-        .simultaneousGesture(
-            DragGesture().onChanged { _ in
+        .onScrollPhaseChange { _, newPhase in
+            if newPhase == .interacting {
                 if viewModel.searchText.isEmpty {
                     searchActive = false
                 } else {
@@ -151,7 +151,7 @@ private extension ClubListView {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
             }
-        )
+        }
     }
     
     @ViewBuilder
