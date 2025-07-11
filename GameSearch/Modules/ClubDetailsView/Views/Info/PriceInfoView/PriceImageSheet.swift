@@ -13,29 +13,24 @@ struct PriceImageSheet: View {
     let imageURL: URL?
 
     var body: some View {
-        VStack {
+        VStack(spacing: 4) {
+            topView
             Spacer()
-
             AsyncImage(url: imageURL) { phase in
                 switch phase {
                 case .empty:
                     progressView
                 case .success(let image):
-                    VStack(spacing: 4) {
-                        topView
-                        successImage(image)
-                    }
-                    .padding(.top, 40)
+                    successImage(image)
+                        .padding(.top, 40)
                 case .failure:
                     errorImage
                 @unknown default:
                     EmptyView()
                 }
             }
-
             Spacer()
         }
-        .ignoresSafeArea()
     }
 }
 
@@ -85,7 +80,7 @@ private extension PriceImageSheet {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 60, height: 60)
-                .foregroundColor(.red)
+                .foregroundColor(.gray)
                 .padding()
         }
     }

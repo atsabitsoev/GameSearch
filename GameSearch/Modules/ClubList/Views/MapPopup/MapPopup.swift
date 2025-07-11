@@ -101,6 +101,7 @@ private extension MapPopup {
                 ratingView
                 addressPriceView
             }
+            .padding(16)
         }
         .cornersRadius(bottom: 20)
         .frame(maxHeight: 111)
@@ -108,6 +109,9 @@ private extension MapPopup {
     
     var titleView: some View {
         Text(data.selectedClub.name)
+            .minimumScaleFactor(0.5)
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
             .foregroundStyle(EAColor.textPrimary)
             .font(EAFont.title)
     }
@@ -210,9 +214,9 @@ private extension MapPopup {
         ZStack(alignment: .bottom) {
             image
                 .resizable()
+                .aspectRatio(contentMode: .fill)
                 .frame(maxWidth: .infinity, maxHeight: Constants.popupFullHeight)
-                .clipped()
-                .cornerRadius(16)
+                .contentShape(RoundedRectangle(cornerRadius: 16))
             LinearGradient(
                 gradient: Gradient(
                     colors: [

@@ -13,7 +13,7 @@ struct MapClubData {
         self.name = club.name
         self.location = .init(latitude: club.addressData.latitude, longitude: club.addressData.longitude)
         self.logo = URL(string: club.logo)
-        self.address = club.addressData.address
+        self.address = club.addressData.address.simplifiedAddress()
         self.rating = String(club.rating)
         self.image = URL(string: club.images.first ?? "")
     }
