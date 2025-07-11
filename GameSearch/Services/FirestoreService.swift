@@ -69,10 +69,10 @@ private extension FirestoreService {
     
     func applyRadius(to query: Query, radius: QueryRadiusData) -> Query {
         query
-            .whereField("addressData.latitude", isGreaterThan: radius.center.latitude - radius.delta.latitude)
-            .whereField("addressData.latitude", isLessThan: radius.center.latitude + radius.delta.latitude)
-            .whereField("addressData.longitude", isGreaterThan: radius.center.longitude - radius.delta.longitude)
-            .whereField("addressData.longitude", isLessThan: radius.center.longitude + radius.delta.longitude)
+            .whereField("addressData.latitude", isGreaterThan: radius.center.latitude - radius.delta.latitude / 2)
+            .whereField("addressData.latitude", isLessThan: radius.center.latitude + radius.delta.latitude / 2)
+            .whereField("addressData.longitude", isGreaterThan: radius.center.longitude - radius.delta.longitude / 2)
+            .whereField("addressData.longitude", isLessThan: radius.center.longitude + radius.delta.longitude / 2)
     }
 }
 

@@ -34,7 +34,7 @@ struct MapView: View {
     var body: some View {
         Map(position: $location) {
             UserAnnotation()
-            ForEach(mapClubs, id: \.name) { clubMapData in
+            ForEach(mapClubs, id: \.id) { clubMapData in
                 Annotation("", coordinate: clubMapData.location) {
                     ClubMapAnnotation(clubMapName: clubMapData.name) {
                         location = .camera(.init(centerCoordinate: clubMapData.location, distance: 3000))

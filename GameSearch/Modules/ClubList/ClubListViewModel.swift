@@ -75,10 +75,8 @@ private extension ClubListViewModel {
     
     func subscribeCameraDelta() {
         $cameraRegion
-            .removeDuplicates(by: { region1, region2 in
-                region1.center.latitude == region2.center.latitude && region1.center.longitude == region2.center.longitude
-            })
-            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .debounce(for: .milliseconds(700), scheduler: DispatchQueue.main)
             .dropFirst()
             .sink { [weak self] delta in
                 guard let self = self else { return }
@@ -103,7 +101,6 @@ private extension ClubListViewModel {
     }
     
     func loadWithDefaultDelta() {
-        isLoading = true
         let radius = defaultRadius()
         cameraRegion = .init(center: radius.center, delta: radius.delta)
         loadClubsByRadius(radius: radius)
@@ -118,6 +115,7 @@ private extension ClubListViewModel {
     }
     
     func loadClubsByRadius(radius: QueryRadiusData) {
+        isLoading = true
         interactor.fetchClubs(radius: radius)
             .receive(on: DispatchQueue.main)
             .sink(
@@ -158,6 +156,7 @@ private extension ClubListViewModel {
         if searchText.isEmpty {
             loadWithDefaultDelta()
         } else {
+            cameraRegion = CameraRegion(center: cameraRegion.center, delta: CLLocationCoordinate2D(latitude: 3, longitude: 3))
             loadClubsBySearchText(searchText)
         }
     }

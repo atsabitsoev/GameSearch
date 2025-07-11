@@ -16,6 +16,8 @@ struct MapClubData {
         self.address = club.addressData.address.simplifiedAddress()
         self.rating = String(club.rating)
         self.image = URL(string: club.images.first ?? "")
+        self.price = club.configurations.getMinPrice()
+        self.phone = club.phoneNumber
     }
     let id: String
     let location: CLLocationCoordinate2D
@@ -24,6 +26,8 @@ struct MapClubData {
     let address: String?
     let rating: String?
     let image: URL?
+    let price: Int
+    let phone: String?
 }
 
 extension MapClubData: Equatable {

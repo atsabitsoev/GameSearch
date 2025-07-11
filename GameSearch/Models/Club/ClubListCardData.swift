@@ -39,18 +39,3 @@ extension Array where Element == FullClubData {
         self.map{ $0.getListCardData() }
     }
 }
-
-
-fileprivate extension Array where Element == RoomConfiguration {
-    func getMinPrice() -> Int {
-        compactMap({ configuration in
-            switch configuration {
-            case .pc(let pCConfiguration):
-                return pCConfiguration.minPriceForHour
-            case .playstation:
-                return nil
-            }
-        })
-        .min() ?? 0
-    }
-}
