@@ -20,7 +20,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
 
     var body: some View {
         TabView {
-            Tab("Клубы", systemImage: "house") {
+            Tab("Клубы", systemImage: "cube") {
                 NavigationStack(path: $router.path) {
                     factory.makeClubListView()
                         .environmentObject(router)
@@ -33,9 +33,6 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                         .enableSwipeBack()
                 }
                 .setupNavigationBarAppearance()
-            }
-            Tab("Карта", systemImage: "map") {
-                Text("Тут был геннадий")
             }
             Tab("Новости", systemImage: "newspaper") {
                 NewsView()

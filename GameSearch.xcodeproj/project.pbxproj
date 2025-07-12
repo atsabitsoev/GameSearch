@@ -15,9 +15,22 @@
 		ACD377732DCE48F0003874AA /* GameSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AC47D3372E231E8E002247B7 /* Exceptions for "GameSearch" folder in "GameSearch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = ACD377722DCE48F0003874AA /* GameSearch */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		ACD377752DCE48F0003874AA /* GameSearch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AC47D3372E231E8E002247B7 /* Exceptions for "GameSearch" folder in "GameSearch" target */,
+			);
 			path = GameSearch;
 			sourceTree = "<group>";
 		};
@@ -270,6 +283,8 @@
 				DEVELOPMENT_TEAM = 89WB9E7UEU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GameSearch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = coob;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Мы используем вашу геолокацию для нахождения ближайших к вам клубов и акций";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Мы используем вашу геолокацию для нахождения ближайших к вам клубов и акций";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -305,6 +320,8 @@
 				DEVELOPMENT_TEAM = 89WB9E7UEU;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GameSearch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = coob;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Мы используем вашу геолокацию для нахождения ближайших к вам клубов и акций";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Мы используем вашу геолокацию для нахождения ближайших к вам клубов и акций";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
