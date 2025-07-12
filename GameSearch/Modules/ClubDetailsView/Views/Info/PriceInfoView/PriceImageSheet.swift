@@ -22,7 +22,6 @@ struct PriceImageSheet: View {
                     progressView
                 case .success(let image):
                     successImage(image)
-                        .padding(.top, 40)
                 case .failure:
                     errorImage
                 @unknown default:

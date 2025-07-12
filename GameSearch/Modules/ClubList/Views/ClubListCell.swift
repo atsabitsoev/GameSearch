@@ -60,6 +60,8 @@ private extension ClubListCell {
     var titleAndRating: some View {
         HStack(alignment: .top) {
             Text(data.name)
+                .minimumScaleFactor(0.5)
+                .lineLimit(2)
                 .font(EAFont.title)
                 .foregroundStyle(EAColor.textPrimary)
             Spacer()
