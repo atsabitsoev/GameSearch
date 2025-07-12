@@ -44,6 +44,7 @@ private extension ClubListView {
                 geoButton
             }
             mapPopupView
+            loadingLine
         }
         .background(EAColor.background)
         .onAppear {
@@ -64,6 +65,17 @@ private extension ClubListView {
                     viewModel.clearMapPopupClub()
                 }
             }
+        }
+    }
+    
+    var loadingLine: some View {
+        VStack {
+            RoundedRectangle(cornerRadius: 0.5)
+                .frame(maxWidth: viewModel.isLoading ? 0 : .infinity, maxHeight: 1)
+                .opacity(viewModel.isLoading ? 1 : 0)
+                .foregroundStyle(EAColor.accent)
+                .animation(.easeInOut, value: viewModel.isLoading)
+            Spacer()
         }
     }
 

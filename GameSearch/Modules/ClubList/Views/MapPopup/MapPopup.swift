@@ -98,8 +98,13 @@ private extension MapPopup {
             Rectangle()
                 .fill(EAColor.info1)
             VStack(spacing: 12) {
-                ratingView
-                addressPriceView
+                HStack {
+                    Spacer()
+                    ratingView
+                    priceText
+                    Spacer()
+                }
+                addressView
             }
             .padding(16)
         }
@@ -116,35 +121,36 @@ private extension MapPopup {
             .font(EAFont.title)
     }
     
-    var phoneButton: some View {
-        Button {
-            UIApplication.shared.open(URL(string: "tel://89604012886")!)
-        } label: {
-            Image(systemName: "phone.circle.fill")
-                .resizable()
-                .frame(width: 40, height: 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(EAColor.textPrimary)
-                )
-        }
-        .padding(12)
+    var priceText: some View {
+        (Text("от ").font(EAFont.info) + Text("\(data.selectedClub.price)").font(EAFont.infoBold) + Text(" ₽/час").font(EAFont.info))
+            .foregroundStyle(EAColor.textPrimary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(EAColor.infoMain)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .frame(height: 32)
     }
     
-    var addressPriceView: some View {
-        VStack {
-            Text(data.selectedClub.address ?? "")
-                .font(.body)
-                .foregroundStyle(EAColor.textPrimary)
-            Group {
-                Text("от ")
-                + Text("120").bold()
-                    .fontWidth(.expanded)
-                + Text(" ₽/час")
+    @ViewBuilder
+    var phoneButton: some View {
+        if let phone = data.selectedClub.phone, !phone.isEmpty {
+            Button {
+                UIApplication.shared.open(URL(string: "tel://\(phone)")!)
+            } label: {
+                Image(systemName: "phone.circle.fill")
+                    .resizable()
+                    .frame(width: 40, height: 40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(EAColor.textPrimary)
+                    )
             }
-            .font(.body)
-            .foregroundStyle(EAColor.textPrimary)
+            .padding(12)
         }
+    }
+    
+    var addressView: some View {
+        LocationLabel(address: data.selectedClub.address ?? "")
     }
     
     var ratingView: some View {
