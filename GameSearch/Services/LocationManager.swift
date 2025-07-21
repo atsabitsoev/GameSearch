@@ -12,6 +12,7 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     private var locationGot = false
     var onLocationGot: () -> () = {}
     var onLocationChange: () -> () = {}
+    @Published var locationAllowed: Bool = false
     
     @Published var location: CLLocationCoordinate2D?
     
@@ -33,6 +34,12 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
             locationGot = true
         } else {
             onLocationChange()
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        DispatchQueue.main.async {
+            self.locationAllowed = status.rawValue > 2
         }
     }
 }

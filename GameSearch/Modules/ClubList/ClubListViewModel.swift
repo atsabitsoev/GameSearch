@@ -32,6 +32,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
         self.interactor = interactor
         subscribeSearchText()
         subscribeCameraDelta()
+        subscribeLocationAuth()
     }
     
     
@@ -96,6 +97,17 @@ private extension ClubListViewModel {
             .store(in: &cancellables)
     }
     
+    func subscribeLocationAuth() {
+        locationManager.$locationAllowed
+            .dropFirst()
+            .sink { [weak self] allowed in
+                if !allowed {
+                    self?.loadWithDefaultDelta()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
     func onLocationChange() {
         geoApplied = false
     }
@@ -107,7 +119,12 @@ private extension ClubListViewModel {
     }
     
     func defaultRadius() -> QueryRadiusData {
-        guard let location = locationManager.location else { return QueryRadiusData(center: CLLocationCoordinate2D(), delta: CLLocationCoordinate2D()) }
+        guard let location = locationManager.location else {
+            return QueryRadiusData(
+                center: CLLocationCoordinate2D(latitude: 55.7482, longitude: 37.6210),
+                delta: CLLocationCoordinate2D(latitude: 0.04, longitude: 0.04)
+            )
+        }
         return QueryRadiusData(
             center: location,
             delta: CLLocationCoordinate2D(latitude: 0.04, longitude: 0.04)
