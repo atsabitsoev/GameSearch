@@ -8,6 +8,8 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     @FocusState private var searchFocused
     @State private var searchActive = false
     @State private var viewDidAppear = false
+    
+    @State private var selectedDetent: PresentationDetent = .height(200)
 
 
     init(viewModel: ViewModel) {
@@ -18,6 +20,7 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
         NavigationView {
             contentView
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar(content: { navBarContent })
                 .toolbarBackground(EAColor.background, for: .navigationBar)
                 .toolbarVisibility(.visible, for: .navigationBar)
                 .toolbarVisibility(.visible, for: .tabBar)
@@ -27,6 +30,16 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                         Text("Ближайшие клубы")
                             .font(EAFont.navigationBarTitle)
                             .foregroundStyle(EAColor.textPrimary)
+                    }
+                }
+                .sheet(isPresented: $viewModel.showFiltersView) {
+                    ZStack {
+                        EAColor.background
+                            .padding(.bottom, -200)
+                        FiltersView(isPresented: $viewModel.showFiltersView, selectedDetent: $selectedDetent)
+                            .presentationDetents([.height(200), .height(370)], selection: $selectedDetent)
+                            .presentationDragIndicator(.visible)
+                            .presentationBackground(EAColor.background)
                     }
                 }
         }
@@ -65,6 +78,19 @@ private extension ClubListView {
                     viewModel.clearMapPopupClub()
                 }
             }
+        }
+    }
+    
+    var navBarContent: some ToolbarContent {
+        ToolbarItem {
+            Button {
+                DispatchQueue.main.async {
+                    viewModel.showFiltersView = true
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+            }
+
         }
     }
     

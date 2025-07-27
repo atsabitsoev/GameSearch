@@ -23,6 +23,8 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     @Published var mapListButtonState: MapListButtonState = .list
     @Published var geoApplied: Bool = true
     
+    @Published var showFiltersView: Bool = false
+    
     private var shouldHideGeoButton = true
     private var lastSearchedText: String = ""
     private var cancellables = Set<AnyCancellable>()

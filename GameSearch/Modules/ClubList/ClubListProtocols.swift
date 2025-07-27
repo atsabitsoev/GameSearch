@@ -20,6 +20,8 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var geoApplied: Bool { get }
     var isLoading: Bool { get }
     
+    var showFiltersView: Bool { get set }
+    
     func onGeoButtonTap()
     func onViewAppear()
     func clearMapPopupClub()
