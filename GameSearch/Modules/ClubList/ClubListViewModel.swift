@@ -13,6 +13,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     private let interactor: Interactor
     
     @Published var searchText = ""
+    @Published var filtersManager = FiltersManager()
     @Published private var clubs: [FullClubData] = []
     @Published var mapClubs: [MapClubData] = []
     @Published var clubListCards: [ClubListCardData] = []
@@ -33,6 +34,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     init(interactor: Interactor) {
         self.interactor = interactor
         subscribeSearchText()
+        subscribeFilters()
         subscribeCameraDelta()
         subscribeLocationAuth()
     }
@@ -43,6 +45,10 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
             self?.loadWithDefaultDelta()
         }
         locationManager.onLocationChange = self.onLocationChange
+    }
+    
+    func onFiltersApply(_ filters: [ClubsFilter]) {
+        filtersManager.remakeFilters(filters)
     }
     
     func routeToDetails(clubID: String, router: Router) {
@@ -76,27 +82,43 @@ private extension ClubListViewModel {
             .store(in: &cancellables)
     }
     
+    func subscribeFilters() {
+        filtersManager.$filters
+            .sink { [weak self] filters in
+                guard self?.mapListButtonState == .list else {
+                    self?.loadClubs(filters: filters)
+                    return
+                }
+                if filters.isEmpty {
+                    self?.setDefaultRegion()
+                } else {
+                    self?.setMediumRegion()
+                }
+                self?.loadClubs(filters: filters)
+            }
+            .store(in: &cancellables)
+    }
+    
     func subscribeCameraDelta() {
         $cameraRegion
             .removeDuplicates()
             .debounce(for: .milliseconds(700), scheduler: DispatchQueue.main)
             .dropFirst()
-            .sink { [weak self] delta in
-                guard let self = self else { return }
-                let radius = QueryRadiusData(center: cameraRegion.center, delta: cameraRegion.delta)
-                if shouldHideGeoButton {
-                    geoApplied = true
-                } else {
-                    geoApplied = radius == defaultRadius()
-                }
-                shouldHideGeoButton = false
-                if searchText.isEmpty {
-                    loadClubsByRadius(radius: radius)
-                } else {
-                    loadClubsBySearchText(searchText)
-                }
+            .sink { [weak self] _ in
+                self?.checkGeoButton()
+                self?.loadClubs(filters: self?.filtersManager.filters ?? [])
             }
             .store(in: &cancellables)
+    }
+    
+    func checkGeoButton() {
+        if shouldHideGeoButton {
+            geoApplied = true
+        } else {
+            let radius = QueryRadiusData(center: cameraRegion.center, delta: cameraRegion.delta)
+            geoApplied = radius == defaultRadius()
+        }
+        shouldHideGeoButton = false
     }
     
     func subscribeLocationAuth() {
@@ -115,9 +137,21 @@ private extension ClubListViewModel {
     }
     
     func loadWithDefaultDelta() {
+        setDefaultRegion()
+        loadClubs(filters: filtersManager.filters)
+    }
+    
+    func setDefaultRegion() {
         let radius = defaultRadius()
         cameraRegion = .init(center: radius.center, delta: radius.delta)
-        loadClubsByRadius(radius: radius)
+    }
+    
+    func setMediumRegion() {
+        cameraRegion = CameraRegion(center: cameraRegion.center, delta: CLLocationCoordinate2D(latitude: 0.2, longitude: 0.2))
+    }
+    
+    func setBigRegion() {
+        cameraRegion = CameraRegion(center: cameraRegion.center, delta: CLLocationCoordinate2D(latitude: 3, longitude: 3))
     }
     
     func defaultRadius() -> QueryRadiusData {
@@ -133,27 +167,9 @@ private extension ClubListViewModel {
         )
     }
     
-    func loadClubsByRadius(radius: QueryRadiusData) {
+    func loadClubs(filters: [ClubsFilter]) {
         isLoading = true
-        interactor.fetchClubs(radius: radius)
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { [weak self] completion in
-                    self?.isLoading = false
-                    if case .failure(let error) = completion {
-                        print(error.localizedDescription)
-                    }
-                },
-                receiveValue: { [weak self] result in
-                    self?.updateClubs(result)
-                }
-            )
-            .store(in: &cancellables)
-    }
-    
-    func loadClubsBySearchText(_ name: String) {
-        isLoading = true
-        interactor.fetchClubs(filter: .name(name), radius: .init(center: cameraRegion.center, delta: cameraRegion.delta))
+        interactor.fetchClubs(filters: filters, radius: QueryRadiusData(center: cameraRegion.center, delta: cameraRegion.delta))
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { [weak self] completion in
@@ -173,10 +189,11 @@ private extension ClubListViewModel {
         guard lastSearchedText != searchText else { return }
         lastSearchedText = searchText
         if searchText.isEmpty {
-            loadWithDefaultDelta()
+            setDefaultRegion()
+            filtersManager.removeSearchFilter()
         } else {
-            cameraRegion = CameraRegion(center: cameraRegion.center, delta: CLLocationCoordinate2D(latitude: 3, longitude: 3))
-            loadClubsBySearchText(searchText)
+            setBigRegion()
+            filtersManager.add(filter: .name(searchText))
         }
     }
     

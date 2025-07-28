@@ -13,7 +13,7 @@ import CoreLocation
 
 // MARK: - Updated Protocol
 protocol NetworkServiceProtocol {
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error>
+    func fetchClubs(filters: [ClubsFilter], radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error>
 }
 
 // MARK: - Updated Service
@@ -22,8 +22,8 @@ final class FirestoreService: NetworkServiceProtocol {
     private let mapper: DataMapperProtocol = DataMapper()
     private let pageSize: Int = 15
     
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
-        getClubsPublisher(filter: filter, radius: radius)
+    func fetchClubs(filters: [ClubsFilter], radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
+        getClubsPublisher(filters: filters, radius: radius)
             .map({ [weak self] collectionSnapshot in
                 guard let self = self else {
                     print("FirestoreService выгрузился из памяти")
@@ -43,16 +43,23 @@ final class FirestoreService: NetworkServiceProtocol {
 
 // MARK: - Private Extensions
 private extension FirestoreService {
-    func getClubsPublisher(filter: ClubsFilter?, radius: QueryRadiusData) -> Future<QuerySnapshot, any Error> {
+    func getClubsPublisher(filters: [ClubsFilter], radius: QueryRadiusData) -> Future<QuerySnapshot, any Error> {
         var baseQuery = buildBaseQuery()
-        if let filter, case let ClubsFilter.name(name) = filter {
-            baseQuery = applySearch(to: baseQuery, name: name)
-            baseQuery = applyRadius(to: baseQuery, radius: radius)
-        } else {
-            baseQuery = applyRadius(to: baseQuery, radius: radius)
+        for filter in filters {
+            baseQuery = applyFilter(to: baseQuery, filter: filter)
         }
+        baseQuery = applyRadius(to: baseQuery, radius: radius)
         
         return baseQuery.getDocuments()
+    }
+    
+    func applyFilter(to query: Query, filter: ClubsFilter) -> Query {
+        switch filter {
+        case .name(let string):
+            applySearch(to: query, name: string)
+        case .videocard(let videocardFilter):
+            applyVideocard(to: query, videocardFilter: videocardFilter)
+        }
     }
     
     func buildBaseQuery() -> Query {
@@ -65,6 +72,11 @@ private extension FirestoreService {
             .whereField("nameLowercase", isGreaterThanOrEqualTo: name.lowercased())
             .whereField("nameLowercase", isLessThan: name.lowercased() + "\u{f8ff}")
             .order(by: "nameLowercase")
+    }
+    
+    func applyVideocard(to query: Query, videocardFilter: VideocardFilter) -> Query {
+        query
+            .whereField("bestVideocardRate", isGreaterThanOrEqualTo: videocardFilter.rawValue)
     }
     
     func applyRadius(to query: Query, radius: QueryRadiusData) -> Query {

@@ -14,10 +14,10 @@ enum ClubsFilter {
 }
 
 enum VideocardFilter: Int {
-    case series2 = 0
-    case series3
-    case series4
-    case series5
+    case series2 = 2
+    case series3 = 3
+    case series4 = 4
+    case series5 = 5
     
     func displayText() -> String {
         switch self {

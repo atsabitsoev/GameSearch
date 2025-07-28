@@ -14,12 +14,34 @@ private enum SubScreen {
 
 
 struct FiltersView: View {
+    @Environment(\.dismiss) private var dismiss
     @Binding var isPresented: Bool
     @Binding var selectedDetent: PresentationDetent
     
     @State private var viewDisappeared = false
     @State private var videocardFilter: VideocardFilter?
     @State private var presentedSubScreen: SubScreen?
+    
+    var applyFilters: ([ClubsFilter]) -> ()
+    
+    
+    init(
+        isPresented: Binding<Bool>,
+        selectedDetent: Binding<PresentationDetent>,
+        initialFilters: [ClubsFilter],
+        applyFilters: @escaping ([ClubsFilter]) -> Void
+    ) {
+        self._isPresented = isPresented
+        self._selectedDetent = selectedDetent
+        self.applyFilters = applyFilters
+        initialFilters.forEach { filter in
+            switch filter {
+            case .videocard(let videocardFilter):
+                self._videocardFilter = State(initialValue: videocardFilter)
+            default: break
+            }
+        }
+    }
     
     
     var body: some View {
@@ -42,7 +64,8 @@ struct FiltersView: View {
                     .foregroundStyle(videocardFilter == nil ? Color.white : Color.info2)
                 }
                 Button {
-                    print("Save")
+                    applyFilters(getCurrentFilters())
+                    dismiss()
                 } label: {
                     Text("Применить")
                         .foregroundStyle(Color.white)
@@ -52,6 +75,15 @@ struct FiltersView: View {
                 .background(Color.accent)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .padding(.top, 32)
+                Button {
+                    cleanFilters()
+                    applyFilters([])
+                    dismiss()
+                } label: {
+                    Text("Сбросить")
+                        .foregroundStyle(Color.red)
+                }
+                .padding(.top, 8)
                 Spacer()
             }
             .padding(.horizontal)
@@ -66,7 +98,7 @@ struct FiltersView: View {
                     .background(EAColor.background)
             }
             .onAppear {
-                selectedDetent = .height(200)
+                selectedDetent = .height(236)
                 viewDisappeared = false
             }
             .onDisappear {
@@ -84,6 +116,17 @@ private extension FiltersView {
         } set: { newValue in
             presentedSubScreen = newValue ? .videocardList : nil
         }
-
+    }
+    
+    func getCurrentFilters() -> [ClubsFilter] {
+        var result = [ClubsFilter]()
+        if let videocardFilter {
+            result.append(.videocard(videocardFilter))
+        }
+        return result
+    }
+    
+    func cleanFilters() {
+        videocardFilter = nil
     }
 }

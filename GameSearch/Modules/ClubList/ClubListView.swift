@@ -4,18 +4,18 @@ import MapKit
 struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
     @EnvironmentObject private var router: Router
     @StateObject private var viewModel: ViewModel
-
+    
     @FocusState private var searchFocused
     @State private var searchActive = false
     @State private var viewDidAppear = false
     
     @State private var selectedDetent: PresentationDetent = .height(200)
-
-
+    
+    
     init(viewModel: ViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
     }
-
+    
     var body: some View {
         NavigationView {
             contentView
@@ -36,10 +36,16 @@ struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
                     ZStack {
                         EAColor.background
                             .padding(.bottom, -200)
-                        FiltersView(isPresented: $viewModel.showFiltersView, selectedDetent: $selectedDetent)
-                            .presentationDetents([.height(200), .height(370)], selection: $selectedDetent)
-                            .presentationDragIndicator(.visible)
-                            .presentationBackground(EAColor.background)
+                        FiltersView(
+                            isPresented: $viewModel.showFiltersView,
+                            selectedDetent: $selectedDetent,
+                            initialFilters: viewModel.filtersManager.filters
+                        ) { newFilters in
+                            viewModel.onFiltersApply(newFilters)
+                        }
+                        .presentationDetents([.height(236), .height(370)], selection: $selectedDetent)
+                        .presentationDragIndicator(.visible)
+                        .presentationBackground(EAColor.background)
                     }
                 }
         }
@@ -88,7 +94,7 @@ private extension ClubListView {
                     viewModel.showFiltersView = true
                 }
             } label: {
-                Image(systemName: "line.3.horizontal.decrease.circle")
+                Image(systemName: viewModel.filtersManager.filtersApplied ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
             }
 
         }

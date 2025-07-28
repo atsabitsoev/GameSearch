@@ -15,6 +15,7 @@ protocol ClubListViewModelProtocol: ObservableObject {
     var mapClubs: [MapClubData] { get }
     var mapPopupClub: MapPopupData? { get set }
     var locationManager: LocationManager { get set }
+    var filtersManager: FiltersManager { get set }
     var cameraRegion: CameraRegion { get set }
     var mapListButtonState: MapListButtonState { get set }
     var geoApplied: Bool { get }
@@ -24,17 +25,12 @@ protocol ClubListViewModelProtocol: ObservableObject {
     
     func onGeoButtonTap()
     func onViewAppear()
+    func onFiltersApply(_ filters: [ClubsFilter])
     func clearMapPopupClub()
     func routeToDetails(clubID: String, router: Router)
 }
 
 
 protocol ClubListInteractorProtocol {
-    func fetchClubs(filter: ClubsFilter?, radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error>
-}
-
-extension ClubListInteractorProtocol {
-    func fetchClubs(radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error> {
-        fetchClubs(filter: nil, radius: radius)
-    }
+    func fetchClubs(filters: [ClubsFilter], radius: QueryRadiusData) -> AnyPublisher<[FullClubData], any Error>
 }

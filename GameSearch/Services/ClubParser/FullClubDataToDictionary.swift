@@ -22,7 +22,8 @@ extension FullClubData {
             "rating": rating,
             "subscribers": subscribers,
             "tags": tags,
-            "logo": logo
+            "logo": logo,
+            "bestVideocardRate": configurations.last?.bestVideocardRate() ?? -1
         ]
         
         // Опциональные поля
@@ -34,6 +35,27 @@ extension FullClubData {
         }
         
         return dict
+    }
+}
+
+private extension RoomConfiguration {
+    func bestVideocardRate() -> Int {
+        switch self {
+        case .pc(let pCConfiguration):
+            if pCConfiguration.videoCard.hasPrefix("NVIDIA GeForce RTX 20") {
+                return 2
+            } else if pCConfiguration.videoCard.hasPrefix("NVIDIA GeForce RTX 30") {
+                return 3
+            } else if pCConfiguration.videoCard.hasPrefix("NVIDIA GeForce RTX 40") {
+                return 4
+            } else if pCConfiguration.videoCard.hasPrefix("NVIDIA GeForce RTX 50") {
+                return 5
+            } else {
+                return -1
+            }
+        case .playstation:
+            return -1
+        }
     }
 }
 
