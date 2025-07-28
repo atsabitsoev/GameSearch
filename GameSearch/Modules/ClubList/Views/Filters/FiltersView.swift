@@ -70,10 +70,10 @@ struct FiltersView: View {
                     Text("Применить")
                         .foregroundStyle(Color.white)
                         .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-                .frame(maxWidth: .infinity)
-                .background(Color.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
                 .padding(.top, 32)
                 Button {
                     cleanFilters()
