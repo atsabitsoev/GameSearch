@@ -184,6 +184,7 @@ private extension ClubListView {
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Поиск"
         )
+        .searchPresentationToolbarBehavior(.avoidHidingContent)
         .searchFocused($searchFocused)
         .ignoresSafeArea(.keyboard)
         .onScrollPhaseChange { _, newPhase in
