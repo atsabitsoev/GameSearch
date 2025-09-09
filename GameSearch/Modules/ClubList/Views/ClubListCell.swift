@@ -51,9 +51,12 @@ private extension ClubListCell {
                 .frame(width: 54, height: 54)
                 .clipShape(RoundedRectangle(cornerRadius: 27))
         } placeholder: {
-            RoundedRectangle(cornerRadius: 27)
-                .fill(EAColor.background)
+            Image("ClubIconPlaceholder")
+                .resizable()
+                .scaleEffect(CGSize(width: 1.1, height: 1.1))
+                .aspectRatio(contentMode: .fill)
                 .frame(width: 54, height: 54)
+                .clipShape(RoundedRectangle(cornerRadius: 27))
         }
     }
     
@@ -115,12 +118,12 @@ private struct TagView: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(EAColor.info1)
             Text(tag)
-                .font(EAFont.infoSmall)
+                .font(EAFont.info)
                 .foregroundStyle(EAColor.info2)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
         }
-        .frame(height: 24)
+        .frame(height: 32)
     }
 }
 

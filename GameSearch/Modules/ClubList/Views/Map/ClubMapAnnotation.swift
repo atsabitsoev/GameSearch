@@ -9,13 +9,19 @@ import SwiftUI
 
 struct ClubMapAnnotation: View {
     @State private var animation: Bool = false
+    private var shouldHideTitles: Bool
     
     let clubMapName: String?
     let didTapAction: () -> Void
 
 
-    init(clubMapName: String? = nil, didTapAction: @escaping () -> Void = {}) {
+    init(
+        clubMapName: String? = nil,
+        shouldHideTitles: Bool = false,
+        didTapAction: @escaping () -> Void = {}
+    ) {
         self.clubMapName = clubMapName
+        self.shouldHideTitles = shouldHideTitles
         self.didTapAction = didTapAction
     }
 
@@ -25,6 +31,7 @@ struct ClubMapAnnotation: View {
             circleImageView
             annotationText
         }
+        .frame(height: 64)
         .onTapGesture {
             withAnimation {
                 animation.toggle()
@@ -56,9 +63,12 @@ private extension ClubMapAnnotation {
 
     var annotationText: some View {
         Group {
-            if let clubMapName {
+            if let clubMapName, !shouldHideTitles {
                 Text(clubMapName)
-                    .font(.caption)
+                    .frame(maxWidth: 100)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .font(.caption2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(2)

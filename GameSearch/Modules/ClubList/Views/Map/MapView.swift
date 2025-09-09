@@ -11,6 +11,7 @@ import MapKit
 struct MapView: View {
     @State private var location: MapCameraPosition = .automatic
     @State private var cameraRegionChangesFromIn = false
+    @State private var shouldHideAnotationTitles = false
     
     @Binding private var cameraRegion: CameraRegion
     @Binding private var selectedClub: MapPopupData?
@@ -36,7 +37,7 @@ struct MapView: View {
             UserAnnotation()
             ForEach(mapClubs, id: \.id) { clubMapData in
                 Annotation("", coordinate: clubMapData.location) {
-                    ClubMapAnnotation(clubMapName: clubMapData.name) {
+                    ClubMapAnnotation(clubMapName: clubMapData.name, shouldHideTitles: shouldHideAnotationTitles) {
                         location = .camera(.init(centerCoordinate: clubMapData.location, distance: 3000))
                         selectedClub = MapPopupData(selectedClub: clubMapData, state: .full)
                     }
@@ -52,8 +53,9 @@ struct MapView: View {
             }
             cameraRegionChangesFromIn = false
         })
-        .onMapCameraChange(frequency: .continuous) {
+        .onMapCameraChange(frequency: .continuous) { (context: MapCameraUpdateContext) in
             setPopupState(.min)
+            shouldHideAnotationTitles = context.region.span.latitudeDelta > 0.1
         }
         .onMapCameraChange(
             frequency: .onEnd,

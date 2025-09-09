@@ -173,9 +173,11 @@ private extension MapPopup {
                 .frame(width: 44, height: 44)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         } placeholder: {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(EAColor.info2)
+            Image("ClubIconPlaceholder")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
                 .frame(width: 44, height: 44)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .padding(12)
     }
