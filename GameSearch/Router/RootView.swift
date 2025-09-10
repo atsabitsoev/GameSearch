@@ -34,9 +34,9 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 }
                 .setupNavigationBarAppearance()
             }
-//            Tab("Новости", systemImage: "newspaper") {
-//                NewsView()
-//            }
+            Tab("Новости", systemImage: "newspaper") {
+                NewsView()
+            }
         }
         .tint(EAColor.accent)
         .setupTabBarAppearance()
