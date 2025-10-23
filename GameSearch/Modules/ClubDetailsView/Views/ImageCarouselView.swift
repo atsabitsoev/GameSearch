@@ -11,7 +11,6 @@ struct ImageCarouselView: View {
     let images: [String]
 
     var body: some View {
-        GeometryReader { geometry in
             TabView {
                 ForEach(images, id: \.self) { imageURL in
                     ZStack {
@@ -20,9 +19,9 @@ struct ImageCarouselView: View {
                         AsyncImage(url: URL(string: imageURL)) { phase in
                             switch phase {
                             case .empty:
-                                proggressView(geometry)
+                                proggressView()
                             case .success(let image):
-                                successImage(image, geometry)
+                                successImage(image)
                             case .failure:
                                 errorView()
                             @unknown default:
@@ -31,26 +30,24 @@ struct ImageCarouselView: View {
                         }
                         .ignoresSafeArea()
                     }
+                    .offset(y: -getKeyWindow().safeAreaInsets.top)
                     .ignoresSafeArea()
                 }
             }
             .tabViewStyle(PageTabViewStyle())
-        }
     }
 }
 
 private extension ImageCarouselView {
-    func successImage(_ image: Image, _ geo: GeometryProxy) -> some View {
+    func successImage(_ image: Image) -> some View {
         image
             .resizable()
             .scaledToFill()
-            .frame(width: geo.size.width, height: geo.size.height)
             .clipped()
     }
     
-    func proggressView(_ geo: GeometryProxy) -> some View {
+    func proggressView() -> some View {
         ProgressView()
-            .frame(width: geo.size.width, height: geo.size.height)
     }
     
     func errorView() -> some View {
@@ -69,6 +66,15 @@ private extension ImageCarouselView {
             .frame(width: 60, height: 60)
             .foregroundColor(.gray)
             .padding()
+    }
+    
+    
+    func getKeyWindow() -> UIWindow {
+        UIApplication
+        .shared
+        .connectedScenes
+        .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+        .first { $0.isKeyWindow }!
     }
 }
 
