@@ -15,6 +15,7 @@ struct NewsResponse: Decodable {
         struct Attributes: Decodable {
             let title: String
             let publishedAt: Int
+            var image: String?
         }
     }
 }

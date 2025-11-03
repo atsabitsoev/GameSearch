@@ -1,5 +1,5 @@
 //
-//  NavBarModifier.swift
+//  ClubsNavBarModifier.swift
 //  GameSearch
 //
 //  Created by Бабочиев Эдуард Таймуразович on 13.05.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NavBarModifier: ViewModifier {
+struct ClubsNavBarModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onAppear {
@@ -24,8 +24,8 @@ struct NavBarModifier: ViewModifier {
 }
 
 extension View {
-    func setupNavigationBarAppearance() -> some View {
+    func setupClubsNavigationBarAppearance() -> some View {
         self
-            .modifier(NavBarModifier())
+            .modifier(ClubsNavBarModifier())
     }
 }

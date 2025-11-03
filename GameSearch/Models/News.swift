@@ -8,8 +8,9 @@
 import Foundation
 
 
-struct News {
+struct News: Identifiable {
     let id: String
     let title: String
     let date: Date
+    var imageUrl: URL?
 }

@@ -9,16 +9,24 @@ import SwiftUI
 
 
 final class ScreenFactory: ScreenFactoryProtocol {
+    
     func makeClubListView() -> some View {
         let interactor = ClubListInteractor()
         let viewModel = ClubListViewModel(interactor: interactor)
         return ClubListView(viewModel: viewModel)
     }
     
-    
     func makeClubDetailsView(_ data: ClubDetailsData) -> some View {
         let interactor = ClubDetailsInteractor()
         let viewModel = ClubDetailsViewModel(data: data, interactor: interactor)
         return ClubDetailsView(viewModel: viewModel)
+    }
+    
+    
+    func makeNewsListView() -> some View {
+        let newsService: NewsServiceProtocol = NewsService()
+        let interactor: NewsListInteractorProtocol = NewsListInteractor(service: newsService)
+        let viewModel: some NewsListViewModelProtocol = NewsListViewModel(interactor: interactor)
+        return NewsListView(viewModel: viewModel)
     }
 }

@@ -8,8 +8,14 @@
 import SwiftUI
 
 protocol ScreenFactoryProtocol {
-    associatedtype List: View
-    associatedtype Details: View
-    func makeClubListView() -> List
-    func makeClubDetailsView(_ data: ClubDetailsData) -> Details
+    associatedtype ClubList: View
+    associatedtype ClubDetails: View
+    
+    associatedtype NewsList: View
+    
+    
+    func makeClubListView() -> ClubList
+    func makeClubDetailsView(_ data: ClubDetailsData) -> ClubDetails
+    
+    func makeNewsListView() -> NewsList
 }

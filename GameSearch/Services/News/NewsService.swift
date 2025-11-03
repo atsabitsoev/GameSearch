@@ -17,6 +17,7 @@ protocol NewsServiceProtocol {
 
 final class NewsService: NewsServiceProtocol {
     private let baseUrl: String = "https://cybersport.ru"
+    private let baseImageUrl = "https://images.cybersport.ru/images/material-card/plain/"
     
     
     /// page начинается с 0
@@ -36,13 +37,19 @@ final class NewsService: NewsServiceProtocol {
             return URLSession.shared.dataTaskPublisher(for: request)
             .map(\.data)
             .decode(type: NewsResponse.self, decoder: JSONDecoder())
-            .map { newsResponse in
+            .map { [weak self] newsResponse in
                 newsResponse.data
                     .map { item in
+                        let imageUrl: URL? = if let self, let imageUrlString = item.attributes.image {
+                            URL(string: self.baseImageUrl + imageUrlString)
+                        } else {
+                            nil
+                        }
                         return News(
                             id: item.id,
                             title: item.attributes.title,
-                            date: Date(timeIntervalSince1970: TimeInterval(item.attributes.publishedAt))
+                            date: Date(timeIntervalSince1970: TimeInterval(item.attributes.publishedAt)),
+                            imageUrl: imageUrl
                         )
                     }
             }

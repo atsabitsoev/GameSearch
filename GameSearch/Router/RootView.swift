@@ -32,10 +32,12 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                         }
                         .enableSwipeBack()
                 }
-                .setupNavigationBarAppearance()
+                .setupClubsNavigationBarAppearance()
             }
             Tab("Новости", systemImage: "newspaper") {
-                NewsView()
+                NavigationStack(path: $router.path) {
+                    factory.makeNewsListView()
+                }
             }
         }
         .tint(EAColor.accent)
