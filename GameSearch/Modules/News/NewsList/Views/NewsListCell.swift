@@ -21,7 +21,7 @@ struct NewsListCell: View {
             } placeholder: {
                 placeholderImage
             }
-            .frame(height: 120)
+            .frame(height: 180)
             .clipped()
             .cornersRadius(top: 16, bottom: 16)
             
