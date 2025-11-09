@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		AC03C71F2E0B1D9F0044A607 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = AC03C71E2E0B1D9F0044A607 /* SwiftSoup */; };
+		AC4A18BC2EC111C40024E542 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = AC4A18BB2EC111C40024E542 /* CachedAsyncImage */; };
 		ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC4A18BC2EC111C40024E542 /* CachedAsyncImage in Frameworks */,
 				ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				AC03C71F2E0B1D9F0044A607 /* SwiftSoup in Frameworks */,
 			);
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */,
 				AC03C71E2E0B1D9F0044A607 /* SwiftSoup */,
+				AC4A18BB2EC111C40024E542 /* CachedAsyncImage */,
 			);
 			productName = GameSearch;
 			productReference = ACD377732DCE48F0003874AA /* GameSearch.app */;
@@ -118,6 +121,7 @@
 			packageReferences = (
 				ACDF4B042DD5097300DE3332 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				AC4A18BA2EC111C40024E542 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = ACD377742DCE48F0003874AA /* Products */;
@@ -379,6 +383,14 @@
 				minimumVersion = 2.8.8;
 			};
 		};
+		AC4A18BA2EC111C40024E542 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-cached-async-image.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
+			};
+		};
 		ACDF4B042DD5097300DE3332 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -394,6 +406,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
+		};
+		AC4A18BB2EC111C40024E542 /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AC4A18BA2EC111C40024E542 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
+			productName = CachedAsyncImage;
 		};
 		ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */ = {
 			isa = XCSwiftPackageProductDependency;

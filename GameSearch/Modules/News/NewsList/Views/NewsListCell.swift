@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CachedAsyncImage
 
 
 struct NewsListCell: View {
@@ -14,7 +15,7 @@ struct NewsListCell: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            AsyncImage(url: data.imageUrl) { image in
+            CachedAsyncImage(url: data.imageUrl) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -80,7 +81,6 @@ private extension NewsListCell {
     
     func setupDate(for date: Date) -> String {
         let calendar = Calendar.current
-        let now = Date()
 
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
