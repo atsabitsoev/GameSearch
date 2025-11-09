@@ -1,5 +1,5 @@
 //
-//  NewsListView.swift
+//  ArticlesListView.swift
 //  GameSearch
 //
 //  Created by Ацамаз on 03.11.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewsListView<ViewModel: NewsListViewModelProtocol>: View {
+struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     
     
@@ -20,16 +20,19 @@ struct NewsListView<ViewModel: NewsListViewModelProtocol>: View {
         ZStack {
             EAColor.background
                 .ignoresSafeArea()
-            List(viewModel.news) { newsItem in
-                NewsListCell(data: newsItem)
+            List(viewModel.articles) { article in
+                ArticlesListCell(data: article)
                     .listRowSeparator(.hidden)
                     .listRowBackground(EAColor.background)
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    .onTapGesture {
+                        viewModel.onCellTap(article)
+                    }
             }
             .listStyle(.plain)
             .listRowSpacing(16)
             .refreshable {
-                await viewModel.loadNews()
+                await viewModel.loadArticles()
             }
         }
         .toolbarBackground(EAColor.background, for: .navigationBar)
@@ -37,7 +40,7 @@ struct NewsListView<ViewModel: NewsListViewModelProtocol>: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             Task {
-                await viewModel.loadNews()
+                await viewModel.loadArticles()
             }
         }
     }

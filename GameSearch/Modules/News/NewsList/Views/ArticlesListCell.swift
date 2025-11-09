@@ -1,5 +1,5 @@
 //
-//  NewsListCell.swift
+//  ArticlesListCell.swift
 //  GameSearch
 //
 //  Created by Ацамаз on 03.11.2025.
@@ -9,8 +9,8 @@ import SwiftUI
 import CachedAsyncImage
 
 
-struct NewsListCell: View {
-    let data: News
+struct ArticlesListCell: View {
+    let data: Article
     
     
     var body: some View {
@@ -48,7 +48,7 @@ struct NewsListCell: View {
 }
 
 
-private extension NewsListCell {
+private extension ArticlesListCell {
     @ViewBuilder
     var articleTypeLogo: some View {
         switch data.type {

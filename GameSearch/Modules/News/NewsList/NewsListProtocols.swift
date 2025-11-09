@@ -1,5 +1,5 @@
 //
-//  NewsListProtocols.swift
+//  ArticlesListProtocols.swift
 //  GameSearch
 //
 //  Created by Ацамаз on 03.11.2025.
@@ -7,14 +7,16 @@
 
 import Combine
 
-protocol NewsListViewModelProtocol: ObservableObject {
-    var news: [News] { get }
+protocol ArticlesListViewModelProtocol: ObservableObject {
+    var articles: [Article] { get }
     
-    func loadNews() async
+    func loadArticles() async
     func loadNextPage()
+    func onCellTap(_ article: Article)
 }
 
 
-protocol NewsListInteractorProtocol {
-    func fetchNews(page: Int) -> AnyPublisher<[News], any Error>
+protocol ArticlesListInteractorProtocol {
+    func fetchArticles(page: Int) -> AnyPublisher<[Article], any Error>
+    func getArticleDataBlocks(slug: String) -> AnyPublisher<[ArticleDataBlock], any Error>
 }

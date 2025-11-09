@@ -9,7 +9,8 @@ import SwiftUI
 
 
 struct RootView<Factory: ScreenFactoryProtocol>: View {
-    @EnvironmentObject private var router: Router
+    @EnvironmentObject private var clubsRouter: ClubsRouter
+    @EnvironmentObject private var articlesRouter: ArticlesRouter
     private let factory: Factory
     
     
@@ -20,11 +21,16 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
 
     var body: some View {
         TabView {
+            Tab("Новости", systemImage: "newspaper") {
+                NavigationStack(path: $articlesRouter.path) {
+                    factory.makeArticlesListView()
+                }
+            }
             Tab("Клубы", systemImage: "cube") {
-                NavigationStack(path: $router.path) {
+                NavigationStack(path: $clubsRouter.path) {
                     factory.makeClubListView()
-                        .environmentObject(router)
-                        .navigationDestination(for: Route.self) { route in
+                        .environmentObject(clubsRouter)
+                        .navigationDestination(for: ClubsRoute.self) { route in
                             switch route {
                             case .details(let data):
                                 factory.makeClubDetailsView(data)
@@ -33,11 +39,6 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                         .enableSwipeBack()
                 }
                 .setupClubsNavigationBarAppearance()
-            }
-            Tab("Новости", systemImage: "newspaper") {
-                NavigationStack(path: $router.path) {
-                    factory.makeNewsListView()
-                }
             }
         }
         .tint(EAColor.accent)

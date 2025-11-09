@@ -11,11 +11,11 @@ protocol ScreenFactoryProtocol {
     associatedtype ClubList: View
     associatedtype ClubDetails: View
     
-    associatedtype NewsList: View
+    associatedtype ArticlesList: View
     
     
     func makeClubListView() -> ClubList
     func makeClubDetailsView(_ data: ClubDetailsData) -> ClubDetails
     
-    func makeNewsListView() -> NewsList
+    func makeArticlesListView() -> ArticlesList
 }

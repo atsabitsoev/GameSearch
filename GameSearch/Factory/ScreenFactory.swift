@@ -23,10 +23,10 @@ final class ScreenFactory: ScreenFactoryProtocol {
     }
     
     
-    func makeNewsListView() -> some View {
-        let newsService: NewsServiceProtocol = NewsService()
-        let interactor: NewsListInteractorProtocol = NewsListInteractor(service: newsService)
-        let viewModel: some NewsListViewModelProtocol = NewsListViewModel(interactor: interactor)
-        return NewsListView(viewModel: viewModel)
+    func makeArticlesListView() -> some View {
+        let articlesService: ArticlesServiceProtocol = ArticlesService()
+        let interactor: ArticlesListInteractorProtocol = ArticlesListInteractor(service: articlesService)
+        let viewModel: some ArticlesListViewModelProtocol = ArticlesListViewModel(interactor: interactor)
+        return ArticlesListView(viewModel: viewModel)
     }
 }

@@ -18,7 +18,8 @@ struct GameSearchApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(factory: ScreenFactory())
-                .environmentObject(Router())
+                .environmentObject(ClubsRouter())
+                .environmentObject(ArticlesRouter())
                 .preferredColorScheme(.dark)
         }
     }

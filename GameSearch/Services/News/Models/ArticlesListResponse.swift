@@ -1,21 +1,22 @@
 //
-//  NewsResponse.swift
+//  ArticlesListResponse.swift
 //  GameSearch
 //
 //  Created by Ацамаз on 01.11.2025.
 //
 
-struct NewsResponse: Decodable {
-    let data: [NewsData]
+struct ArticlesListResponse: Decodable {
+    let data: [ArticlesData]
     let included: [Included]
     
-    struct NewsData: Decodable {
+    struct ArticlesData: Decodable {
         let id: String
         let attributes: Attributes
         let relationships: Relationships
         
         struct Attributes: Decodable {
             let title: String
+            let slug: String
             let publishedAt: Int
             var image: String?
         }

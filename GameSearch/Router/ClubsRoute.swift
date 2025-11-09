@@ -7,7 +7,7 @@
 
 
 
-enum Route: Hashable {
+enum ClubsRoute: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case .details(let data):
@@ -15,7 +15,7 @@ enum Route: Hashable {
         }
     }
     
-    static func == (lhs: Route, rhs: Route) -> Bool {
+    static func == (lhs: ClubsRoute, rhs: ClubsRoute) -> Bool {
         switch (lhs, rhs) {
         case let (.details(data1), .details(data2)): return data1.id == data2.id
         }

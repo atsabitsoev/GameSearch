@@ -1,5 +1,5 @@
 //
-//  GhostNewsCell.swift
+//  GhostArticlesCell.swift
 //  GameSearch
 //
 //  Created by Ацамаз on 29.05.2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct GhostNewsCell: View {
+struct GhostArticlesCell: View {
     var body: some View {
         VStack(spacing: 12) {
             RoundedRectangle(cornerRadius: 12)

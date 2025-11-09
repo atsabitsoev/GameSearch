@@ -1,5 +1,5 @@
 //
-//  NewsPlaceholderView.swift
+//  ArticlesPlaceholderView.swift
 //  GameSearch
 //
 //  Created by Бабочиев Эдуард Таймуразович on 29.05.2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewsPlaceholderView: View {
+struct ArticlesPlaceholderView: View {
     @State private var moveRight = false
     @State private var isJumping = false
     @State private var glow = false
@@ -32,21 +32,21 @@ struct NewsPlaceholderView: View {
     var contentView: some View {
         VStack(spacing: 24) {
             GhostHeader()
-            ghostNewsList
+            ghostArticlesList
             Spacer()
         }
         .background(EAColor.background)
     }
 
-    private var ghostNewsList: some View {
+    private var ghostArticlesList: some View {
         VStack(spacing: 16) {
             ForEach(0..<2) { _ in
-                GhostNewsCell()
+                GhostArticlesCell()
             }
         }
     }
 }
 
 #Preview {
-    NewsPlaceholderView()
+    ArticlesPlaceholderView()
 }

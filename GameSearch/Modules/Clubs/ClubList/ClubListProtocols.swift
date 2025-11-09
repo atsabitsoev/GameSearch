@@ -27,7 +27,7 @@ protocol ClubListViewModelProtocol: ObservableObject {
     func onViewAppear()
     func onFiltersApply(_ filters: [ClubsFilter])
     func clearMapPopupClub()
-    func routeToDetails(clubID: String, router: Router)
+    func routeToDetails(clubID: String, router: ClubsRouter)
 }
 
 

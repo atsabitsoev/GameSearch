@@ -33,14 +33,14 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
     
     init(interactor: Interactor) {
         self.interactor = interactor
-        subscribeSearchText()
-        subscribeFilters()
-        subscribeCameraDelta()
-        subscribeLocationAuth()
     }
     
     
     func onViewAppear() {
+        subscribeSearchText()
+        subscribeFilters()
+        subscribeCameraDelta()
+        subscribeLocationAuth()
         locationManager.onLocationGot = { [weak self] in
             self?.loadWithDefaultDelta()
         }
@@ -51,7 +51,7 @@ final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListV
         filtersManager.remakeFilters(filters)
     }
     
-    func routeToDetails(clubID: String, router: Router) {
+    func routeToDetails(clubID: String, router: ClubsRouter) {
         guard let club = getClubDetails(by: clubID) else {
             print("Club not found, need delete from Base")
             return

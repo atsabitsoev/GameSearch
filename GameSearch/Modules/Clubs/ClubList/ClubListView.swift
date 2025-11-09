@@ -2,7 +2,7 @@ import SwiftUI
 import MapKit
 
 struct ClubListView<ViewModel: ClubListViewModelProtocol>: View {
-    @EnvironmentObject private var router: Router
+    @EnvironmentObject private var router: ClubsRouter
     @StateObject private var viewModel: ViewModel
     
     @FocusState private var searchFocused

@@ -44,9 +44,6 @@ struct MapView: View {
                 }
             }
         }
-        .onChange(of: mapClubs) {
-            updateCamera()
-        }
         .onChange(of: cameraRegion, { _, newValue in
             if !cameraRegionChangesFromIn {
                 location = .region(.init(center: newValue.center, span: .init(latitudeDelta: newValue.delta.latitude, longitudeDelta: newValue.delta.longitude)))
@@ -77,56 +74,6 @@ private extension MapView {
                 selectedClub?.state = state
             }
         }
-    }
-    
-    func updateCamera() {
-        if let closestClub = closestPoint(to: centerLocation, from: mapClubs.map(\.location)) {
-            let region = regionThatFits(points: [centerLocation, closestClub])
-//            location = .region(region)
-        } else {
-//            location = .camera(.init(centerCoordinate: centerLocation, distance: 3000))
-        }
-    }
-    
-    func makeCoordinateRegion(region: CameraRegion) -> MKCoordinateRegion {
-        let latMetersPerDegree = 111_000.0
-        let lonMetersPerDegree = 111_320.0 * cos(region.center.latitude * .pi / 180.0)
-
-        let deltaLatMeters = region.delta.latitude * latMetersPerDegree
-        let deltaLonMeters = region.delta.longitude * lonMetersPerDegree
-
-        return MKCoordinateRegion(center: region.center, latitudinalMeters: deltaLatMeters, longitudinalMeters: deltaLonMeters)
-    }
-    
-    func closestPoint(to target: CLLocationCoordinate2D, from points: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D? {
-        let targetLocation = CLLocation(latitude: target.latitude, longitude: target.longitude)
-        return points.min {
-            let d1 = targetLocation.distance(from: CLLocation(latitude: $0.latitude, longitude: $0.longitude))
-            let d2 = targetLocation.distance(from: CLLocation(latitude: $1.latitude, longitude: $1.longitude))
-            return d1 < d2
-        }
-    }
-    
-    func regionThatFits(points: [CLLocationCoordinate2D]) -> MKCoordinateRegion {
-        let lats = points.map(\.latitude)
-        let lons = points.map(\.longitude)
-        
-        let minLat = lats.min() ?? 0
-        let maxLat = lats.max() ?? 0
-        let minLon = lons.min() ?? 0
-        let maxLon = lons.max() ?? 0
-        
-        let center = CLLocationCoordinate2D(
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        )
-        
-        let span = MKCoordinateSpan(
-            latitudeDelta: max(maxLat - minLat, 0.01) * 1.5,
-            longitudeDelta: max(maxLon - minLon, 0.01) * 1.5
-        )
-        
-        return MKCoordinateRegion(center: center, span: span)
     }
 }
 
