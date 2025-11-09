@@ -48,4 +48,16 @@ extension View {
                 )
             )
     }
+    
+    func cornersRadius(_ radius: CGFloat) -> some View {
+        self
+            .modifier(
+                CornersModifier(
+                    topLeading: radius,
+                    topTrailing: radius,
+                    bottomLeading: radius,
+                    bottomTrailing: radius
+                )
+            )
+    }
 }

@@ -18,6 +18,8 @@ enum EAColor {
     static let infoMain = Color("InfoMainColor")
 
     static let yellow = Color("YellowColor")
+    static let dotaColor = Color("dotaColor")
+    static let csColor = Color("csColor")
 
     static let textPrimary = Color("TextPrimary")
     static let textSecondary = Color("TextSecondary")

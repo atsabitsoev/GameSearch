@@ -22,34 +22,40 @@ final class NewsService: NewsServiceProtocol {
     
     /// page начинается с 0
     func getLatestNews(page: Int = 0) -> AnyPublisher<[News], any Error> {
-            let limit = 30
-            let offset = page * limit
-            let urlString = "\(baseUrl)/api/materials?page[offset]=\(offset)&page[limit]=\(limit)&sort=-publishedAt"
-            guard let url = URL(string: urlString) else {
-                print("Invalid URL")
-                return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
-            }
-            
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-            
-            // Создаем и запускаем задачу
-            return URLSession.shared.dataTaskPublisher(for: request)
+        let limit = 30
+        let offset = page * limit
+        let urlString = "\(baseUrl)/api/materials?page[offset]=\(offset)&page[limit]=\(limit)&sort=-publishedAt"
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        // Создаем и запускаем задачу
+        return URLSession.shared.dataTaskPublisher(for: request)
             .map(\.data)
             .decode(type: NewsResponse.self, decoder: JSONDecoder())
             .map { [weak self] newsResponse in
-                newsResponse.data
+                return newsResponse.data
                     .map { item in
                         let imageUrl: URL? = if let self, let imageUrlString = item.attributes.image {
                             URL(string: self.baseImageUrl + imageUrlString)
                         } else {
                             nil
                         }
+                        
+                        let type = newsResponse.included.first(where: {
+                            $0.id == item.relationships.mainTag.data.id
+                        })
+                        
                         return News(
                             id: item.id,
                             title: item.attributes.title,
                             date: Date(timeIntervalSince1970: TimeInterval(item.attributes.publishedAt)),
-                            imageUrl: imageUrl
+                            imageUrl: imageUrl,
+                            type: type?.attributes.name
                         )
                     }
             }

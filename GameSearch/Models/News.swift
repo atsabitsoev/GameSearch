@@ -13,4 +13,5 @@ struct News: Identifiable {
     let title: String
     let date: Date
     var imageUrl: URL?
+    let type: ArticalType?
 }

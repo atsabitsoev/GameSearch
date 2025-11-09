@@ -21,22 +21,47 @@ struct NewsListCell: View {
             } placeholder: {
                 placeholderImage
             }
-            .frame(height: 180)
+            .frame(height: 150)
             .clipped()
-            .cornersRadius(top: 16, bottom: 16)
+            .cornersRadius(16)
             
             Text(data.title)
+                .font(EAFont.info)
+                .foregroundStyle(EAColor.textPrimary)
                 .padding(.horizontal, 16)
-                .padding(.bottom, 16)
+            
+            HStack {
+                Text(setupDate(for: data.date))
+                    .font(EAFont.infoSmall)
+                    .foregroundStyle(EAColor.textSecondary)
+                Spacer()
+                articleTypeLogo
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
-        .background(EAColor.info1)
-        .cornerRadius(12)
+        .background(data.type == .dota2 ? EAColor.dotaColor.opacity(0.3) : data.type == .cs2 ? EAColor.csColor.opacity(0.3) : EAColor.info1)
+        .cornerRadius(16)
         .shadow(color: EAColor.secondaryBackground, radius: 8, x: 0, y: 2)
     }
 }
 
 
 private extension NewsListCell {
+    @ViewBuilder
+    var articleTypeLogo: some View {
+        switch data.type {
+        case .cs2: Image("cs")
+                .resizable()
+                .frame(width: 24, height: 24)
+        case .dota2:
+            Image("dota2")
+                .resizable()
+                .frame(width: 24, height: 24)
+        default: EmptyView()
+        }
+    }
+    
     var placeholderImage: some View {
         RoundedRectangle(cornerRadius: 12)
             .fill(EAColor.info2)
@@ -51,5 +76,22 @@ private extension NewsListCell {
                     Spacer()
                 }
             )
+    }
+    
+    func setupDate(for date: Date) -> String {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+
+        if calendar.isDateInToday(date) {
+            return "Сегодня в \(formatter.string(from: date))"
+        } else if calendar.isDateInYesterday(date) {
+            return "Вчера в \(formatter.string(from: date))"
+        } else {
+            formatter.dateFormat = "dd.MM в HH:mm"
+            return formatter.string(from: date)
+        }
     }
 }
