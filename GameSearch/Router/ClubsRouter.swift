@@ -24,9 +24,9 @@ final class ClubsRouter: ObservableObject {
 }
 
 final class ArticlesRouter: ObservableObject {
-    @Published var path: [ClubsRoute] = []
+    @Published var path: [ArticlesRoute] = []
 
-    func push(_ route: ClubsRoute) {
+    func push(_ route: ArticlesRoute) {
         path.append(route)
     }
 

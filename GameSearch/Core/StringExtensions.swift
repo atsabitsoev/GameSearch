@@ -17,7 +17,8 @@ extension String {
     }
 
     func htmlToText() -> String {
-        guard let text = try? SwiftSoup.parse(self).text() else { return self }
+        let replacedNewStrings = self.replacingOccurrences(of: "<br>", with: "\\n")
+        guard let text = try? SwiftSoup.parse(replacedNewStrings).text().replacingOccurrences(of: "\\n", with: "\n") else { return self }
         return text
     }
 }

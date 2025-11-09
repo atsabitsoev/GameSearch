@@ -96,12 +96,12 @@ private extension ArticlesService {
             .map { [weak self] articleResponse in
                 guard let self else { return [] }
                 return articleResponse.data.attributes.content.blocks
-                    .compactMap { block in
+                    .compactMap { block -> ArticleDataBlock? in
                         switch block.type {
                         case .paragraph:
                             guard case .paragraph(let responseData) = block.data else { return nil }
                             let data = ParagraphBlockData(text: responseData.text.htmlToText())
-                            return .paragraph(data)
+                            return ArticleDataBlock(id: block.id, data: .paragraph(data))
                         case .authoredQuote:
                             guard case .authoredQuote(let responseData) = block.data else { return nil }
                             let data = AuthoredQuoteData(
@@ -110,7 +110,7 @@ private extension ArticlesService {
                                 text: responseData.text.htmlToText(),
                                 photo: URL(string: self.quoteImageUrl + responseData.photo)
                             )
-                            return .authoredQuote(data)
+                            return ArticleDataBlock(id: block.id, data: .authoredQuote(data))
                         case .other:
                             return nil
                         }

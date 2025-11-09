@@ -12,7 +12,7 @@ struct ClubsNavBarModifier: ViewModifier {
         content
             .onAppear {
                 let appearance = UINavigationBarAppearance()
-                appearance.configureWithOpaqueBackground()
+                appearance.configureWithTransparentBackground()
                 let backButtonAppearance = UIBarButtonItemAppearance()
                 backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
                 appearance.backButtonAppearance = backButtonAppearance

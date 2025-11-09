@@ -12,11 +12,10 @@ protocol ArticlesListViewModelProtocol: ObservableObject {
     
     func loadArticles() async
     func loadNextPage()
-    func onCellTap(_ article: Article)
+    func onCellTap(_ article: Article, router: ArticlesRouter)
 }
 
 
 protocol ArticlesListInteractorProtocol {
     func fetchArticles(page: Int) -> AnyPublisher<[Article], any Error>
-    func getArticleDataBlocks(slug: String) -> AnyPublisher<[ArticleDataBlock], any Error>
 }

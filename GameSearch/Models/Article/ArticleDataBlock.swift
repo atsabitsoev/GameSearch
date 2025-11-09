@@ -8,9 +8,14 @@
 import Foundation
 
 
-enum ArticleDataBlock {
-    case paragraph(ParagraphBlockData)
-    case authoredQuote(AuthoredQuoteData)
+struct ArticleDataBlock: Identifiable {
+    let id: String
+    let data: Data
+
+    enum Data {
+        case paragraph(ParagraphBlockData)
+        case authoredQuote(AuthoredQuoteData)
+    }
 }
 
 

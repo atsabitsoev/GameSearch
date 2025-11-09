@@ -29,4 +29,11 @@ final class ScreenFactory: ScreenFactoryProtocol {
         let viewModel: some ArticlesListViewModelProtocol = ArticlesListViewModel(interactor: interactor)
         return ArticlesListView(viewModel: viewModel)
     }
+
+    func makeArticleDetailsView(article: Article) -> some View {
+        let articlesService: ArticlesServiceProtocol = ArticlesService()
+        let interactor: ArticleDetailsInteractorProtocol = ArticleDetailsInteractor(service: articlesService)
+        let viewModel: some ArticleDetailsViewModelProtocol = ArticleDetailsViewModel(article: article, interactor: interactor)
+        return ArticleDetailsView(viewModel: viewModel)
+    }
 }

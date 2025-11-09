@@ -34,13 +34,7 @@ final class ArticlesListViewModel: ArticlesListViewModelProtocol {
         print("Не сделано")
     }
 
-    func onCellTap(_ article: Article) {
-        interactor.getArticleDataBlocks(slug: article.slug)
-            .sink { completion in
-                print(completion)
-            } receiveValue: { blocks in
-                print(blocks)
-            }
-            .store(in: &cancellables)
+    func onCellTap(_ article: Article, router: ArticlesRouter) {
+        router.push(.details(article))
     }
 }

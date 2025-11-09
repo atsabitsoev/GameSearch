@@ -24,6 +24,13 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
             Tab("Новости", systemImage: "newspaper") {
                 NavigationStack(path: $articlesRouter.path) {
                     factory.makeArticlesListView()
+                        .environmentObject(articlesRouter)
+                        .navigationDestination(for: ArticlesRoute.self) { route in
+                            switch route {
+                            case .details(let data):
+                                factory.makeArticleDetailsView(article: data)
+                            }
+                        }
                 }
             }
             Tab("Клубы", systemImage: "cube") {

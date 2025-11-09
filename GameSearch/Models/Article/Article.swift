@@ -15,5 +15,5 @@ struct Article: Identifiable {
     var imageUrl: URL?
     let type: ArticalType?
     let slug: String
-    let dataBlocks: [ArticleDataBlock]
+    var dataBlocks: [ArticleDataBlock] = []
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
+    @EnvironmentObject private var router: ArticlesRouter
     @StateObject private var viewModel: ViewModel
     
     
@@ -26,7 +27,7 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
                     .listRowBackground(EAColor.background)
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     .onTapGesture {
-                        viewModel.onCellTap(article)
+                        viewModel.onCellTap(article, router: router)
                     }
             }
             .listStyle(.plain)
@@ -38,10 +39,8 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
         .toolbarBackground(EAColor.background, for: .navigationBar)
         .navigationTitle("Новости")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            Task {
-                await viewModel.loadArticles()
-            }
+        .task {
+            await viewModel.loadArticles()
         }
     }
 }

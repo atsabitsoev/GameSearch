@@ -27,7 +27,7 @@ struct ArticlesListCell: View {
             .cornersRadius(16)
             
             Text(data.title)
-                .font(EAFont.info)
+                .font(EAFont.smallTitle)
                 .foregroundStyle(EAColor.textPrimary)
                 .padding(.horizontal, 16)
             
