@@ -16,6 +16,9 @@ final class ClubParserService {
                 if let data {
                     result.append(data)
                     group.leave()
+                } else {
+                    print("пропустил")
+                    group.leave()
                 }
             }
         }

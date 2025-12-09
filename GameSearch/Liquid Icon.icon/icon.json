@@ -1,0 +1,123 @@
+{
+  "color-space-for-untagged-svg-colors" : "display-p3",
+  "fill" : {
+    "linear-gradient" : [
+      "extended-srgb:0.00000,0.75294,0.90980,1.00000",
+      "extended-srgb:0.38039,0.33333,0.96078,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Rectangle Copy 2.png",
+          "name" : "Rectangle Copy 2",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              314.125,
+              266.875
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "blend-mode" : "plus-lighter",
+          "fill" : {
+            "solid" : "srgb:1.00000,0.94814,0.00000,1.00000"
+          },
+          "image-name" : "C O O B 3.png",
+          "name" : "C O O B 3",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -99.75,
+              266
+            ]
+          }
+        },
+        {
+          "image-name" : "Rectangle Copy.png",
+          "name" : "Rectangle Copy",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -112.875,
+              265.125
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "Rectangle 2.png",
+          "name" : "Rectangle 2",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -121.625
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "Rectangle.png",
+          "name" : "Rectangle",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -105.875
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "iOS"
+    ]
+  }
+}
