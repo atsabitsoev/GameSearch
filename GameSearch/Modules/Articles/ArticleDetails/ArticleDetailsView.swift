@@ -32,12 +32,17 @@ struct ArticleDetailsView<ViewModel: ArticleDetailsViewModelProtocol>: View {
                             HeaderView(text: headerData.text)
                         case .list(let listData):
                             ListView(data: listData)
+                        case .webRaw(let webRawData):
+                            WebRawView(data: webRawData)
+                                .aspectRatio(16/9, contentMode: .fill)
+                        case .gallery(let galleryData):
+                            GalleryView(images: galleryData.images.map(\.absoluteString))
                         }
                     }
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.bottom, 8)
+            .padding(.bottom, 16)
         }
         .frame(maxWidth: .infinity)
         .background(EAColor.background)

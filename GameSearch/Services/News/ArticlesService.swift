@@ -20,6 +20,7 @@ final class ArticlesService: ArticlesServiceProtocol {
     private let baseUrl: String = "https://cybersport.ru/api/materials"
     private let cardImageUrl = "https://images.cybersport.ru/images/material-card/plain/"
     private let quoteImageUrl = "https://images.cybersport.ru/images/quote-author/plain/"
+    private let asIsImageUrl = "https://images.cybersport.ru/images/as-is/plain/"
 
     
     /// page начинается с 0
@@ -101,7 +102,7 @@ private extension ArticlesService {
                         case .paragraph:
                             guard case .paragraph(let responseData) = block.data else { return nil }
                             let data = ParagraphBlockData(text: responseData.text.htmlToText())
-                            return ArticleDataBlock(id: block.id, data: .paragraph(data))
+                            return ArticleDataBlock(id: block.id, data: .paragraph(data), type: .init(rawValue: block.type.rawValue) ?? .other)
                         case .authoredQuote:
                             guard case .authoredQuote(let responseData) = block.data else { return nil }
                             let data = AuthoredQuoteData(
@@ -110,15 +111,28 @@ private extension ArticlesService {
                                 text: responseData.text.htmlToText(),
                                 photo: URL(string: self.quoteImageUrl + responseData.photo)
                             )
-                            return ArticleDataBlock(id: block.id, data: .authoredQuote(data))
+                            return ArticleDataBlock(id: block.id, data: .authoredQuote(data), type: .init(rawValue: block.type.rawValue) ?? .other)
                         case .header:
                             guard case .header(let responseData) = block.data else { return nil }
                             let data = HeaderBlockData(text: responseData.text.htmlToText(), level: responseData.level)
-                            return ArticleDataBlock(id: block.id, data: .header(data))
+                            return ArticleDataBlock(id: block.id, data: .header(data), type: .init(rawValue: block.type.rawValue) ?? .other)
                         case .list:
-                            guard case .list(let responseData) =  block.data else { return nil }
+                            guard case .list(let responseData) = block.data else { return nil }
                             let data = ListBlockData(items: responseData.items.map{ $0.htmlToText() })
-                            return ArticleDataBlock(id: block.id, data: .list(data))
+                            return ArticleDataBlock(id: block.id, data: .list(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                        case .raw:
+                            guard case .webRaw(let responseData) = block.data else { return nil }
+                            let data = WebRawBlockData(html: responseData.html)
+                            return ArticleDataBlock(id: block.id, data: .webRaw(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                        case .gallery:
+                            guard case .gallery(let responseData) = block.data else { return nil }
+                            let urls: [URL] = responseData.images.map(\.image).compactMap { [weak self] imageUrlString in
+                                guard let self else { return nil }
+                                return URL(string: self.asIsImageUrl + imageUrlString)
+
+                            }
+                            let data = GalleryBlockData(images: [URL(string: "https://images.cybersport.ru/images/material-card/plain/41/4143411a-1342-4e6d-b6e7-2601b7c9fff8.jpg")!] + urls)
+                            return ArticleDataBlock(id: block.id, data: .gallery(data), type: .init(rawValue: block.type.rawValue) ?? .other)
                         case .other:
                             return nil
                         }

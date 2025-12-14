@@ -90,9 +90,8 @@ private extension PriceInfoView {
     }
 
     var priceImage: some View {
-        PriceImageSheet(imageURL: priceInfo.priceImage)
+        PriceImageSheet(imageURL: priceInfo.priceImage, shouldHideTitle: false)
             .presentationBackground(EAColor.background)
-            .presentationDragIndicator(.visible)
     }
 }
 

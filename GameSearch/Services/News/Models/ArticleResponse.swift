@@ -47,6 +47,14 @@ struct ArticleResponse: Decodable {
                             if let listBlock = try? container?.decode(ListBlock.self, forKey: .data) {
                                 self.data = .list(listBlock)
                             }
+                        case .raw:
+                            if let webRawBlock = try? container?.decode(WebRawBlock.self, forKey: .data) {
+                                self.data = .webRaw(webRawBlock)
+                            }
+                        case .gallery:
+                            if let galleryBlock = try? container?.decode(GalleryBlock.self, forKey: .data) {
+                                self.data = .gallery(galleryBlock)
+                            }
                         case .other:
                             break
                         }
@@ -62,6 +70,8 @@ struct ArticleResponse: Decodable {
                         case authoredQuote
                         case header
                         case list
+                        case raw
+                        case gallery
                         case other
                     }
 
@@ -70,6 +80,8 @@ struct ArticleResponse: Decodable {
                         case authoredQuote(AuthoredQuoteBlock)
                         case header(HeaderBlock)
                         case list(ListBlock)
+                        case webRaw(WebRawBlock)
+                        case gallery(GalleryBlock)
                     }
 
                     struct ParagraphBlock: Decodable {
@@ -91,6 +103,19 @@ struct ArticleResponse: Decodable {
 
                     struct ListBlock: Decodable {
                         let items: [String]
+                    }
+
+                    struct WebRawBlock: Decodable {
+                        let html: String
+                    }
+
+                    struct GalleryBlock: Decodable {
+                        let images: [ImageData]
+
+                        struct ImageData: Decodable {
+                            let caption: String
+                            let image: String
+                        }
                     }
                 }
             }

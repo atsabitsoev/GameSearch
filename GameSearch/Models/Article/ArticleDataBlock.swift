@@ -11,12 +11,24 @@ import Foundation
 struct ArticleDataBlock: Identifiable {
     let id: String
     let data: Data
+    let type: BlockType
+
+    enum BlockType: String {
+        case paragraph
+        case authoredQuote
+        case header
+        case list
+        case raw
+        case other
+    }
 
     enum Data {
         case paragraph(ParagraphBlockData)
         case authoredQuote(AuthoredQuoteData)
         case header(HeaderBlockData)
         case list(ListBlockData)
+        case webRaw(WebRawBlockData)
+        case gallery(GalleryBlockData)
     }
 }
 
@@ -39,4 +51,12 @@ struct HeaderBlockData {
 
 struct ListBlockData {
     let items: [String]
+}
+
+struct WebRawBlockData {
+    let html: String
+}
+
+struct GalleryBlockData {
+    let images: [URL]
 }

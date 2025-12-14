@@ -33,8 +33,19 @@ private extension ArticleDetailsViewModel {
             interactor.getArticleDataBlocks(slug: article.slug)
                 .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in continuation.resume() },
-                      receiveValue: { [weak self] blocks in self?.article.dataBlocks = blocks })
+                      receiveValue: { [weak self] blocks in self?.article.dataBlocks = blocks.clearLastHeaders() })
                 .store(in: &cancellables)
         }
+    }
+}
+
+
+private extension Array where Element == ArticleDataBlock {
+    func clearLastHeaders() -> [ArticleDataBlock] {
+        var copy = self
+        while let last = copy.last, last.type == .header {
+            copy.removeLast()
+        }
+        return copy
     }
 }

@@ -11,6 +11,7 @@ import SwiftUI
 struct PriceImageSheet: View {
     @Environment(\.dismiss) var dismiss
     let imageURL: URL?
+    let shouldHideTitle: Bool
 
     var body: some View {
         VStack(spacing: 4) {
@@ -59,6 +60,7 @@ private extension PriceImageSheet {
         Text(Constants.title)
             .font(EAFont.title)
             .foregroundStyle(EAColor.textPrimary)
+            .opacity(shouldHideTitle ? 0 : 1)
     }
 
     var progressView: some View {
