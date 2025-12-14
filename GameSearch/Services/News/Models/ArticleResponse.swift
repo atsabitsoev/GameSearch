@@ -39,6 +39,14 @@ struct ArticleResponse: Decodable {
                             if let authoredQuoteBlock = try? container?.decode(AuthoredQuoteBlock.self, forKey: .data) {
                                 self.data = .authoredQuote(authoredQuoteBlock)
                             }
+                        case .header:
+                            if let headerBlock = try? container?.decode(HeaderBlock.self, forKey: .data) {
+                                self.data = .header(headerBlock)
+                            }
+                        case .list:
+                            if let listBlock = try? container?.decode(ListBlock.self, forKey: .data) {
+                                self.data = .list(listBlock)
+                            }
                         case .other:
                             break
                         }
@@ -52,12 +60,16 @@ struct ArticleResponse: Decodable {
                     enum BlockType: String, Decodable {
                         case paragraph
                         case authoredQuote
+                        case header
+                        case list
                         case other
                     }
 
                     enum BlockData: Decodable {
                         case paragraph(ParagraphBlock)
                         case authoredQuote(AuthoredQuoteBlock)
+                        case header(HeaderBlock)
+                        case list(ListBlock)
                     }
 
                     struct ParagraphBlock: Decodable {
@@ -70,6 +82,15 @@ struct ArticleResponse: Decodable {
                         let photo: String
                         let occupation: String
                         let playerSlug: String
+                    }
+
+                    struct HeaderBlock: Decodable {
+                        let text: String
+                        let level: Int
+                    }
+
+                    struct ListBlock: Decodable {
+                        let items: [String]
                     }
                 }
             }

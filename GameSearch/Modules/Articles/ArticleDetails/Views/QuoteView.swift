@@ -22,6 +22,7 @@ struct QuoteView: View {
                         nameView
                         opportunityView
                     }
+                    Spacer()
                 }
                 quoteTextView
             }
@@ -49,10 +50,13 @@ private extension QuoteView {
             .font(EAFont.smallTitle)
     }
 
+    @ViewBuilder
     var opportunityView: some View {
-        Text(data.authorDescription)
-            .font(EAFont.info)
-            .foregroundStyle(EAColor.textSecondary)
+        if !data.authorDescription.isEmpty {
+            Text(data.authorDescription)
+                .font(EAFont.info)
+                .foregroundStyle(EAColor.textSecondary)
+        }
     }
 
     var quoteTextView: some View {

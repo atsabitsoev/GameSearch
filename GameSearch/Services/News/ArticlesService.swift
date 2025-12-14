@@ -111,6 +111,14 @@ private extension ArticlesService {
                                 photo: URL(string: self.quoteImageUrl + responseData.photo)
                             )
                             return ArticleDataBlock(id: block.id, data: .authoredQuote(data))
+                        case .header:
+                            guard case .header(let responseData) = block.data else { return nil }
+                            let data = HeaderBlockData(text: responseData.text.htmlToText(), level: responseData.level)
+                            return ArticleDataBlock(id: block.id, data: .header(data))
+                        case .list:
+                            guard case .list(let responseData) =  block.data else { return nil }
+                            let data = ListBlockData(items: responseData.items.map{ $0.htmlToText() })
+                            return ArticleDataBlock(id: block.id, data: .list(data))
                         case .other:
                             return nil
                         }

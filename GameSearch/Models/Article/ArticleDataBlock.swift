@@ -15,6 +15,8 @@ struct ArticleDataBlock: Identifiable {
     enum Data {
         case paragraph(ParagraphBlockData)
         case authoredQuote(AuthoredQuoteData)
+        case header(HeaderBlockData)
+        case list(ListBlockData)
     }
 }
 
@@ -28,4 +30,13 @@ struct AuthoredQuoteData {
     let authorDescription: String
     let text: String
     let photo: URL?
+}
+
+struct HeaderBlockData {
+    let text: String
+    let level: Int
+}
+
+struct ListBlockData {
+    let items: [String]
 }

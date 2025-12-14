@@ -28,11 +28,16 @@ struct ArticleDetailsView<ViewModel: ArticleDetailsViewModelProtocol>: View {
                             ParagraphView(text: paragraphData.text)
                         case .authoredQuote(let quoteData):
                             QuoteView(data: quoteData)
+                        case .header(let headerData):
+                            HeaderView(text: headerData.text)
+                        case .list(let listData):
+                            ListView(data: listData)
                         }
                     }
                 }
             }
             .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
         .frame(maxWidth: .infinity)
         .background(EAColor.background)

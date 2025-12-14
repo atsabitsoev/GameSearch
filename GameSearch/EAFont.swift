@@ -14,6 +14,7 @@ enum EAFont {
     static let smallTitle: Font = Font.custom("Helvetica-Medium", size: 16)
     static let description: Font = Font.custom("Helvetica", size: 12)
     static let infoTitle: Font = Font.custom("Helvetica-Bold", size: 18)
+    static let header: Font = Font.custom("Helvetica-Bold", size: 20)
     static let infoTitleMedium: Font = Font.custom("Helvetica", size: 18)
     static let info: Font = Font.custom("Helvetica", size: 14)
     static let infoBold: Font = Font.custom("Helvetica-Bold", size: 14)
