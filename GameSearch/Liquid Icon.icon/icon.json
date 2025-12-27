@@ -2,8 +2,8 @@
   "color-space-for-untagged-svg-colors" : "display-p3",
   "fill" : {
     "linear-gradient" : [
-      "extended-srgb:0.00000,0.75294,0.90980,1.00000",
-      "extended-srgb:0.38039,0.33333,0.96078,1.00000"
+      "srgb:0.14452,0.00000,0.98740,1.00000",
+      "srgb:0.09804,0.00000,0.65490,1.00000"
     ]
   },
   "groups" : [
@@ -42,12 +42,14 @@
           "position" : {
             "scale" : 1,
             "translation-in-points" : [
-              -99.75,
+              -106.75,
               266
             ]
           }
         },
         {
+          "glass" : true,
+          "hidden" : false,
           "image-name" : "Rectangle Copy.png",
           "name" : "Rectangle Copy",
           "position" : {
