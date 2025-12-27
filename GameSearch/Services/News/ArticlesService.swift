@@ -131,7 +131,7 @@ private extension ArticlesService {
                                 return URL(string: self.asIsImageUrl + imageUrlString)
 
                             }
-                            let data = GalleryBlockData(images: [URL(string: "https://images.cybersport.ru/images/material-card/plain/41/4143411a-1342-4e6d-b6e7-2601b7c9fff8.jpg")!] + urls)
+                            let data = GalleryBlockData(images: urls)
                             return ArticleDataBlock(id: block.id, data: .gallery(data), type: .init(rawValue: block.type.rawValue) ?? .other)
                         case .other:
                             return nil
