@@ -19,5 +19,5 @@ protocol ScreenFactoryProtocol {
     func makeClubDetailsView(_ data: ClubDetailsData) -> ClubDetails
     
     func makeArticlesListView() -> ArticlesList
-    func makeArticleDetailsView(article: Article) -> ArticleDetails
+    func makeArticleDetailsView(data: ArticleDetailsVMInitData) -> ArticleDetails
 }

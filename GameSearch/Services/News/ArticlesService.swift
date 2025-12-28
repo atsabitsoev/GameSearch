@@ -12,7 +12,7 @@ import Combine
 
 protocol ArticlesServiceProtocol {
     func getLatestArticles(page: Int) -> AnyPublisher<[Article], any Error>
-    func getArticleDataBlocks(slug: String) -> AnyPublisher<[ArticleDataBlock], any Error>
+    func getArticle(slug: String) -> AnyPublisher<Article, any Error>
 }
 
 
@@ -42,7 +42,7 @@ final class ArticlesService: ArticlesServiceProtocol {
     }
 
 
-    func getArticleDataBlocks(slug: String) -> AnyPublisher<[ArticleDataBlock], any Error> {
+    func getArticle(slug: String) -> AnyPublisher<Article, any Error> {
         let urlString = "\(baseUrl)/slug/\(slug)"
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -90,54 +90,79 @@ private extension ArticlesService {
             .eraseToAnyPublisher()
     }
 
-    func parsedArticlePublisher(_ dataTaskPublisher: URLSession.DataTaskPublisher) -> AnyPublisher<[ArticleDataBlock], any Error> {
+    func parsedArticlePublisher(_ dataTaskPublisher: URLSession.DataTaskPublisher) -> AnyPublisher<Article, any Error> {
         dataTaskPublisher
             .map(\.data)
             .decode(type: ArticleResponse.self, decoder: JSONDecoder())
-            .map { [weak self] articleResponse in
-                guard let self else { return [] }
-                return articleResponse.data.attributes.content.blocks
-                    .compactMap { block -> ArticleDataBlock? in
-                        switch block.type {
-                        case .paragraph:
-                            guard case .paragraph(let responseData) = block.data else { return nil }
-                            let data = ParagraphBlockData(text: responseData.text.htmlToText())
-                            return ArticleDataBlock(id: block.id, data: .paragraph(data), type: .init(rawValue: block.type.rawValue) ?? .other)
-                        case .authoredQuote:
-                            guard case .authoredQuote(let responseData) = block.data else { return nil }
-                            let data = AuthoredQuoteData(
-                                authorName: responseData.name,
-                                authorDescription: responseData.occupation,
-                                text: responseData.text.htmlToText(),
-                                photo: URL(string: self.quoteImageUrl + responseData.photo)
-                            )
-                            return ArticleDataBlock(id: block.id, data: .authoredQuote(data), type: .init(rawValue: block.type.rawValue) ?? .other)
-                        case .header:
-                            guard case .header(let responseData) = block.data else { return nil }
-                            let data = HeaderBlockData(text: responseData.text.htmlToText(), level: responseData.level)
-                            return ArticleDataBlock(id: block.id, data: .header(data), type: .init(rawValue: block.type.rawValue) ?? .other)
-                        case .list:
-                            guard case .list(let responseData) = block.data else { return nil }
-                            let data = ListBlockData(items: responseData.items.map{ $0.htmlToText() })
-                            return ArticleDataBlock(id: block.id, data: .list(data), type: .init(rawValue: block.type.rawValue) ?? .other)
-                        case .raw:
-                            guard case .webRaw(let responseData) = block.data else { return nil }
-                            let data = WebRawBlockData(html: responseData.html)
-                            return ArticleDataBlock(id: block.id, data: .webRaw(data), type: .init(rawValue: block.type.rawValue) ?? .other)
-                        case .gallery:
-                            guard case .gallery(let responseData) = block.data else { return nil }
-                            let urls: [URL] = responseData.images.map(\.image).compactMap { [weak self] imageUrlString in
-                                guard let self else { return nil }
-                                return URL(string: self.asIsImageUrl + imageUrlString)
-
-                            }
-                            let data = GalleryBlockData(images: urls)
-                            return ArticleDataBlock(id: block.id, data: .gallery(data), type: .init(rawValue: block.type.rawValue) ?? .other)
-                        case .other:
-                            return nil
-                        }
-                    }
+            .compactMap { [weak self] articleResponse in
+                guard let self else { return nil }
+                return articleResponseToArticle(response: articleResponse)
             }
             .eraseToAnyPublisher()
+    }
+
+    func articleResponseToArticle(response: ArticleResponse) -> Article {
+        let data = response.data
+        let imageUrl: URL? = if let imageUrlString = data.attributes.image {
+            URL(string: self.cardImageUrl + imageUrlString)
+        } else {
+            nil
+        }
+
+        let type = response.included.first(where: {
+            $0.id == data.relationships.mainTag.data.id
+        })
+
+        let dataBlocks = data.attributes.content.blocks
+            .compactMap { block -> ArticleDataBlock? in
+                switch block.type {
+                case .paragraph:
+                    guard case .paragraph(let responseData) = block.data else { return nil }
+                    let data = ParagraphBlockData(text: responseData.text.htmlToText())
+                    return ArticleDataBlock(id: block.id, data: .paragraph(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                case .authoredQuote:
+                    guard case .authoredQuote(let responseData) = block.data else { return nil }
+                    let data = AuthoredQuoteData(
+                        authorName: responseData.name,
+                        authorDescription: responseData.occupation,
+                        text: responseData.text.htmlToText(),
+                        photo: URL(string: self.quoteImageUrl + responseData.photo)
+                    )
+                    return ArticleDataBlock(id: block.id, data: .authoredQuote(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                case .header:
+                    guard case .header(let responseData) = block.data else { return nil }
+                    let data = HeaderBlockData(text: responseData.text.htmlToText(), level: responseData.level)
+                    return ArticleDataBlock(id: block.id, data: .header(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                case .list:
+                    guard case .list(let responseData) = block.data else { return nil }
+                    let data = ListBlockData(items: responseData.items.map{ $0.htmlToText() })
+                    return ArticleDataBlock(id: block.id, data: .list(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                case .raw:
+                    guard case .webRaw(let responseData) = block.data else { return nil }
+                    let data = WebRawBlockData(html: responseData.html)
+                    return ArticleDataBlock(id: block.id, data: .webRaw(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                case .gallery:
+                    guard case .gallery(let responseData) = block.data else { return nil }
+                    let urls: [URL] = responseData.images.map(\.image).compactMap { [weak self] imageUrlString in
+                        guard let self else { return nil }
+                        return URL(string: self.asIsImageUrl + imageUrlString)
+
+                    }
+                    let data = GalleryBlockData(images: urls)
+                    return ArticleDataBlock(id: block.id, data: .gallery(data), type: .init(rawValue: block.type.rawValue) ?? .other)
+                case .other:
+                    return nil
+                }
+            }
+
+        return Article(
+            id: data.id,
+            title: data.attributes.title,
+            date: Date(timeIntervalSince1970: TimeInterval(data.attributes.publishedAt)),
+            imageUrl: imageUrl,
+            type: type?.attributes.name,
+            slug: data.attributes.slug,
+            dataBlocks: dataBlocks
+        )
     }
 }

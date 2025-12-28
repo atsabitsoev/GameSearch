@@ -7,14 +7,19 @@
 
 struct ArticleResponse: Decodable {
     let data: Data
+    let included: [ArticlesIncluded]
 
     struct Data: Decodable {
+        let id: String
         let attributes: Attributes
+        let relationships: ArticlesRelationships
 
         struct Attributes: Decodable {
             let title: String
             let publishedAt: Int
             let content: Content
+            var image: String?
+            let slug: String
 
             struct Content: Decodable {
                 let blocks: [Block]

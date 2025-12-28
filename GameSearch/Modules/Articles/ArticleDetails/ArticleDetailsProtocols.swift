@@ -9,12 +9,12 @@ import Combine
 
 
 protocol ArticleDetailsViewModelProtocol: ObservableObject {
-    var article: Article { get }
+    var article: Article? { get }
 
     func onAppear() async
 }
 
 
 protocol ArticleDetailsInteractorProtocol {
-    func getArticleDataBlocks(slug: String) -> AnyPublisher<[ArticleDataBlock], any Error>
+    func getArticle(slug: String) -> AnyPublisher<Article, any Error>
 }

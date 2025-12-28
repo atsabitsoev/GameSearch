@@ -1,0 +1,72 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "srgb:0.00000,0.62375,0.62375,1.00000",
+      "srgb:0.00107,0.17274,0.36813,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "coob.png",
+          "name" : "coob",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              8.75,
+              212.625
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "blend-mode" : "plus-lighter",
+          "fill" : "none",
+          "glass" : false,
+          "image-name" : "icon-park-outline_cube-two.png",
+          "name" : "icon-park-outline_cube-two",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -93.625
+            ]
+          }
+        },
+        {
+          "fill" : "none",
+          "glass" : true,
+          "image-name" : "df26d9affe311eaaf657e574714567b20abcd510.png",
+          "name" : "df26d9affe311eaaf657e574714567b20abcd510"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

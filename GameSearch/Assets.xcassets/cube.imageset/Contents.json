@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-park-outline_cube-two-2.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

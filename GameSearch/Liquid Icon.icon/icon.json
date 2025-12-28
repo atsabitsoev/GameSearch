@@ -2,7 +2,7 @@
   "color-space-for-untagged-svg-colors" : "display-p3",
   "fill" : {
     "linear-gradient" : [
-      "srgb:0.14452,0.00000,0.98740,1.00000",
+      "srgb:0.14510,0.00000,0.98824,1.00000",
       "srgb:0.09804,0.00000,0.65490,1.00000"
     ]
   },

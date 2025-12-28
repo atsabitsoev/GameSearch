@@ -18,7 +18,7 @@ final class ArticleDetailsInteractor: ArticleDetailsInteractorProtocol {
     }
 
 
-    func getArticleDataBlocks(slug: String) -> AnyPublisher<[ArticleDataBlock], any Error> {
-        service.getArticleDataBlocks(slug: slug)
+    func getArticle(slug: String) -> AnyPublisher<Article, any Error> {
+        service.getArticle(slug: slug)
     }
 }

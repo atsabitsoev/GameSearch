@@ -35,6 +35,6 @@ final class ArticlesListViewModel: ArticlesListViewModelProtocol {
     }
 
     func onCellTap(_ article: Article, router: ArticlesRouter) {
-        router.push(.details(article))
+        router.push(.detailsByArticle(article))
     }
 }

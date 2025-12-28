@@ -22,7 +22,7 @@ struct ArticleDetailsView<ViewModel: ArticleDetailsViewModelProtocol>: View {
             VStack(spacing: 24) {
                 titleView
                 VStack(alignment: .leading, spacing: 16) {
-                    ForEach(viewModel.article.dataBlocks) { dataBlock in
+                    ForEach(viewModel.article?.dataBlocks ?? []) { dataBlock in
                         switch dataBlock.data {
                         case .paragraph(let paragraphData):
                             ParagraphView(text: paragraphData.text)
@@ -50,6 +50,13 @@ struct ArticleDetailsView<ViewModel: ArticleDetailsViewModelProtocol>: View {
             ToolbarItem(placement: .principal) {
                 articleTypeLogo
             }
+            if let slug = viewModel.article?.slug {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: URL(string: "https://gamesearchdeeplinkhosting.web.app/news/\(slug)")!) {
+                        Label("", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
         })
         .task {
             await viewModel.onAppear()
@@ -60,14 +67,14 @@ struct ArticleDetailsView<ViewModel: ArticleDetailsViewModelProtocol>: View {
 
 private extension ArticleDetailsView {
     var titleView: some View {
-        Text(viewModel.article.title)
+        Text(viewModel.article?.title ?? "")
             .font(EAFont.title)
             .multilineTextAlignment(.center)
     }
 
     @ViewBuilder
     var articleTypeLogo: some View {
-        switch viewModel.article.type {
+        switch viewModel.article?.type {
         case .cs2: Image("cs")
                 .resizable()
                 .frame(width: 24, height: 24)

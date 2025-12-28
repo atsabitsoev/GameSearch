@@ -13,7 +13,7 @@ struct Article: Identifiable {
     let title: String
     let date: Date
     var imageUrl: URL?
-    let type: ArticalType?
+    let type: ArticleType?
     let slug: String
-    var dataBlocks: [ArticleDataBlock] = []
+    var dataBlocks: [ArticleDataBlock]
 }
