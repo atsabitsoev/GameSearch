@@ -13,6 +13,7 @@ import Firebase
 struct GameSearchApp: App {
     init() {
         FirebaseApp.configure()
+        AppMetricaReporter.activate()
     }
     
     var body: some Scene {

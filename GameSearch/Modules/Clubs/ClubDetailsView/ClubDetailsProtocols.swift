@@ -16,4 +16,6 @@ protocol ClubDetailsViewModelProtocol: ObservableObject {
     var sectionPickerState: DetailsSection { get set }
     var output: ClubDetailsVMOutput? { get set }
     var selectedSpecId: UUID? { get set }
+
+    func activate()
 }

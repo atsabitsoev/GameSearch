@@ -54,6 +54,12 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
         }
         .tint(EAColor.accent)
         .setupTabBarAppearance()
+        .onAppear {
+            sendTabAnalytics(for: currentTab)
+        }
+        .onChange(of: currentTab) { _, newTab in
+            sendTabAnalytics(for: newTab)
+        }
         .onOpenURL { url in
             handleUrl(url)
         }
@@ -69,8 +75,30 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
             } else {
                 articlesRouter.reset()
             }
+            sendDeeplinkAnalytics(url, slug: slug)
         case nil:
             return
+        }
+    }
+}
+
+
+private extension RootView {
+    func sendDeeplinkAnalytics(_ url: URL, slug: String?) {
+        var deeplinkParams: [String: Any] = ["path": url.path]
+        if let slug {
+            deeplinkParams["article_slug"] = slug
+        }
+
+        AppMetricaReporter.reportEvent("deeplink_open", parameters: deeplinkParams)
+    }
+
+    func sendTabAnalytics(for tab: TabTag) {
+        switch tab {
+        case .news:
+            AppMetricaReporter.reportEvent("tab_news")
+        case .clubs:
+            AppMetricaReporter.reportEvent("tab_clubs")
         }
     }
 }

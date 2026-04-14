@@ -24,6 +24,9 @@ struct ClubDetailsView<ViewModel: ClubDetailsViewModelProtocol>: View {
             .navigationBarBackButtonHidden()
             .customBackButton()
             .toolbarBackgroundVisibility(.hidden, for: .automatic)
+            .onAppear {
+                viewModel.activate()
+            }
     }
 
 

@@ -28,6 +28,7 @@ protocol ClubListViewModelProtocol: ObservableObject {
     func onFiltersApply(_ filters: [ClubsFilter])
     func clearMapPopupClub()
     func routeToDetails(clubID: String, router: ClubsRouter)
+    func sendMapListButtonTap(for state: MapListButtonState)
 }
 
 

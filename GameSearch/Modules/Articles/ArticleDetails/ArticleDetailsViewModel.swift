@@ -34,6 +34,8 @@ final class ArticleDetailsViewModel: ArticleDetailsViewModelProtocol {
 
     func onAppear() async {
         await loadArticle()
+
+        sendOpenDetailAnalytics()
     }
 }
 
@@ -51,6 +53,22 @@ private extension ArticleDetailsViewModel {
                 })
                 .store(in: &cancellables)
         }
+    }
+}
+
+
+//MARK: - Analytics
+
+private extension ArticleDetailsViewModel {
+    func sendOpenDetailAnalytics() {
+        guard let article else { return }
+        AppMetricaReporter.reportEvent(
+            "news_detail_open",
+            parameters: [
+                "article_id": article.id,
+                "slug": article.slug
+            ]
+        )
     }
 }
 

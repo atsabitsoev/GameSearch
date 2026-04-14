@@ -72,6 +72,9 @@ private extension ClubListView {
             viewModel.locationManager.requestLocation()
             viewModel.onViewAppear()
         }
+        .onChange(of: viewModel.mapListButtonState) { _, newState in
+            viewModel.sendMapListButtonTap(for: newState)
+        }
         .onChange(of: searchFocused) { _, isFocused in
             if isFocused && viewModel.mapListButtonState.isMap {
                 withAnimation(.spring(duration: 0.3)) {

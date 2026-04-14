@@ -235,3 +235,15 @@ private extension ClubListViewModel {
         return club
     }
 }
+
+
+// MARK: - Analytics
+
+extension ClubListViewModel {
+    func sendMapListButtonTap(for state: MapListButtonState) {
+        AppMetricaReporter.reportEvent(
+            "clubs_view_mode",
+            parameters: ["mode": state == .map ? "map" : "list"]
+        )
+    }
+}

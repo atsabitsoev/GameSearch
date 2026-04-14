@@ -21,8 +21,15 @@ final class ClubDetailsViewModel: ClubDetailsViewModelProtocol {
     init(data: ClubDetailsData, interactor: ClubDetailsInteractorProtocol) {
         self.clubDetails = data
         self.interactor = interactor
-        
+    }
+
+    func activate() {
         setupOutput()
+
+        AppMetricaReporter.reportEvent(
+            "club_detail_open",
+            parameters: ["club_id": clubDetails.id]
+        )
     }
 }
 
