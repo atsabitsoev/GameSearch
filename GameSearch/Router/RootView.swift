@@ -9,10 +9,13 @@ import SwiftUI
 
 
 struct RootView<Factory: ScreenFactoryProtocol>: View {
+    @AppStorage("has_seen_welcome_view") private var hasSeenWelcomeView = false
     @EnvironmentObject private var clubsRouter: ClubsRouter
     @EnvironmentObject private var articlesRouter: ArticlesRouter
 
     @State private var currentTab: TabTag = .news
+    @State private var isWelcomeViewPresented = false
+
     private let factory: Factory
     
     
@@ -51,10 +54,16 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 }
                 .setupClubsNavigationBarAppearance()
             }
+            Tab("Турниры", systemImage: "trophy", value: .tournaments) {
+                NavigationStack {
+                    factory.makeTournamentsView()
+                }
+            }
         }
         .tint(EAColor.accent)
         .setupTabBarAppearance()
         .onAppear {
+            isWelcomeViewPresented = /*!hasSeenStartScreen*/ true
             sendTabAnalytics(for: currentTab)
         }
         .onChange(of: currentTab) { _, newTab in
@@ -63,12 +72,24 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
         .onOpenURL { url in
             handleUrl(url)
         }
+        .fullScreenCover(isPresented: $isWelcomeViewPresented) {
+            WelcomeView(
+                onContinue: onWelcomeContinue
+            ) { destination in
+                onWelcomeDestination(destination)
+            }
+            .onAppear {
+              hasSeenWelcomeView = true
+              sendWelcomeShownAnalytics()
+            }
+        }
     }
 
     func handleUrl(_ url: URL) {
         let deepLink = Deeplink(from: url)
         switch deepLink {
         case .articles(let slug):
+            isWelcomeViewPresented = false
             currentTab = .news
             if let slug {
                 articlesRouter.push(.detailsBySlug(slug))
@@ -79,6 +100,25 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
         case nil:
             return
         }
+    }
+
+    func onWelcomeDestination(_ destination: WelcomeDestination) {
+        switch destination {
+        case .clubs:
+            currentTab = .clubs
+        case .news:
+            currentTab = .news
+        case .tournaments:
+            currentTab = .tournaments
+        }
+        isWelcomeViewPresented = false
+
+        sendWelcomeOptionAnalytics(destination)
+    }
+
+    func onWelcomeContinue() {
+        isWelcomeViewPresented = false
+        AppMetricaReporter.reportEvent("welcome_continue_tap")
     }
 }
 
@@ -99,6 +139,21 @@ private extension RootView {
             AppMetricaReporter.reportEvent("tab_news")
         case .clubs:
             AppMetricaReporter.reportEvent("tab_clubs")
+        case .tournaments:
+            AppMetricaReporter.reportEvent("tab_tournaments")
         }
+    }
+
+    func sendWelcomeOptionAnalytics(_ destination: WelcomeDestination) {
+        AppMetricaReporter.reportEvent(
+            "welcome_option_tap",
+            parameters: [
+                "option": destination.rawValue
+            ]
+        )
+    }
+
+    func sendWelcomeShownAnalytics() {
+        AppMetricaReporter.reportEvent("welcome_screen_shown")
     }
 }

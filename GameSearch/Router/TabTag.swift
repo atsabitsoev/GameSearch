@@ -8,4 +8,5 @@
 enum TabTag: String {
     case news
     case clubs
+    case tournaments
 }

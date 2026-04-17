@@ -36,4 +36,8 @@ final class ScreenFactory: ScreenFactoryProtocol {
         let viewModel: some ArticleDetailsViewModelProtocol = ArticleDetailsViewModel(data: data, interactor: interactor)
         return ArticleDetailsView(viewModel: viewModel)
     }
+
+    func makeTournamentsView() -> some View {
+        TournamentsPlaceholderView()
+    }
 }

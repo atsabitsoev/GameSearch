@@ -13,6 +13,7 @@ protocol ScreenFactoryProtocol {
     
     associatedtype ArticlesList: View
     associatedtype ArticleDetails: View
+    associatedtype Tournaments: View
 
     
     func makeClubListView() -> ClubList
@@ -20,4 +21,5 @@ protocol ScreenFactoryProtocol {
     
     func makeArticlesListView() -> ArticlesList
     func makeArticleDetailsView(data: ArticleDetailsVMInitData) -> ArticleDetails
+    func makeTournamentsView() -> Tournaments
 }

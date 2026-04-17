@@ -4,6 +4,8 @@
 <dict>
 	<key>AppMetricaAPIKey</key>
 	<string>e17da53d-2918-4e10-a7bb-a3dffdb50588</string>
+	<key>PandaScoreAPIKey</key>
+	<string>F5IRpOR0RtXX6dAScvJ6xRg3_Jdaq6D17gfOQ8OqpuAxoJpL9kg</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
