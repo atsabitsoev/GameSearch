@@ -63,7 +63,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
         .tint(EAColor.accent)
         .setupTabBarAppearance()
         .onAppear {
-            isWelcomeViewPresented = /*!hasSeenStartScreen*/ true
+            isWelcomeViewPresented = !hasSeenWelcomeView
             sendTabAnalytics(for: currentTab)
         }
         .onChange(of: currentTab) { _, newTab in
