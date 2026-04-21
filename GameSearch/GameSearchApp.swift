@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreLocation
 import Firebase
+import AnalyticsModule
 
 @main
 struct GameSearchApp: App {

@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		67590FB12F8D03FF00297BF5 /* AppMetricaAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 67590FB02F8D03FF00297BF5 /* AppMetricaAnalytics */; };
-		67590FB32F8D03FF00297BF5 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = 67590FB22F8D03FF00297BF5 /* AppMetricaCore */; };
 		AC03C71F2E0B1D9F0044A607 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = AC03C71E2E0B1D9F0044A607 /* SwiftSoup */; };
 		AC4A18BC2EC111C40024E542 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = AC4A18BB2EC111C40024E542 /* CachedAsyncImage */; };
+		AC932FB02F97ED3E00E3714B /* AnalyticsModule in Frameworks */ = {isa = PBXBuildFile; productRef = AC932FAF2F97ED3E00E3714B /* AnalyticsModule */; };
 		ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */; };
 /* End PBXBuildFile section */
 
@@ -45,8 +44,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC4A18BC2EC111C40024E542 /* CachedAsyncImage in Frameworks */,
-				67590FB12F8D03FF00297BF5 /* AppMetricaAnalytics in Frameworks */,
-				67590FB32F8D03FF00297BF5 /* AppMetricaCore in Frameworks */,
+				AC932FB02F97ED3E00E3714B /* AnalyticsModule in Frameworks */,
 				ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				AC03C71F2E0B1D9F0044A607 /* SwiftSoup in Frameworks */,
 			);
@@ -94,8 +92,7 @@
 				ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */,
 				AC03C71E2E0B1D9F0044A607 /* SwiftSoup */,
 				AC4A18BB2EC111C40024E542 /* CachedAsyncImage */,
-				67590FB02F8D03FF00297BF5 /* AppMetricaAnalytics */,
-				67590FB22F8D03FF00297BF5 /* AppMetricaCore */,
+				AC932FAF2F97ED3E00E3714B /* AnalyticsModule */,
 			);
 			productName = GameSearch;
 			productReference = ACD377732DCE48F0003874AA /* GameSearch.app */;
@@ -128,7 +125,7 @@
 				ACDF4B042DD5097300DE3332 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				AC4A18BA2EC111C40024E542 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */,
-				67590FAF2F8D03FF00297BF5 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
+				AC932FAE2F97ED3E00E3714B /* XCLocalSwiftPackageReference "AnalyticsModule" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = ACD377742DCE48F0003874AA /* Products */;
@@ -387,15 +384,14 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		67590FAF2F8D03FF00297BF5 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.2.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		AC932FAE2F97ED3E00E3714B /* XCLocalSwiftPackageReference "AnalyticsModule" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = AnalyticsModule;
 		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
 		AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
@@ -423,16 +419,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		67590FB02F8D03FF00297BF5 /* AppMetricaAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 67590FAF2F8D03FF00297BF5 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
-			productName = AppMetricaAnalytics;
-		};
-		67590FB22F8D03FF00297BF5 /* AppMetricaCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 67590FAF2F8D03FF00297BF5 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
-			productName = AppMetricaCore;
-		};
 		AC03C71E2E0B1D9F0044A607 /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AC03C71D2E0B1D9F0044A607 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
@@ -442,6 +428,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AC4A18BA2EC111C40024E542 /* XCRemoteSwiftPackageReference "swiftui-cached-async-image" */;
 			productName = CachedAsyncImage;
+		};
+		AC932FAF2F97ED3E00E3714B /* AnalyticsModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AnalyticsModule;
 		};
 		ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */ = {
 			isa = XCSwiftPackageProductDependency;

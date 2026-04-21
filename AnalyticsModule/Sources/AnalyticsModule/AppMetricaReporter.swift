@@ -6,10 +6,10 @@
 import AppMetricaCore
 import Foundation
 
-enum AppMetricaReporter {
+public enum AppMetricaReporter {
     private static let launchCountKey = "appmetrica.launch_count"
 
-    static func activate() {
+    public static func activate() {
         guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "AppMetricaAPIKey") as? String,
               !apiKey.isEmpty
         else { return }
@@ -32,7 +32,7 @@ enum AppMetricaReporter {
         ])
     }
 
-    static func reportEvent(_ name: String, parameters: [String: Any]? = nil) {
+    public static func reportEvent(_ name: String, parameters: [String: Any]? = nil) {
         guard AppMetrica.isActivated else { return }
         AppMetrica.reportEvent(name: name, parameters: parameters, onFailure: nil)
     }

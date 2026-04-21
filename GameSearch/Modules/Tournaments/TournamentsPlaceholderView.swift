@@ -1,4 +1,5 @@
 import SwiftUI
+import AnalyticsModule
 
 //TODO: - Удалить при переходе на реальные турниры через Liquipedia API
 struct TournamentsPlaceholderView: View {

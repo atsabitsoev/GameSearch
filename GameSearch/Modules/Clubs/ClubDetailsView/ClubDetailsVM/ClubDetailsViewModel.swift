@@ -7,7 +7,7 @@
 
 import Combine
 import Foundation
-
+import AnalyticsModule
 
 final class ClubDetailsViewModel: ClubDetailsViewModelProtocol {
     private let interactor: ClubDetailsInteractorProtocol

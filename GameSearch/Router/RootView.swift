@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import AnalyticsModule
 
 struct RootView<Factory: ScreenFactoryProtocol>: View {
     @AppStorage("has_seen_welcome_view") private var hasSeenWelcomeView = false

@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import CoreLocation
+import AnalyticsModule
 
 final class ClubListViewModel<Interactor: ClubListInteractorProtocol>: ClubListViewModelProtocol {
     private let interactor: Interactor
