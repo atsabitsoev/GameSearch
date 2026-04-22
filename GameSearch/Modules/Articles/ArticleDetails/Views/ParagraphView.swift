@@ -15,5 +15,7 @@ struct ParagraphView: View {
     var body: some View {
         Text(text)
             .font(EAFont.infoTitleMedium)
+            .foregroundStyle(EAColor.textPrimary)
+            .lineSpacing(4)
     }
 }

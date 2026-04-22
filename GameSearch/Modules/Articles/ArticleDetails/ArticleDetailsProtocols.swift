@@ -10,6 +10,7 @@ import Combine
 
 protocol ArticleDetailsViewModelProtocol: ObservableObject {
     var article: Article? { get }
+    var isLoadingContent: Bool { get }
 
     func onAppear() async
 }

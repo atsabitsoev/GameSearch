@@ -65,7 +65,9 @@ private extension ArticlesService {
             .decode(type: ArticlesListResponse.self, decoder: JSONDecoder())
             .map { [weak self] articlesResponse in
                 return articlesResponse.data
-                    .map { item in
+                    .compactMap { item in
+                        guard item.attributes.externalLink == nil else { return nil }
+
                         let imageUrl: URL? = if let self, let imageUrlString = item.attributes.image {
                             URL(string: self.cardImageUrl + imageUrlString)
                         } else {
