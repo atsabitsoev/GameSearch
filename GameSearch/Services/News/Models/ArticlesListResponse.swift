@@ -18,6 +18,7 @@ struct ArticlesListResponse: Decodable {
             let title: String
             let slug: String
             let publishedAt: Int
+            let externalLink: String?
             var image: String?
         }
     }

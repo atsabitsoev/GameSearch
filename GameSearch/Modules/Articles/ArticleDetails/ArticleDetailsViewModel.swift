@@ -20,6 +20,7 @@ final class ArticleDetailsViewModel: ArticleDetailsViewModelProtocol {
     private let interactor: ArticleDetailsInteractorProtocol
 
     @Published var article: Article?
+    @Published var isLoadingContent: Bool = true
     private var initingSlug: String?
     private var cancellables: [AnyCancellable] = []
 
@@ -42,13 +43,17 @@ final class ArticleDetailsViewModel: ArticleDetailsViewModelProtocol {
 
 
 private extension ArticleDetailsViewModel {
+    @MainActor
     func loadArticle() async {
         guard let slug = article?.slug ?? initingSlug else { return }
+        isLoadingContent = true
         await withCheckedContinuation { continuation in
             interactor.getArticle(slug: slug)
                 .receive(on: DispatchQueue.main)
-                .sink(receiveCompletion: { _ in continuation.resume() },
-                      receiveValue: { [weak self] article in
+                .sink(receiveCompletion: { [weak self] _ in
+                    self?.isLoadingContent = false
+                    continuation.resume()
+                }, receiveValue: { [weak self] article in
                     self?.article = article
                     self?.article?.dataBlocks = article.dataBlocks.clearLastHeaders()
                 })
