@@ -12,6 +12,7 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     @State private var scrollToTopToggle = false
     @State private var refreshChip: RefreshChip = .none
+    @State private var filtersHeaderHeight: CGFloat = 0
 
     private enum RefreshChip {
         case none
@@ -69,11 +70,22 @@ private extension ArticlesListView {
             }
             .listStyle(.plain)
             .listRowSpacing(12)
+            .overlay(alignment: .top) {
+                if filtersHeaderHeight > 0 {
+                    floatingHeaderOverlay
+                        .padding(.top, filtersHeaderHeight)
+                        .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
+                        .animation(.easeOut(duration: 0.2), value: refreshChip)
+                }
+            }
             .onChange(of: scrollToTopToggle) {
                 guard let firstId = viewModel.articles.first?.id else { return }
                 withAnimation(.easeOut(duration: 0.25)) {
                     proxy.scrollTo(firstId, anchor: .top)
                 }
+            }
+            .onPreferenceChange(FiltersHeightPreferenceKey.self) { newHeight in
+                filtersHeaderHeight = newHeight
             }
         }
     }
@@ -108,32 +120,42 @@ private extension ArticlesListView {
     }
 
     var filtersPinnedHeader: some View {
-        VStack(spacing: 8) {
-            ArticlesFiltersView(
-                selectedFilter: viewModel.selectedFilter,
-                onSelect: { filter in
-                    withAnimation(.easeOut(duration: 0.2)) {
-                        viewModel.onFilterSelect(filter)
-                    }
-                    scrollToTopToggle.toggle()
+        ArticlesFiltersView(
+            selectedFilter: viewModel.selectedFilter,
+            onSelect: { filter in
+                withAnimation(.easeOut(duration: 0.2)) {
+                    viewModel.onFilterSelect(filter)
                 }
-            )
-            if viewModel.filteredPendingCount > 0 {
-                showNewButton
-            } else {
-                switch refreshChip {
-                case .success:
-                    refreshedChip
-                case .failure:
-                    refreshFailedChip
-                case .none:
-                    EmptyView()
-                }
+                scrollToTopToggle.toggle()
+            }
+        )
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(
+                    key: FiltersHeightPreferenceKey.self,
+                    value: geo.size.height
+                )
+            }
+        )
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
+    }
+
+    @ViewBuilder
+    var floatingHeaderOverlay: some View {
+        if viewModel.filteredPendingCount > 0 {
+            showNewButton
+        } else {
+            switch refreshChip {
+            case .success:
+                refreshedChip
+                    .allowsHitTesting(false)
+            case .failure:
+                refreshFailedChip
+                    .allowsHitTesting(false)
+            case .none:
+                EmptyView()
             }
         }
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
-        .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
-        .animation(.easeOut(duration: 0.2), value: refreshChip)
     }
 
     var showNewButton: some View {
@@ -248,13 +270,22 @@ private extension ArticlesListView {
     }
 
     func refreshArticles() async {
+        let firstIdBefore = viewModel.articles.first?.id
         let succeeded = await viewModel.pullToRefresh()
+        let firstIdAfter = viewModel.articles.first?.id
+        let hasNewArticles = succeeded && firstIdBefore != firstIdAfter
+
         let nextChip: RefreshChip = succeeded ? .success : .failure
         let displayDuration: UInt64 = succeeded ? 1_600_000_000 : 2_500_000_000
 
         withAnimation(.easeOut(duration: 0.2)) {
             refreshChip = nextChip
         }
+
+        if hasNewArticles {
+            scrollToTopToggle.toggle()
+        }
+
         Task {
             try? await Task.sleep(nanoseconds: displayDuration)
             await MainActor.run {
@@ -264,6 +295,14 @@ private extension ArticlesListView {
                 }
             }
         }
+    }
+}
+
+private struct FiltersHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
