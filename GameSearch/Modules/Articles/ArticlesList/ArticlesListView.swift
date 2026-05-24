@@ -12,7 +12,6 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
     @StateObject private var viewModel: ViewModel
     @State private var scrollToTopToggle = false
     @State private var refreshChip: RefreshChip = .none
-    @State private var filtersHeaderHeight: CGFloat = 0
 
     private enum RefreshChip {
         case none
@@ -32,9 +31,6 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
                 .ignoresSafeArea()
 
             contentView
-                .refreshable {
-                    await refreshArticles()
-                }
         }
         .navigationTitle("Новости")
         .navigationBarTitleDisplayMode(.automatic)
@@ -51,7 +47,7 @@ private extension ArticlesListView {
         case .loading:
             skeletonView
         case .content:
-            articlesListView
+            articlesContentView
         case .empty:
             emptyStateView
         case .error(let message):
@@ -59,33 +55,49 @@ private extension ArticlesListView {
         }
     }
 
-    var articlesListView: some View {
-        ScrollViewReader { proxy in
-            List {
-                Section {
-                    listCellsView
-                } header: {
-                    filtersPinnedHeader
-                }
-            }
-            .listStyle(.plain)
-            .listRowSpacing(12)
-            .overlay(alignment: .top) {
-                if filtersHeaderHeight > 0 {
-                    floatingHeaderOverlay
-                        .padding(.top, filtersHeaderHeight)
+    var articlesContentView: some View {
+        VStack(spacing: 0) {
+            filtersHeader
+                .background(EAColor.background)
+
+            articlesList
+                .overlay(alignment: .top) {
+                    floatingChipOverlay
+                        .padding(.top, 4)
                         .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
                         .animation(.easeOut(duration: 0.2), value: refreshChip)
                 }
+        }
+    }
+
+    var filtersHeader: some View {
+        ArticlesFiltersView(
+            selectedFilter: viewModel.selectedFilter,
+            onSelect: { filter in
+                withAnimation(.easeOut(duration: 0.2)) {
+                    viewModel.onFilterSelect(filter)
+                }
+                scrollToTopToggle.toggle()
+            }
+        )
+        .padding(.bottom, 10)
+    }
+
+    var articlesList: some View {
+        ScrollViewReader { proxy in
+            List {
+                listCellsView
+            }
+            .listStyle(.plain)
+            .listRowSpacing(12)
+            .refreshable {
+                await refreshArticles()
             }
             .onChange(of: scrollToTopToggle) {
                 guard let firstId = viewModel.articles.first?.id else { return }
                 withAnimation(.easeOut(duration: 0.25)) {
                     proxy.scrollTo(firstId, anchor: .top)
                 }
-            }
-            .onPreferenceChange(FiltersHeightPreferenceKey.self) { newHeight in
-                filtersHeaderHeight = newHeight
             }
         }
     }
@@ -119,29 +131,8 @@ private extension ArticlesListView {
         }
     }
 
-    var filtersPinnedHeader: some View {
-        ArticlesFiltersView(
-            selectedFilter: viewModel.selectedFilter,
-            onSelect: { filter in
-                withAnimation(.easeOut(duration: 0.2)) {
-                    viewModel.onFilterSelect(filter)
-                }
-                scrollToTopToggle.toggle()
-            }
-        )
-        .background(
-            GeometryReader { geo in
-                Color.clear.preference(
-                    key: FiltersHeightPreferenceKey.self,
-                    value: geo.size.height
-                )
-            }
-        )
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
-    }
-
     @ViewBuilder
-    var floatingHeaderOverlay: some View {
+    var floatingChipOverlay: some View {
         if viewModel.filteredPendingCount > 0 {
             showNewButton
         } else {
@@ -297,13 +288,3 @@ private extension ArticlesListView {
         }
     }
 }
-
-private struct FiltersHeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
-
