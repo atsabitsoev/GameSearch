@@ -9,17 +9,17 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
-    @State private var location: MapCameraPosition = .automatic
+    @State private var location: MapCameraPosition
     @State private var cameraRegionChangesFromIn = false
     @State private var shouldHideAnotationTitles = false
-    
+
     @Binding private var cameraRegion: CameraRegion
     @Binding private var selectedClub: MapPopupData?
-    
+
     private let centerLocation: CLLocationCoordinate2D
     private let mapClubs: [MapClubData]
-    
-    
+
+
     init(
         centerLocation: CLLocationCoordinate2D? = nil,
         for clubs: [MapClubData],
@@ -30,8 +30,21 @@ struct MapView: View {
         self.mapClubs = clubs
         self._selectedClub = selectedClub
         self._cameraRegion = cameraRegion
+        // Сразу выставляем позицию карты из cameraRegion вместо .automatic,
+        // чтобы не было фантомного auto-fit на старте, который дёргает лишнюю
+        // подписку и ещё один запрос клубов.
+        let initial = cameraRegion.wrappedValue
+        self._location = State(initialValue: .region(
+            MKCoordinateRegion(
+                center: initial.center,
+                span: MKCoordinateSpan(
+                    latitudeDelta: initial.delta.latitude,
+                    longitudeDelta: initial.delta.longitude
+                )
+            )
+        ))
     }
-    
+
     var body: some View {
         Map(position: $location) {
             UserAnnotation()
@@ -59,9 +72,20 @@ struct MapView: View {
             { (context: MapCameraUpdateContext) in
                 setPopupState(.full)
                 let region: MKCoordinateRegion = context.region
-                let delta: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: region.span.latitudeDelta, longitude: region.span.longitudeDelta)
+                let newRegion = CameraRegion(
+                    center: region.center,
+                    delta: CLLocationCoordinate2D(
+                        latitude: region.span.latitudeDelta,
+                        longitude: region.span.longitudeDelta
+                    )
+                )
+                // Settle-jitter MapKit: после программного centering карта
+                // обычно отдаёт чуть другие координаты (float-точность,
+                // snapping). Если разница ничтожна — не пишем обратно
+                // в cameraRegion, чтобы не дёрнуть лишний запрос клубов.
+                if newRegion.isApproximatelyEqual(to: cameraRegion) { return }
                 cameraRegionChangesFromIn = true
-                self.cameraRegion = CameraRegion(center: region.center, delta: delta)
+                self.cameraRegion = newRegion
             })
     }
 }
@@ -82,7 +106,7 @@ private enum Constants {
     static let defaultLongtude = 37.3636
     static let latitudinalMeters: Double = 1500
     static let longitudinalMeters: Double = 1500
-    
+
     static let defaultCenterLocation: CLLocationCoordinate2D = .init(
         latitude: Constants.defaultLatitude,
         longitude: Constants.defaultLongtude

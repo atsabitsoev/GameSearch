@@ -8,12 +8,12 @@
 import Foundation
 
 
-enum ClubsFilter {
+enum ClubsFilter: Equatable {
     case name(String)
     case videocard(VideocardFilter)
 }
 
-enum VideocardFilter: Int {
+enum VideocardFilter: Int, Equatable {
     case series2 = 2
     case series3 = 3
     case series4 = 4
