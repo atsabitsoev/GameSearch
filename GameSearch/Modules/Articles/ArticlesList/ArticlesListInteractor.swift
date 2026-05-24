@@ -16,7 +16,7 @@ final class ArticlesListInteractor: ArticlesListInteractorProtocol {
     }
     
     
-    func fetchArticles(page: Int) -> AnyPublisher<[Article], any Error> {
-        service.getLatestArticles(page: page)
+    func fetchArticles(offset: Int, limit: Int) -> AnyPublisher<[Article], any Error> {
+        service.getLatestArticles(offset: offset, limit: limit)
     }
 }

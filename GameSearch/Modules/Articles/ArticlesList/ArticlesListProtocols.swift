@@ -14,13 +14,19 @@ enum ArticlesListState {
     case error(message: String)
 }
 
+@MainActor
 protocol ArticlesListViewModelProtocol: ObservableObject {
     var articles: [Article] { get }
+    var pendingNewArticles: [Article] { get }
+    var filteredPendingCount: Int { get }
     var selectedFilter: ArticlesFilter { get set }
     var isLoadingNextPage: Bool { get }
     var state: ArticlesListState { get }
-    
-    func loadArticles() async
+
+    func onAppear() async
+    func pullToRefresh() async -> Bool
+    func retry() async
+    func revealPendingArticles()
     func loadNextPage()
     func onItemAppear(_ article: Article)
     func onFilterSelect(_ filter: ArticlesFilter)
@@ -29,5 +35,5 @@ protocol ArticlesListViewModelProtocol: ObservableObject {
 
 
 protocol ArticlesListInteractorProtocol {
-    func fetchArticles(page: Int) -> AnyPublisher<[Article], any Error>
+    func fetchArticles(offset: Int, limit: Int) -> AnyPublisher<[Article], any Error>
 }

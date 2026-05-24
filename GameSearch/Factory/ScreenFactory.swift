@@ -23,6 +23,7 @@ final class ScreenFactory: ScreenFactoryProtocol {
     }
     
     
+    @MainActor
     func makeArticlesListView() -> some View {
         let articlesService: ArticlesServiceProtocol = ArticlesService()
         let interactor: ArticlesListInteractorProtocol = ArticlesListInteractor(service: articlesService)
