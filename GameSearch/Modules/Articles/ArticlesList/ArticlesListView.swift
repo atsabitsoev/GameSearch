@@ -33,7 +33,7 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
             contentView
         }
         .navigationTitle("Новости")
-        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.onAppear()
         }
