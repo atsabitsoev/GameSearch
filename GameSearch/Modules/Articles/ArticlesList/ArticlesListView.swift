@@ -11,7 +11,13 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
     @EnvironmentObject private var router: ArticlesRouter
     @StateObject private var viewModel: ViewModel
     @State private var scrollToTopToggle = false
-    @State private var showRefreshChip = false
+    @State private var refreshChip: RefreshChip = .none
+
+    private enum RefreshChip {
+        case none
+        case success
+        case failure
+    }
 
 
     init(viewModel: ViewModel) {
@@ -32,7 +38,7 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
         .navigationTitle("Новости")
         .navigationBarTitleDisplayMode(.automatic)
         .task {
-            await viewModel.loadArticles()
+            await viewModel.onAppear()
         }
     }
 }
@@ -112,18 +118,69 @@ private extension ArticlesListView {
                     scrollToTopToggle.toggle()
                 }
             )
-            if showRefreshChip {
-                Text("Обновлено только что")
-                    .font(EAFont.infoSmall)
-                    .foregroundStyle(EAColor.textPrimary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(EAColor.secondaryBackground.opacity(0.8))
-                    .clipShape(Capsule())
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+            if viewModel.filteredPendingCount > 0 {
+                showNewButton
+            } else {
+                switch refreshChip {
+                case .success:
+                    refreshedChip
+                case .failure:
+                    refreshFailedChip
+                case .none:
+                    EmptyView()
+                }
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
+        .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
+        .animation(.easeOut(duration: 0.2), value: refreshChip)
+    }
+
+    var showNewButton: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.25)) {
+                viewModel.revealPendingArticles()
+            }
+            scrollToTopToggle.toggle()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.up")
+                    .font(EAFont.infoSmall)
+                    .accessibilityHidden(true)
+                Text("Показать новое (\(viewModel.filteredPendingCount))")
+                    .font(EAFont.infoSmall)
+            }
+            .foregroundStyle(EAColor.background)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(EAColor.accent)
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Показать новое (\(viewModel.filteredPendingCount))"))
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    var refreshedChip: some View {
+        Text("Обновлено только что")
+            .font(EAFont.infoSmall)
+            .foregroundStyle(EAColor.textPrimary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(EAColor.secondaryBackground.opacity(0.8))
+            .clipShape(Capsule())
+            .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    var refreshFailedChip: some View {
+        Text("Не удалось обновить")
+            .font(EAFont.infoSmall)
+            .foregroundStyle(EAColor.textPrimary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(EAColor.secondaryBackground.opacity(0.8))
+            .clipShape(Capsule())
+            .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     var skeletonView: some View {
@@ -177,7 +234,7 @@ private extension ArticlesListView {
                 .foregroundStyle(EAColor.textPrimary)
             Button("Повторить") {
                 Task {
-                    await viewModel.loadArticles()
+                    await viewModel.retry()
                 }
             }
             .padding(.horizontal, 12)
@@ -191,15 +248,19 @@ private extension ArticlesListView {
     }
 
     func refreshArticles() async {
-        await viewModel.loadArticles()
+        let succeeded = await viewModel.pullToRefresh()
+        let nextChip: RefreshChip = succeeded ? .success : .failure
+        let displayDuration: UInt64 = succeeded ? 1_600_000_000 : 2_500_000_000
+
         withAnimation(.easeOut(duration: 0.2)) {
-            showRefreshChip = true
+            refreshChip = nextChip
         }
         Task {
-            try? await Task.sleep(nanoseconds: 1_600_000_000)
+            try? await Task.sleep(nanoseconds: displayDuration)
             await MainActor.run {
+                guard refreshChip == nextChip else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
-                    showRefreshChip = false
+                    refreshChip = .none
                 }
             }
         }

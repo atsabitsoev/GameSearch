@@ -11,7 +11,7 @@ import Combine
 
 
 protocol ArticlesServiceProtocol {
-    func getLatestArticles(page: Int) -> AnyPublisher<[Article], any Error>
+    func getLatestArticles(offset: Int, limit: Int) -> AnyPublisher<[Article], any Error>
     func getArticle(slug: String) -> AnyPublisher<Article, any Error>
 }
 
@@ -22,11 +22,8 @@ final class ArticlesService: ArticlesServiceProtocol {
     private let quoteImageUrl = "https://images.cybersport.ru/images/quote-author/plain/"
     private let asIsImageUrl = "https://images.cybersport.ru/images/as-is/plain/"
 
-    
-    /// page начинается с 0
-    func getLatestArticles(page: Int = 0) -> AnyPublisher<[Article], any Error> {
-        let limit = 30
-        let offset = page * limit
+
+    func getLatestArticles(offset: Int, limit: Int) -> AnyPublisher<[Article], any Error> {
         let urlString = "\(baseUrl)?page[offset]=\(offset)&page[limit]=\(limit)&sort=-publishedAt"
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
