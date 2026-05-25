@@ -12,4 +12,11 @@ struct PandaScoreStandingDTO: Decodable, Sendable {
     let losses: Int?
     let ties: Int?
     let points: Int?
+    /// Total matches played = wins + losses + ties. PandaScore returns
+    /// this for group/Swiss-format standings.
+    let total: Int?
+    /// Map-level wins inside this standings entry (CS2 group stage).
+    let gameWins: Int?
+    let gameLosses: Int?
+    let gameTies: Int?
 }

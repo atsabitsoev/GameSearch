@@ -73,18 +73,18 @@ GameSearch/
 │       │       ├── TournamentsFilterSheet.swift   ← Phase 1
 │       │       └── TournamentsSkeletonList.swift
 │       │
-│       ├── TournamentDetails/
+│       ├── TournamentDetails/                ← Phase 1.B
 │       │   ├── TournamentDetailsView.swift
 │       │   ├── TournamentDetailsViewModel.swift
 │       │   ├── TournamentDetailsInteractor.swift
-│       │   ├── TournamentDetailsProtocols.swift
+│       │   ├── TournamentDetailsProtocols.swift  ← enum TournamentDetailsTab + state + interactor + VM протоколы
 │       │   └── Views/
 │       │       ├── TournamentHeaderView.swift
-│       │       ├── TournamentTabPicker.swift      ← переиспользует SwipeSegmentedView
-│       │       ├── MatchesTab.swift
-│       │       ├── StandingsTab.swift
-│       │       ├── BracketsTab.swift              ← Phase 1
-│       │       ├── ParticipantsTab.swift
+│       │       ├── TournamentTabPicker.swift     ← собственный 4-сегмент, НЕ через SwipeSegmentedView (см. ниже)
+│       │       ├── MatchesTab.swift              ← внутри MatchRowView (private)
+│       │       ├── StandingsTab.swift            ← внутри StandingRow + StandingsRowSkeleton (private)
+│       │       ├── BracketsTab.swift             ← заглушка «Сетка скоро» (полная — Phase 4)
+│       │       ├── ParticipantsTab.swift         ← внутри ParticipantsEmptyView (private)
 │       │       ├── ParticipantTeamCard.swift
 │       │       └── TournamentDetailsSkeleton.swift
 │       │
@@ -131,6 +131,10 @@ GameSearch/
 │       │   ├── CountryFlag.swift
 │       │   ├── PrizepoolLabel.swift
 │       │   ├── ScoreView.swift             ← "16 : 14" с подсветкой winner
+│       │   ├── MatchTimeFormatter.swift    ← Phase 1.B: relative time для матча (ru_RU)
+│       │   ├── TournamentsEmptyStateView.swift ← Phase 1.A: универсальный empty/error
+│       │   ├── TournamentsStrings.swift    ← Phase 1.A: микрокопи RU
+│       │   ├── TournamentsAnalytics.swift  ← Phase 1.A: type-safe события AppMetrica
 │       │   └── SpoilerWrapper.swift        ← Phase 3
 │       │
 │       └── TournamentsPlaceholderView.swift  ← ОСТАВИТЬ как error/empty state
@@ -249,6 +253,19 @@ TournamentsListView
 
 ---
 
+## Решения по реюзу компонентов (Phase 1.B)
+
+### `TournamentTabPicker` НЕ переиспользует `SwipeSegmentedView`
+
+Изначально в этом документе и в `10-screens.md` предполагалось переиспользовать `Modules/Clubs/ClubDetailsView/Views/SectionPicker/SwipeSegmentedView.swift`. На практике этот компонент:
+
+1. **Жёстко завязан на `DetailsSection`** (Clubs-специфичный enum с кейсами `.common` / `.specification`) и на `SectionPicker`. Обобщение требует параметризации обоих компонентов и аккуратной миграции `ClubDetailsView`.
+2. **Использует `TabView(.page(indexDisplayMode: .never))`** для свайпов между табами — тяжелее по перфу с нашими 4 табами и lazy-загружаемой стандингс-вкладкой, и менее предсказуемо для unit-тестов.
+
+Решение Phase 1.B: построить отдельный `TournamentTabPicker` в стиле уже существующего `TournamentSegmentControl` (Phase 1.A) — единый визуальный язык внутри модуля, минимальная поверхность для багов. Если в Phase 4 (Polish) потребуется swipe-between-tabs, чистый рефакторинг — generic-параметризация `SwipeSegmentedView<Tag: Hashable & Identifiable>` отдельным тикетом.
+
+---
+
 ## Что НЕ создавать (распространённые ошибки агентов)
 
 - ❌ **Не создавать отдельный `NetworkManager` / `APIManager` singleton.** Один `PandaScoreAPIClient` через DI — достаточно.
@@ -279,4 +296,4 @@ TournamentsListView
 
 ---
 
-_Last updated: 2026-05-25_
+_Last updated: 2026-05-25 (Phase 1.B — добавлен `TournamentDetails/` с реальной реализацией, `Shared/MatchTimeFormatter.swift`, ADR-эквивалент про `TournamentTabPicker`)_

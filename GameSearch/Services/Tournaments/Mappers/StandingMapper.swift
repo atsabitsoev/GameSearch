@@ -14,10 +14,14 @@ enum StandingMapper {
         return Standing(
             team: team,
             rank: rank,
-            wins: dto.wins ?? 0,
-            losses: dto.losses ?? 0,
+            wins: dto.wins,
+            losses: dto.losses,
             ties: dto.ties,
-            points: dto.points
+            points: dto.points,
+            total: dto.total,
+            gameWins: dto.gameWins,
+            gameLosses: dto.gameLosses,
+            gameTies: dto.gameTies
         )
     }
 

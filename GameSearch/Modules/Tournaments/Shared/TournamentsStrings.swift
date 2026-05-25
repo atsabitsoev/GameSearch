@@ -55,8 +55,58 @@ enum TournamentsStrings {
     // MARK: - Match statuses
 
     static let matchStatusLive = "LIVE"
+    static let matchStatusFinished = "Завершён"
+    static let matchStatusCanceled = "Отменён"
+    static let matchStatusPostponed = "Перенесён"
 
     // MARK: - Match format
 
     static func bestOf(_ n: Int) -> String { "BO\(n)" }
+
+    // MARK: - Tournament details
+
+    static let tournamentDetailsNavTitleFallback = "Турнир"
+
+    static let tournamentTabMatches = "Матчи"
+    static let tournamentTabStandings = "Таблица"
+    static let tournamentTabBrackets = "Сетка"
+    static let tournamentTabParticipants = "Команды"
+
+    static let tournamentPrizeLabel = "Призовой"
+    static let tournamentShareButton = "Поделиться"
+
+    static let tournamentBracketsComingSoonTitle = "Сетка скоро появится"
+    static let tournamentBracketsComingSoonSubtitle = "Над сеткой плей-офф ещё работаем"
+
+    // MARK: - Standings
+
+    static let standingsColRank = "#"
+    static let standingsColTeam = "Команда"
+    static let standingsColWins = "В"
+    static let standingsColLosses = "П"
+    static let standingsColTotal = "Игр"
+    static let standingsColMaps = "Карты"
+    static let standingsColPoints = "Очки"
+
+    static let standingsEmptyTitle = "Таблицы пока нет"
+    static let standingsEmptySubtitle = "Появится после первых матчей"
+
+    // MARK: - Participants
+
+    static let participantsSectionTitle = "Команды-участники"
+    static let participantsRosterLabel = "Состав"
+    static let participantsNoRoster = "Состав не объявлен"
+    static let participantsEmptyTitle = "Команды ещё не объявлены"
+    static let participantsEmptySubtitle = "Список появится ближе к старту"
+
+    // MARK: - Matches tab
+
+    static let matchesEmptyTitle = "Расписание ещё не готово"
+    static let matchesEmptySubtitle = "Появится ближе к старту"
+
+    // MARK: - Relative time
+
+    static let timeToday = "Сегодня"
+    static let timeTomorrow = "Завтра"
+    static let timeYesterday = "Вчера"
 }

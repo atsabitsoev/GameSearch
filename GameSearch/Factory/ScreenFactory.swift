@@ -79,7 +79,16 @@ final class ScreenFactory: ScreenFactoryProtocol {
 
     @MainActor
     func makeTournamentDetailsView(idOrSlug: String) -> some View {
-        TournamentsPhasePlaceholder(title: "Турнир \(idOrSlug)")
+        let interactor = TournamentDetailsInteractor(
+            tournamentsService: tournamentsService,
+            matchesService: matchesService,
+            cache: tournamentsCacheStore
+        )
+        let viewModel = TournamentDetailsViewModel(
+            idOrSlug: idOrSlug,
+            interactor: interactor
+        )
+        return TournamentDetailsView(viewModel: viewModel)
     }
 
     @MainActor

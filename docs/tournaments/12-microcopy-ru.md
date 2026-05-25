@@ -97,13 +97,17 @@
 
 ### Standings table header
 
-| Ключ | Текст |
-|---|---|
-| `standings_col_rank` | `#` |
-| `standings_col_team` | `Команда` |
-| `standings_col_wins` | `В` |
-| `standings_col_losses` | `П` |
-| `standings_col_points` | `Очки` |
+| Ключ | Текст | Источник данных |
+|---|---|---|
+| `standings_col_rank` | `#` | `Standing.rank` |
+| `standings_col_team` | `Команда` | `Standing.team.name` |
+| `standings_col_wins` | `В` | `Standing.wins` (PandaScore wins, только group/Swiss) |
+| `standings_col_losses` | `П` | `Standing.losses` |
+| `standings_col_total` | `Игр` | `Standing.total` (= wins+losses+ties) |
+| `standings_col_maps` | `Карты` | `"{gameWins}-{gameLosses}"` |
+| `standings_col_points` | `Очки` | `Standing.points` (legacy для не-CS игр) |
+
+Колонки отрисовываются только если у хотя бы одной строки есть соответствующее значение (`StandingsColumnLayout`). Для playoff-bracket таблица деградирует до `# | Команда`.
 
 ### Participants tab
 
@@ -112,6 +116,22 @@
 | `participants_section_title` | `Команды-участники` |
 | `participants_roster_label` | `Состав` |
 | `participants_no_roster` | `Состав не объявлен` |
+| `participants_empty_title` | `Команды ещё не объявлены` (Phase 1.B — когда `participants == nil/[]`) |
+| `participants_empty_subtitle` | `Список появится ближе к старту` |
+
+### Standings tab — empty state
+
+| Ключ | Текст |
+|---|---|
+| `standings_empty_title` | `Таблицы пока нет` (Phase 1.B — резерв на случай если API вернёт пустой список) |
+| `standings_empty_subtitle` | `Появится после первых матчей` |
+
+### Matches tab — empty state
+
+| Ключ | Текст |
+|---|---|
+| `matches_empty_title` | `Расписание ещё не готово` (резерв; в коде сейчас переиспользуется `empty_upcoming_*`) |
+| `matches_empty_subtitle` | `Появится ближе к старту` |
 
 ---
 
@@ -300,6 +320,16 @@
 
 Используем `DateFormatter` с `locale = Locale(identifier: "ru_RU")` и `RelativeDateTimeFormatter` для «через X минут».
 
+Базовые относительные слова (для лекс. согласования с другими временными строками):
+
+| Ключ | Текст |
+|---|---|
+| `time_today` | `Сегодня` |
+| `time_tomorrow` | `Завтра` |
+| `time_yesterday` | `Вчера` |
+
+Реализация (Phase 1.B): `Shared/MatchTimeFormatter.swift` — статический enum с методами `upcoming(_:)`, `finished(_:)`, `clock(_:)`. Все используют общий cached `DateFormatter` с `ru_RU` локалью.
+
 ---
 
 ## Форматирование чисел
@@ -316,4 +346,4 @@
 
 ---
 
-_Last updated: 2026-05-25_
+_Last updated: 2026-05-25 (Phase 1.B — добавлены empty states для Standings/Participants/Matches табов, базовые «Сегодня/Завтра/Вчера»)_

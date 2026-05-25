@@ -14,6 +14,11 @@ protocol MatchesServiceProtocol: Sendable {
     func fetchMatches(game: Game, segment: TournamentSegment) async throws -> [Match]
     func fetchMatchDetails(id: MatchId) async throws -> Match
     func fetchLives(game: Game?) async throws -> [Match]
+    /// Full match payloads for a tournament — needed because inline
+    /// matches inside `/tournaments/{id}` are stripped of `opponents`,
+    /// `results`, `league_id`, and `videogame`, which makes them
+    /// unrenderable. This endpoint returns the full match shape.
+    func fetchTournamentMatches(tournamentId: TournamentId) async throws -> [Match]
 }
 
 // MARK: - Implementation
@@ -91,6 +96,29 @@ final class MatchesService: MatchesServiceProtocol, @unchecked Sendable {
         await cache.write(matches, key: key, ttl: TTL.lives)
         return matches
     }
+
+    func fetchTournamentMatches(tournamentId: TournamentId) async throws -> [Match] {
+        let key = "matches:tournament:\(tournamentId)"
+
+        if let cached: [Match] = await cache.read([Match].self, key: key) {
+            return cached
+        }
+
+        let query: [URLQueryItem] = [
+            URLQueryItem(name: "filter[tournament_id]", value: "\(tournamentId)"),
+            URLQueryItem(name: "page[size]", value: "100"),
+            URLQueryItem(name: "sort", value: "begin_at")
+        ]
+        let dtos = try await api.get([PandaScoreMatchDTO].self, path: "/matches", query: query)
+        let matches = MatchMapper.mapAll(dtos)
+        // Live matches need fresh data; finished/canceled-only sets can sit
+        // for longer. Pick the shorter TTL whenever anything is still live.
+        let ttl: TimeInterval = matches.contains(where: { $0.isLive })
+            ? TTL.tournamentMatchesLive
+            : TTL.tournamentMatchesStatic
+        await cache.write(matches, key: key, ttl: ttl)
+        return matches
+    }
 }
 
 // MARK: - TTLs
@@ -104,6 +132,8 @@ private extension MatchesService {
         static let matchDetailsLive: TimeInterval = 30
         static let matchDetailsFinished: TimeInterval = 24 * 60 * 60
         static let lives: TimeInterval = 30
+        static let tournamentMatchesLive: TimeInterval = 60
+        static let tournamentMatchesStatic: TimeInterval = 60 * 60
     }
 
     func ttl(forList segment: TournamentSegment) -> TimeInterval {

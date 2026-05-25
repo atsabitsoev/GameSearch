@@ -39,14 +39,36 @@
 - `Router/RootView.swift` — таб «Турниры» обёрнут в `NavigationStack(path: $tournamentsRouter.path)` + `.navigationDestination(for: TournamentsRoute.self)`. Deeplinks `gamesearch://tournaments`, `gamesearch://tournament/<id>`, `gamesearch://match/<id>` работают (URL scheme `gamesearch` зарегистрирован в `Info.plist`).
 - `Modules/Tournaments/TournamentsPlaceholderView.swift` (legacy) — пока сохранён, удалить когда уберём `PandaScoreTournamentsService` (DoD Phase 1).
 
-**Phase 1.B (Детали турнира) и 1.C (Детали матча) — следующие на очереди.** В `ScreenFactory` пока заглушки `TournamentsPhasePlaceholder` для `makeTournamentDetailsView(idOrSlug:)` и `makeMatchDetailsView(id:)`.
+**Phase 1.B (Детали турнира) — завершена + post-Phase-1.B bugfix-итерация по результатам разбора через Proxyman.**
+- `GameSearch/Modules/Tournaments/TournamentDetails/` — VIPER-стек (`TournamentDetailsProtocols`, `TournamentDetailsInteractor`, `TournamentDetailsViewModel`, `TournamentDetailsView`).
+- `GameSearch/Modules/Tournaments/TournamentDetails/Views/` — `TournamentHeaderView` (hero-карточка), `TournamentStagePicker` (горизонтальный picker сиблингов-стадий серии), `TournamentTabPicker` (4 таба горизонтально-скроллируемые), `MatchesTab` + локальный `MatchRowView` + `MatchRowSkeleton`, `StandingsTab` + `StandingRow` + `StandingsRowSkeleton` + `StandingsColumnLayout`, `ParticipantsTab` + `ParticipantTeamCard`, `BracketsTab` (заглушка), `TournamentDetailsSkeleton`.
+- `Shared/MatchTimeFormatter.swift` — `ru_RU` форматтер времени матча (`upcoming` / `finished` / `clock`). Будет переиспользован в 1.C.
+- `Shared/TournamentsStrings.swift` — расширен строками деталей (`tournamentTab*`, `standingsCol*`, `participants*`, `time*`, `matchStatusFinished/Canceled/Postponed`).
+- `Shared/TournamentsAnalytics.swift` — добавлены `tournamentTabSwitched(id:tab:)`, `tournamentShared(id:slug:)`, enum `TournamentTab`, screen-case `.tournament` для `matchOpened.fromScreen`.
+- `Factory/ScreenFactory.makeTournamentDetailsView(idOrSlug:)` — отдаёт реальный `TournamentDetailsView`, инжектирует `tournamentsService` + `matchesService` + `cacheStore`. Placeholder остался только для `makeMatchDetailsView(id:)`.
+
+**Архитектура загрузки данных деталей (важный паттерн для Phase 1.C):**
+1. **Tournament details** — `TournamentsService.fetchTournamentDetails(idOrSlug:)` → `GET /tournaments/<idOrSlug>`. Возвращает `Tournament` с `participants` (для таба «Команды»). Inline `tournament.matches` **намеренно игнорируются**, т.к. они приходят без `opponents`, `results`, `league_id`, `videogame` — невозможно отрисовать как карточку матча.
+2. **Матчи турнира** — `MatchesService.fetchTournamentMatches(tournamentId:)` → `GET /matches?filter[tournament_id]=<id>&page[size]=100&sort=begin_at`. Возвращает полные `[Match]` с opponents/results/streams/games. VM запускает этот fetch автоматически сразу после успешного `loadTournament`, потому что таб «Матчи» — дефолтный. Cache TTL: 60s для live-сетов, 1ч для статичных.
+2a. **Сиблинги-стадии серии** — `TournamentsService.fetchSeriesTournaments(serieId:)` → `GET /series/<id>/tournaments`. Возвращает `[Tournament]` для всех стадий той же серии. VM кикает один раз после первого `loadTournament` (детектит дубликаты через `stagesRequestedForSerieId`). Если стадий > 1 → отрисовываем `TournamentStagePicker`. Тап на чип → `onSelectStage(_:)` меняет `activeIdOrSlug`, ресетит matches/standings sub-states, перезапускает `loadTournament`. Stages list reuse — не перефетчим siblings.
+3. **Standings** — `TournamentsService.fetchStandings(tournamentId:)` → `GET /tournaments/<id>/standings`. Lazy fetch (только при первом тапе на таб «Таблица»). **Два формата** в зависимости от типа стадии:
+   - **Group/Swiss stage** → полная shape `{rank, team, wins, losses, ties, total, game_wins, game_losses, game_ties}`. Пример: Astana 2026 Group Stage (id 20902, 16 команд с реальной статистикой).
+   - **Playoff bracket** → минимальная `{rank, team, last_match}`. Пример: Astana 2026 Playoffs (id 20930). Бракет сам передаёт прогрессию.
+   - `Standing` модель имеет все эти поля опциональными. `StandingsTab` через `StandingsColumnLayout(standings:)` индивидуально скрывает каждую stat-колонку если у всех записей nil → group stage показывает `# | Команда | В | П | Игр | Карты`, playoff деградирует до `# | Команда`.
+4. **Brackets** — заглушка (Phase 4 polish).
+5. **Participants** — derive из `tournament.participants` (без отдельного запроса).
+
+- Share: `ShareLink` с URL `gamesearch://tournament/<slug>` показывается только в `.loaded` state. `simultaneousGesture` отправляет analytics на нажатие.
+- Подтверждено в Proxyman: открытие Astana 2026 Playoffs → 2 запроса (`/tournaments/cs-go-pgl-astana-2026-playoffs` + `/matches?filter[tournament_id]=20930`) → таб «Матчи» отрисовывает реальные 8 матчей с командами/счётами; открытие Cologne Major 2026 Stage 1 → тоже 2 запроса → 7 матчей рендерятся с лого. Pull-to-refresh инвалидирует обе кэш-записи.
+
+**Phase 1.C (Детали матча) — следующая на очереди.** В `ScreenFactory.makeMatchDetailsView(id:)` пока заглушка `TournamentsPhasePlaceholder`.
 
 **Что точно НЕ трогать (Phase 0 контракт):**
 - Сигнатуры `TournamentsServiceProtocol.fetchTournaments(game:segment:)` и `fetchTournamentsPage(game:segment:page:pageSize:)` — page=1 со значением pageSize=50 сохраняет старый cache key для совместимости с Phase 0 тестами.
 - `MatchesServiceProtocol`.
 - Старый `PandaScoreTournamentsService` (он же `PlaceholderTournamentsServiceProtocol`) — продолжает работать как раньше, удалить только в конце Phase 1.
 
-**Важно**: при создании новых экранов в 1.B/1.C — переиспользовать `Shared/` компоненты (особенно `TournamentsStrings`, `TournamentsAnalytics`, `TeamLogo`, `LiveBadge`, `ScoreView`).
+**Важно**: при создании новых экранов в 1.C — переиспользовать `Shared/` компоненты (особенно `TournamentsStrings`, `TournamentsAnalytics`, `TeamLogo`, `LiveBadge`, `ScoreView`, `MatchTimeFormatter`, `CountryFlag`). Для MatchHeaderView подойдут уже `TeamLogo` + `ScoreView` + `LiveBadge`. Для отрисовки игроков матча — паттерн из `ParticipantTeamCard` (флажок страны + nickname + role).
 
 ---
 

@@ -82,4 +82,40 @@ final class TournamentsServiceTests: XCTestCase {
 
         XCTAssertEqual(apiClient.callCount, 1)
     }
+
+    func test_fetchSeriesTournaments_callsSeriesEndpoint() async throws {
+        apiClient.responseHandler = { path, query in
+            XCTAssertEqual(path, "/series/10574/tournaments")
+            XCTAssertTrue(query.isEmpty)
+            return [
+                try PandaScoreFixtures.decode(
+                    PandaScoreTournamentDTO.self,
+                    named: "tournament_running_cs2",
+                    in: TournamentsServiceTests.self
+                )
+            ]
+        }
+
+        let stages = try await sut.fetchSeriesTournaments(serieId: 10574)
+
+        XCTAssertEqual(apiClient.callCount, 1)
+        XCTAssertEqual(stages.count, 1)
+    }
+
+    func test_fetchSeriesTournaments_secondCall_servesFromCache() async throws {
+        apiClient.responseHandler = { _, _ in
+            [
+                try PandaScoreFixtures.decode(
+                    PandaScoreTournamentDTO.self,
+                    named: "tournament_running_cs2",
+                    in: TournamentsServiceTests.self
+                )
+            ]
+        }
+
+        _ = try await sut.fetchSeriesTournaments(serieId: 10574)
+        _ = try await sut.fetchSeriesTournaments(serieId: 10574)
+
+        XCTAssertEqual(apiClient.callCount, 1)
+    }
 }

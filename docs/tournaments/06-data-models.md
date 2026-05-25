@@ -205,7 +205,7 @@ struct TournamentSeriesGroup: Identifiable, Hashable, Sendable {
 
 Используется внутри `TournamentsListViewModel`: `state.loaded(groups: [TournamentSeriesGroup])`. Карточка списка (`TournamentCard`) принимает группу, а не одиночный турнир. Навигация выполняется на `representativeStage.slug`.
 
-В Phase 1.B (детали) можно либо открывать конкретную стадию (как сейчас), либо подгружать все стадии серии для отображения tab «Матчи» по группам.
+В Phase 1.B (детали) открывается конкретная стадия. **Важно**: `tournament.matches?` приходит в payload `/tournaments/<id>`, но эти inline-матчи приходят без `opponents`, `results`, `league_id`, `videogame` — отрисовать как карточку матча нельзя. Поэтому в Phase 1.B для таба «Матчи» используется отдельный fetch `MatchesService.fetchTournamentMatches(tournamentId:)` (endpoint `/matches?filter[tournament_id]=<id>`), который отдаёт полную shape.
 
 ---
 
@@ -374,10 +374,19 @@ struct Standing: Identifiable, Hashable, Sendable {
     var id: TeamId { team.id }
     let team: Team
     let rank: Int
-    let wins: Int
-    let losses: Int
+    /// Optional — PandaScore возвращает W/L (match-level) и game-level
+    /// статы только для **group/Swiss** standings. Playoff brackets
+    /// отдают только `rank` + `team` + `last_match`. `StandingsTab`
+    /// через `StandingsColumnLayout(standings:)` скрывает колонки, у
+    /// которых нет данных, чтобы избежать "0/0/—" артефактов.
+    let wins: Int?
+    let losses: Int?
     let ties: Int?
-    let points: Int?
+    let points: Int?       // legacy — для других игр; в CS2 nil
+    let total: Int?        // = wins + losses + ties (PandaScore field)
+    let gameWins: Int?     // карты выиграны
+    let gameLosses: Int?
+    let gameTies: Int?
 }
 
 struct Bracket: Hashable, Sendable {
@@ -513,4 +522,4 @@ tournaments_cache/{tournament_id}      ← L3 cache (Phase 1+)
 
 ---
 
-_Last updated: 2026-05-25_
+_Last updated: 2026-05-25 (Phase 1.B bugfix v2: `Standing` расширен полями `total`, `gameWins`, `gameLosses`, `gameTies` — PandaScore возвращает их для group/Swiss standings (Astana 2026 Group Stage показывает 9z @ rank 1: wins=3, total=3, gameWins-gameLosses=6-2). UI добавил колонки «Игр» и «Карты»)_

@@ -81,4 +81,48 @@ final class MatchesServiceTests: XCTestCase {
 
         XCTAssertEqual(apiClient.callCount, 1)
     }
+
+    func test_fetchTournamentMatches_callsMatchesEndpointWithFilter() async throws {
+        apiClient.responseHandler = { path, query in
+            XCTAssertEqual(path, "/matches")
+            XCTAssertTrue(query.contains {
+                $0.name == "filter[tournament_id]" && $0.value == "20930"
+            })
+            XCTAssertTrue(query.contains {
+                $0.name == "page[size]" && $0.value == "100"
+            })
+            XCTAssertTrue(query.contains {
+                $0.name == "sort" && $0.value == "begin_at"
+            })
+            let dto = try PandaScoreFixtures.decode(
+                PandaScoreMatchDTO.self,
+                named: "match_running",
+                in: MatchesServiceTests.self
+            )
+            return [dto]
+        }
+
+        let result = try await sut.fetchTournamentMatches(tournamentId: 20930)
+
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(apiClient.callCount, 1)
+    }
+
+    func test_fetchTournamentMatches_secondCall_servesFromCache() async throws {
+        var calls = 0
+        apiClient.responseHandler = { _, _ in
+            calls += 1
+            let dto = try PandaScoreFixtures.decode(
+                PandaScoreMatchDTO.self,
+                named: "match_running",
+                in: MatchesServiceTests.self
+            )
+            return [dto]
+        }
+
+        _ = try await sut.fetchTournamentMatches(tournamentId: 12345)
+        _ = try await sut.fetchTournamentMatches(tournamentId: 12345)
+
+        XCTAssertEqual(calls, 1)
+    }
 }

@@ -124,18 +124,20 @@
 
 ### Состав
 - **TournamentHeaderView** — лого лиги, название серии и стадии, даты, страна, tier-бейдж, призовой.
-- **TournamentTabPicker** — четыре вкладки. Использует существующий `SwipeSegmentedView`.
+- **TournamentStagePicker** (Phase 1.B v3) — горизонтальный picker сиблингов-стадий той же серии. Появляется ТОЛЬКО если у серии больше одной стадии. Лейблы из `tournament.name`: `Group Stage · Playoffs` или `Group A · Group B · Playoffs`. Тап → перезагрузка деталей выбранной стадии (header + matches + standings reset, share URL обновляется). Подгружается отдельным запросом `GET /series/<id>/tournaments`.
+- **TournamentTabPicker** — четыре вкладки. Собственная реализация в стиле `TournamentSegmentControl` (Phase 1.A) — `SwipeSegmentedView` (Clubs) не подошёл, см. ADR в `08-modules-and-files.md`.
 - Содержимое вкладок:
-  - **Матчи** — список `MatchRow`, сгруппированный по стадиям (`Group Stage`, `Playoffs`, `Grand Final`).
-  - **Таблица** — `StandingsTab` с табличкой rank/wins/losses.
+  - **Матчи** — список `MatchRowView` для активной стадии. Загружается через отдельный `MatchesService.fetchTournamentMatches(tournamentId:)` (inline `tournament.matches` обрезаны PandaScore).
+  - **Таблица** — `StandingsTab`. Для group/Swiss стадий — `# | Команда | В | П | Игр | Карты`. Для playoff bracket — `# | Команда`. Колонки определяются автоматически через `StandingsColumnLayout`.
   - **Сетка** — `BracketsTab` (Phase 1, в MVP — заглушка «Скоро»).
-  - **Команды** — список `ParticipantTeamCard` с ростерами.
+  - **Команды** — список `ParticipantTeamCard` с ростерами (из `tournament.participants`).
 
 ### Поведение
-- Pull-to-refresh обновляет данные текущего туронира.
+- Pull-to-refresh обновляет данные текущей стадии турнира (включая sibling-стадии).
+- Тап на чип в `TournamentStagePicker` → перезагрузка деталей выбранной стадии. Tab остаётся выбран тот же (для UX непрерывности — переключился с «Таблица Playoffs» на «Таблица Group Stage»).
 - Тап на матч → push `MatchDetailsView`.
 - Тап на команду в «Команды» → push `TeamProfileView` (Phase 2).
-- Share-кнопка → `UIActivityViewController` с deeplink `gamesearch://tournament/<slug>`.
+- Share-кнопка → `UIActivityViewController` с deeplink `gamesearch://tournament/<active-stage-slug>`. URL обновляется при смене стадии.
 - Heart-кнопка (Phase 1) → переключение избранного.
 
 ---
@@ -439,4 +441,4 @@
 
 ---
 
-_Last updated: 2026-05-25_
+_Last updated: 2026-05-25 (Phase 1.B v3 — добавлен `TournamentStagePicker` чтобы пользователь мог переключаться между стадиями серии без deeplink; теперь Group Stage с полной W/L таблицей доступен в 1 тап из Playoffs)_

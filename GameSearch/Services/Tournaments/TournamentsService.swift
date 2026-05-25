@@ -24,6 +24,10 @@ protocol TournamentsServiceProtocol: Sendable {
     func fetchTournamentDetails(idOrSlug: String) async throws -> Tournament
     func fetchStandings(tournamentId: TournamentId) async throws -> [Standing]
     func fetchBrackets(tournamentId: TournamentId) async throws -> Bracket
+    /// Sibling stages of a series — used by `TournamentDetailsView`'s
+    /// stage switcher so the user can hop between e.g. Group Stage and
+    /// Playoffs of the same series after opening either one.
+    func fetchSeriesTournaments(serieId: SerieId) async throws -> [Tournament]
 }
 
 // MARK: - Implementation
@@ -123,6 +127,23 @@ final class TournamentsService: TournamentsServiceProtocol, @unchecked Sendable 
         await cache.write(bracket, key: key, ttl: TTL.brackets)
         return bracket
     }
+
+    func fetchSeriesTournaments(serieId: SerieId) async throws -> [Tournament] {
+        let key = "series:tournaments:\(serieId)"
+
+        if let cached: [Tournament] = await cache.read([Tournament].self, key: key) {
+            return cached
+        }
+
+        let dtos = try await api.get(
+            [PandaScoreTournamentDTO].self,
+            path: "/series/\(serieId)/tournaments",
+            query: []
+        )
+        let stages = TournamentMapper.mapAll(dtos)
+        await cache.write(stages, key: key, ttl: TTL.seriesStages)
+        return stages
+    }
 }
 
 // MARK: - TTLs and keys
@@ -137,6 +158,9 @@ private extension TournamentsService {
         static let tournamentDetailsStatic: TimeInterval = 60 * 60
         static let standings: TimeInterval = 5 * 60
         static let brackets: TimeInterval = 5 * 60
+        /// Stage composition of a series is very stable after the series
+        /// starts (new stages aren't added mid-event). 1 hour is plenty.
+        static let seriesStages: TimeInterval = 60 * 60
     }
 
     func ttl(forList segment: TournamentSegment) -> TimeInterval {

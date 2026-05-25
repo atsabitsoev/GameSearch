@@ -19,6 +19,9 @@ enum TournamentsAnalyticsEvent {
     case listScrolledToBottom(page: Int)
 
     case tournamentOpened(id: TournamentId, slug: String, fromScreen: Screen)
+    case tournamentTabSwitched(id: TournamentId, tab: TournamentTab)
+    case tournamentStageSwitched(fromStageId: TournamentId, toStageId: TournamentId, serieId: SerieId)
+    case tournamentShared(id: TournamentId, slug: String)
 
     case liveStripShown(count: Int, game: Game)
     case liveStripChipTapped(matchId: MatchId, position: Int)
@@ -33,8 +36,16 @@ enum TournamentsAnalyticsEvent {
         case details
         case match
         case liveStrip = "live_strip"
+        case tournament
         case deeplink
         case favorites
+    }
+
+    enum TournamentTab: String {
+        case matches
+        case standings
+        case brackets
+        case participants
     }
 
     enum ErrorKind: String {
@@ -52,6 +63,9 @@ extension TournamentsAnalyticsEvent {
         case .pulledToRefresh: "tournaments_pulled_to_refresh"
         case .listScrolledToBottom: "tournaments_list_scrolled_to_bottom"
         case .tournamentOpened: "tournament_opened"
+        case .tournamentTabSwitched: "tournament_tab_switched"
+        case .tournamentStageSwitched: "tournament_stage_switched"
+        case .tournamentShared: "tournament_shared"
         case .liveStripShown: "live_strip_shown"
         case .liveStripChipTapped: "live_strip_chip_tapped"
         case .matchOpened: "match_opened"
@@ -77,6 +91,22 @@ extension TournamentsAnalyticsEvent {
                 "tournament_id": id,
                 "tournament_slug": slug,
                 "from_screen": from.rawValue
+            ]
+        case .tournamentTabSwitched(let id, let tab):
+            return [
+                "tournament_id": id,
+                "tab": tab.rawValue
+            ]
+        case .tournamentStageSwitched(let from, let to, let serieId):
+            return [
+                "from_stage_id": from,
+                "to_stage_id": to,
+                "serie_id": serieId
+            ]
+        case .tournamentShared(let id, let slug):
+            return [
+                "tournament_id": id,
+                "tournament_slug": slug
             ]
         case .liveStripShown(let count, let game):
             return ["count": count, "game": game.rawValue]
