@@ -315,13 +315,15 @@ func fetchTournaments(game: Game, segment: TournamentSegment) async throws -> [T
 
 | Триггер | Что инвалидируем |
 |---|---|
-| Pull-to-refresh на списке | `prefix: "tournaments:list:"` |
+| Pull-to-refresh на списке | `prefix: "tournaments:list:{game}:{segment}"` + `prefix: "matches:lives:"` + `prefix: "series:tournaments:"` (последний нужен для sibling-stages enrichment, см. ниже) |
 | Pull-to-refresh на деталях | `prefix: "tournament:detail:{id}"` |
 | Добавление в избранное | ничего из tournaments, только favorites |
 | Изменение фильтра | соответствующий списочный ключ |
 | Logout | всё (`invalidateAll`) |
 | Memory warning | L1 авто, L2 не трогаем |
 | Schema migration | всё (по `schemaVersion`) |
+
+**Про `series:tournaments:<id>` (TTL 1ч).** `TournamentsListInteractor` после `/tournaments/{segment}` для каждой серии без `prizepool` ни в одной видимой стадии параллельно дёргает `/series/{id}/tournaments` — единственный способ узнать prizepool, когда он привязан к Playoffs, который ещё не в running. Если pull-to-refresh не сбрасывает этот префикс — пользователь увидит то же самое «без призового», даже если PandaScore уже обновил Playoffs. См. также `04-pandascore-api.md` секцию про prizepool и `00-context-for-agents.md` пункт «Sibling-stages enrichment».
 
 ---
 

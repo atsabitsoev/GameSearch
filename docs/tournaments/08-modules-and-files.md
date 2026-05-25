@@ -237,9 +237,13 @@ TournamentsListView
   └── TournamentsListViewModel
       └── TournamentsListInteractor
           ├── TournamentsService
-          │   ├── PandaScoreAPIClient
-          │   ├── CacheStore
-          │   └── TournamentMapper
+          │   ├── fetchTournamentsPage(...) ─── /{game}/tournaments/{segment}
+          │   └── fetchSeriesTournaments(...) ── /series/{id}/tournaments
+          │           (sibling-stages enrichment для серий без prizepool,
+          │            см. enrichWithSiblingStages в Interactor)
+          │       ├── PandaScoreAPIClient
+          │       ├── CacheStore
+          │       └── TournamentMapper
           └── MatchesService (для live strip)
               └── ...
 ```

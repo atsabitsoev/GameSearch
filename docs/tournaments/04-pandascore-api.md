@@ -177,6 +177,9 @@ https://api.pandascore.co/csgo/tournaments/running?page[size]=50&sort=-begin_at
 |---|---|---|---|
 | GET | `/leagues` | Список лиг (для фильтрации) | 24 часа |
 | GET | `/series/upcoming` | Серии турниров (LCS Summer и т.п.) | 30 мин |
+| GET | `/series/{id}/tournaments` | **Все стадии одной серии** — единственный способ узнать призовой фонд Playoffs, если в `/{game}/tournaments/{segment}` пришёл только Group Stage | 1 час |
+
+> **Важно про prizepool.** PandaScore прикрепляет поле `prizepool` обычно только к **Playoffs/Final** стадии серии. На сегмент-эндпоинтах `/{game}/tournaments/{running|upcoming|past}` это создаёт UX-баг: если у серии 10616 «Europe Series #2» в `/running` виден только Group Stage (id 21029, `prizepool: null`), а Playoffs (id 21038, `prizepool: "50000 USD"`) ещё не начался — карточка серии в списке остаётся без призового, без правильного `tier` и с обрезанным subtitle. Реально это видно через `curl /series/10616/tournaments`. Фикс — обогащение страницы через `/series/{id}/tournaments` для серий без prizepool, см. `TournamentsListInteractor.enrichWithSiblingStages` и `00-context-for-agents.md` пункт «Sibling-stages enrichment».
 
 ---
 
