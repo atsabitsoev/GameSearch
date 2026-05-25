@@ -97,6 +97,9 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 articlesRouter.reset()
             }
             sendDeeplinkAnalytics(url, slug: slug)
+        case .tournamentsTab, .tournamentDetails, .matchDetails:
+            // Routing for tournaments deeplinks ships with Phase 1 navigation.
+            return
         case nil:
             return
         }

@@ -13,7 +13,18 @@
 		ACDF4B062DD5097300DE3332 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = ACDF4B052DD5097300DE3332 /* FirebaseFirestoreCombine-Community */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		AB000000000000000000A00A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACD3776B2DCE48F0003874AA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ACD377722DCE48F0003874AA;
+			remoteInfo = GameSearch;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		AB000000000000000000A002 /* GameSearchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GameSearchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACD377732DCE48F0003874AA /* GameSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -28,6 +39,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		AB000000000000000000A00B /* GameSearchTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GameSearchTests;
+			sourceTree = "<group>";
+		};
 		ACD377752DCE48F0003874AA /* GameSearch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -39,6 +55,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AB000000000000000000A004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ACD377702DCE48F0003874AA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -57,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				ACD377752DCE48F0003874AA /* GameSearch */,
+				AB000000000000000000A00B /* GameSearchTests */,
 				ACD377742DCE48F0003874AA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				ACD377732DCE48F0003874AA /* GameSearch.app */,
+				AB000000000000000000A002 /* GameSearchTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,6 +97,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		AB000000000000000000A001 /* GameSearchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB000000000000000000A008 /* Build configuration list for PBXNativeTarget "GameSearchTests" */;
+			buildPhases = (
+				AB000000000000000000A003 /* Sources */,
+				AB000000000000000000A004 /* Frameworks */,
+				AB000000000000000000A005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AB000000000000000000A009 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AB000000000000000000A00B /* GameSearchTests */,
+			);
+			name = GameSearchTests;
+			packageProductDependencies = (
+			);
+			productName = GameSearchTests;
+			productReference = AB000000000000000000A002 /* GameSearchTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		ACD377722DCE48F0003874AA /* GameSearch */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ACD3777E2DCE48F2003874AA /* Build configuration list for PBXNativeTarget "GameSearch" */;
@@ -108,6 +156,10 @@
 				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					AB000000000000000000A001 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = ACD377722DCE48F0003874AA;
+					};
 					ACD377722DCE48F0003874AA = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -133,11 +185,19 @@
 			projectRoot = "";
 			targets = (
 				ACD377722DCE48F0003874AA /* GameSearch */,
+				AB000000000000000000A001 /* GameSearchTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AB000000000000000000A005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ACD377712DCE48F0003874AA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -148,6 +208,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AB000000000000000000A003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		ACD3776F2DCE48F0003874AA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -157,7 +224,68 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		AB000000000000000000A009 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ACD377722DCE48F0003874AA /* GameSearch */;
+			targetProxy = AB000000000000000000A00A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		AB000000000000000000A006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89WB9E7UEU;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bitsoev.gamesearchea.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GameSearch.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GameSearch";
+			};
+			name = Debug;
+		};
+		AB000000000000000000A007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89WB9E7UEU;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bitsoev.gamesearchea.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GameSearch.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GameSearch";
+			};
+			name = Release;
+		};
 		ACD3777C2DCE48F2003874AA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -364,6 +492,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AB000000000000000000A008 /* Build configuration list for PBXNativeTarget "GameSearchTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB000000000000000000A006 /* Debug */,
+				AB000000000000000000A007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		ACD3776E2DCE48F0003874AA /* Build configuration list for PBXProject "GameSearch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

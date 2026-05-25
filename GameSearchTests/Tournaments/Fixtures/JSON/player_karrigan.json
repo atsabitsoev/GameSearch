@@ -1,0 +1,26 @@
+{
+  "id": 12345,
+  "name": "karrigan",
+  "first_name": "Finn",
+  "last_name": "Andersen",
+  "nationality": "DK",
+  "age": 35,
+  "birthday": "1990-02-25",
+  "role": "Coach",
+  "active": true,
+  "image_url": "https://cdn-api.pandascore.co/images/karrigan.png",
+  "current_videogame": {
+    "id": 3,
+    "name": "CS-GO",
+    "slug": "cs-go"
+  },
+  "current_team": {
+    "id": 411,
+    "name": "FaZe Clan",
+    "slug": "faze-clan",
+    "acronym": "FAZE",
+    "location": "EU",
+    "image_url": "https://cdn-api.pandascore.co/images/faze.png"
+  },
+  "modified_at": "2026-04-01T08:00:00Z"
+}

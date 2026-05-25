@@ -1,0 +1,84 @@
+{
+  "id": 1071234,
+  "name": "FaZe vs NaVi",
+  "status": "running",
+  "match_type": "best_of",
+  "number_of_games": 5,
+  "begin_at": "2026-05-25T15:00:00Z",
+  "scheduled_at": "2026-05-25T15:00:00Z",
+  "end_at": null,
+  "draw": false,
+  "forfeit": false,
+  "winner_id": null,
+  "winner_type": "Team",
+  "tournament_id": 13420,
+  "serie_id": 6125,
+  "league_id": 4501,
+  "modified_at": "2026-05-25T15:30:00Z",
+  "videogame": {
+    "id": 3,
+    "name": "CS-GO",
+    "slug": "cs-go"
+  },
+  "opponents": [
+    {
+      "type": "Team",
+      "opponent": {
+        "id": 411,
+        "name": "FaZe Clan",
+        "slug": "faze-clan",
+        "acronym": "FAZE",
+        "location": "EU",
+        "image_url": "https://cdn-api.pandascore.co/images/faze.png",
+        "modified_at": "2026-05-20T10:00:00Z"
+      }
+    },
+    {
+      "type": "Team",
+      "opponent": {
+        "id": 412,
+        "name": "Natus Vincere",
+        "slug": "navi",
+        "acronym": "NAVI",
+        "location": "UA",
+        "image_url": "https://cdn-api.pandascore.co/images/navi.png",
+        "modified_at": "2026-05-20T10:00:00Z"
+      }
+    }
+  ],
+  "results": [
+    { "team_id": 411, "score": 1 },
+    { "team_id": 412, "score": 0 }
+  ],
+  "games": [
+    {
+      "id": 999111,
+      "position": 1,
+      "status": "finished",
+      "winner": { "id": 411, "type": "Team" },
+      "begin_at": "2026-05-25T15:05:00Z",
+      "end_at": "2026-05-25T15:50:00Z",
+      "length": 2700,
+      "complete": true,
+      "detailed_stats": true,
+      "video_url": null,
+      "map": { "name": "Mirage" }
+    }
+  ],
+  "streams_list": [
+    {
+      "language": "ru",
+      "embed_url": "https://player.twitch.tv/?channel=maincast&parent=example.com",
+      "raw_url": "https://www.twitch.tv/maincast",
+      "main": true,
+      "official": false
+    },
+    {
+      "language": "en",
+      "embed_url": null,
+      "raw_url": "https://www.youtube.com/watch?v=abc123",
+      "main": false,
+      "official": true
+    }
+  ]
+}

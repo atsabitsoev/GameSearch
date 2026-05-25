@@ -1,6 +1,6 @@
 import Foundation
 
-protocol TournamentsServiceProtocol {
+protocol PlaceholderTournamentsServiceProtocol {
     func fetchTopTournaments() async -> [TournamentHeadline]
 }
 
@@ -15,8 +15,8 @@ enum TournamentGame: String, Hashable {
 }
 
 
-//TODO: - Удалить при переходе на реальные турниры через Liquipedia API
-final class PandaScoreTournamentsService: TournamentsServiceProtocol {
+//TODO: - Удалить после Phase 1: TournamentsService и TournamentsListView заменят этот placeholder.
+final class PandaScoreTournamentsService: PlaceholderTournamentsServiceProtocol {
     private let session: URLSession
     private let defaults = UserDefaults.standard
     private let apiHost = "https://api.pandascore.co"

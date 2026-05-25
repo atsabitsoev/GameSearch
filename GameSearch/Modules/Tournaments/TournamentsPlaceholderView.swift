@@ -7,9 +7,9 @@ struct TournamentsPlaceholderView: View {
     @State private var dota2Tournament: String?
     @State private var isLoadingTournaments = false
     @State private var showConfirmationToast = false
-    private let tournamentsService: any TournamentsServiceProtocol
+    private let tournamentsService: any PlaceholderTournamentsServiceProtocol
 
-    init(tournamentsService: any TournamentsServiceProtocol = PandaScoreTournamentsService()) {
+    init(tournamentsService: any PlaceholderTournamentsServiceProtocol = PandaScoreTournamentsService()) {
         self.tournamentsService = tournamentsService
     }
 

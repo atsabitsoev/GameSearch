@@ -22,6 +22,7 @@ struct GameSearchApp: App {
             RootView(factory: ScreenFactory())
                 .environmentObject(ClubsRouter())
                 .environmentObject(ArticlesRouter())
+                .environmentObject(TournamentsRouter())
                 .preferredColorScheme(.dark)
         }
     }

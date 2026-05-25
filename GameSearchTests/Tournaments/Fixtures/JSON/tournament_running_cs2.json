@@ -1,0 +1,33 @@
+{
+  "id": 13420,
+  "slug": "csgo-pgl-major-copenhagen-2026",
+  "name": "Group Stage",
+  "tier": "s",
+  "begin_at": "2026-03-21T08:00:00Z",
+  "end_at": "2026-03-31T20:00:00Z",
+  "prizepool": "1250000 United States Dollar",
+  "country": "DK",
+  "region": "EUROPE",
+  "live_supported": true,
+  "modified_at": "2026-03-15T12:00:00Z",
+  "league": {
+    "id": 4501,
+    "name": "PGL",
+    "slug": "csgo-pgl",
+    "image_url": "https://cdn-api.pandascore.co/images/pgl.png"
+  },
+  "serie": {
+    "id": 6125,
+    "name": "Major Copenhagen 2026",
+    "full_name": "Major Copenhagen 2026 March",
+    "year": 2026,
+    "season": null
+  },
+  "videogame": {
+    "id": 3,
+    "name": "CS-GO",
+    "slug": "cs-go"
+  },
+  "matches": [],
+  "expected_roster": []
+}
