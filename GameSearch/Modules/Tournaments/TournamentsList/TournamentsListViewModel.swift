@@ -201,9 +201,13 @@ private extension TournamentsListViewModel {
             applyLoadedState()
             updateLiveMatches(liveResult, for: snapshotGame)
             hasLoadedInitial = true
-        } catch is CancellationError {
-            return
         } catch {
+            // `URLError.cancelled` and `CancellationError` are not real
+            // failures — they happen when SwiftUI tears down a Task on
+            // pull-to-refresh / view-lifecycle. Surfacing them as
+            // `applyErrorState` would flip the list into the "временно
+            // недоступны" placeholder.
+            if error.isCancellation { return }
             guard generation == loadGeneration,
                   snapshotGame == selectedGame,
                   snapshotSegment == selectedSegment else { return }
@@ -237,10 +241,13 @@ private extension TournamentsListViewModel {
                     self.applyNextPage(page, pageNumber: pageNumber)
                 }
             } catch {
+                let cancelled = error.isCancellation
                 await MainActor.run {
                     guard generation == self.pageGeneration else { return }
                     self.isLoadingNextPage = false
-                    self.hasMorePages = false
+                    // Cancellation just means "user moved on" — keep
+                    // `hasMorePages = true` so a later scroll can retry.
+                    if !cancelled { self.hasMorePages = false }
                 }
             }
         }

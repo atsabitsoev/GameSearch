@@ -152,9 +152,8 @@ private extension MatchDetailsViewModel {
                     await self?.loadTournamentContext(tournamentId: match.tournamentId)
                 }
             }
-        } catch is CancellationError {
-            return
         } catch {
+            if error.isCancellation { return }
             guard generation == loadGeneration else { return }
             let kind = errorKind(for: error)
             state = .error(kind: kind)
@@ -170,9 +169,8 @@ private extension MatchDetailsViewModel {
             let tournament = try await interactor.fetchTournament(idOrSlug: String(tournamentId))
             guard generation == tournamentGeneration else { return }
             tournamentContext = .loaded(tournament)
-        } catch is CancellationError {
-            return
         } catch {
+            if error.isCancellation { return }
             guard generation == tournamentGeneration else { return }
             // Caption is enhancement — silent failure.
             tournamentContext = .unavailable

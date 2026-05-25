@@ -107,11 +107,18 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 articlesRouter.reset()
             }
             sendDeeplinkAnalytics(url, slug: slug)
-        case .tournamentsTab:
+        case .tournamentsTab(let game):
             isWelcomeViewPresented = false
             currentTab = .tournaments
             tournamentsRouter.reset()
-            sendTournamentsDeeplinkAnalytics(url, kind: "tab")
+            // `gamesearch://tournaments/<game>` opens the tab AND preselects
+            // the game segment (cs2 / dota2). Without this, the tab would
+            // open with whatever game was last selected, contradicting the
+            // contract documented in `docs/tournaments/14-deeplinks.md`.
+            if let game {
+                tournamentsRouter.preselectedGame = game
+            }
+            sendTournamentsDeeplinkAnalytics(url, kind: "tab", value: game?.rawValue)
         case .tournamentDetails(let idOrSlug):
             isWelcomeViewPresented = false
             currentTab = .tournaments

@@ -124,9 +124,15 @@ private extension PandaScoreAPIClient {
 
     func shouldRetry(error: TournamentsServiceError) -> Bool {
         switch error {
-        case .noNetwork, .serverError:
+        case .noNetwork:
             return true
-        case .rateLimited, .unauthorized, .missingApiKey, .invalidURL, .decoding, .unknown:
+        case .serverError(let status):
+            // Retry only on 5xx and on 408 Request Timeout. 4xx responses
+            // (404, 400, etc.) are deterministic — re-trying them wastes
+            // rate-limit budget for the same answer.
+            return status >= 500 || status == 408
+        case .cancelled, .rateLimited, .unauthorized, .missingApiKey,
+             .invalidURL, .decoding, .unknown:
             return false
         }
     }

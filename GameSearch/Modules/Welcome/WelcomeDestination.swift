@@ -32,7 +32,7 @@ extension WelcomeDestination {
         case .news:
             "Новости игр"
         case .tournaments:
-            "Турниры (скоро)"
+            "Киберспорт"
         }
     }
 
@@ -43,7 +43,7 @@ extension WelcomeDestination {
         case .news:
             "Читай самые свежие новости из мира гейминга"
         case .tournaments:
-            "Следи за турнирами по CS2, Dota 2 и другим играм"
+            "Турниры и матчи по CS2 и Dota 2: расписание, счёт, стримы"
         }
     }
 

@@ -151,6 +151,9 @@ extension StreamRow {
 
     /// Maps PandaScore-style language codes to a flag emoji. PandaScore
     /// uses ISO 639-1 with occasional locale tags ("en", "ru", "pt-br").
+    /// For codes without a primary mapping we fall through to the
+    /// `iso639To3166` table (Nordics, Czech, Hindi, ...) before trying
+    /// the locale-suffix fallback.
     static func languageFlag(for code: String) -> String? {
         let normalised = code.lowercased()
         let country: String?
@@ -173,6 +176,11 @@ extension StreamRow {
             // Try splitting "xx-YY" and using the country tag.
             if let suffix = normalised.split(separator: "-").dropFirst().first {
                 country = String(suffix).uppercased()
+            } else if let mapped = iso639To3166[normalised] {
+                // Generic ISO 639-1 → ISO 3166-1 alpha-2 fallback so we
+                // cover Nordic languages (sv, fi, no, da, is), Czech /
+                // Slovak / Hungarian, Hindi, Thai, Vietnamese, etc.
+                country = mapped
             } else {
                 country = nil
             }
@@ -197,12 +205,69 @@ extension StreamRow {
         case "ko": return "한국어"
         case "tr": return "Türkçe"
         case "ar": return "العربية"
+        case "sv": return "Svenska"
+        case "fi": return "Suomi"
+        case "no", "nb", "nn": return "Norsk"
+        case "da": return "Dansk"
+        case "is": return "Íslenska"
+        case "cs": return "Čeština"
+        case "sk": return "Slovenčina"
+        case "hu": return "Magyar"
+        case "ro": return "Română"
+        case "bg": return "Български"
+        case "el": return "Ελληνικά"
+        case "he", "iw": return "עברית"
+        case "hi": return "हिन्दी"
+        case "th": return "ไทย"
+        case "vi": return "Tiếng Việt"
+        case "id": return "Bahasa Indonesia"
+        case "ms": return "Bahasa Melayu"
+        case "fa": return "فارسی"
         case "":
             return TournamentsStrings.unknownLanguage
         default:
             return code.uppercased()
         }
     }
+
+    /// Minimal ISO 639-1 → ISO 3166-1 alpha-2 lookup for languages
+    /// without an explicit entry in `languageFlag(for:)`. Used as the
+    /// last-resort fallback before we give up and show the bare code.
+    private static let iso639To3166: [String: String] = [
+        "sv": "SE",
+        "fi": "FI",
+        "no": "NO", "nb": "NO", "nn": "NO",
+        "da": "DK",
+        "is": "IS",
+        "cs": "CZ",
+        "sk": "SK",
+        "hu": "HU",
+        "ro": "RO",
+        "bg": "BG",
+        "el": "GR",
+        "he": "IL", "iw": "IL",
+        "hi": "IN",
+        "th": "TH",
+        "vi": "VN",
+        "id": "ID",
+        "ms": "MY",
+        "fa": "IR",
+        "nl": "NL",
+        "et": "EE",
+        "lv": "LV",
+        "lt": "LT",
+        "sl": "SI",
+        "hr": "HR",
+        "sr": "RS",
+        "mk": "MK",
+        "ka": "GE",
+        "az": "AZ",
+        "hy": "AM",
+        "kk": "KZ",
+        "uz": "UZ",
+        "ky": "KG",
+        "tg": "TJ"
+    ]
 }
 
 // MARK: - Stream Opener

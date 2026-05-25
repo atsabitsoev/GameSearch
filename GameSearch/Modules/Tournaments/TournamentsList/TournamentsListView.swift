@@ -39,13 +39,30 @@ struct TournamentsListView<ViewModel: TournamentsListViewModelProtocol>: View {
             viewModel.setRouteHandler { [weak router] route in
                 router?.push(route)
             }
+            // Apply any deeplink-provided game preselection now that the
+            // view (and its VM) are mounted.
+            applyPreselectedGameIfNeeded()
         }
         .onDisappear {
             viewModel.setRouteHandler(nil)
         }
+        .onChange(of: router.preselectedGame) { _, _ in
+            applyPreselectedGameIfNeeded()
+        }
         .task {
             await viewModel.onAppear()
         }
+    }
+
+    /// Reads `router.preselectedGame` (set by deeplink handler) and
+    /// forwards it to the VM exactly once. The router clears the value
+    /// so a future tab re-entry without a deeplink does not re-apply it.
+    private func applyPreselectedGameIfNeeded() {
+        guard let game = router.preselectedGame else { return }
+        if viewModel.selectedGame != game {
+            viewModel.onSelectGame(game)
+        }
+        router.consumePreselectedGame()
     }
 }
 

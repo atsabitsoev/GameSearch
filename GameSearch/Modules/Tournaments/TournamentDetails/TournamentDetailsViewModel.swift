@@ -221,6 +221,19 @@ private extension TournamentDetailsViewModel {
             matchesTask = Task { [weak self] in
                 await self?.loadMatches(tournamentId: tournament.id)
             }
+            // Standings are lazy on a fresh open, but if the user had the
+            // standings tab active on the previous stage and just switched
+            // stages via the stage picker — `onSelectStage` already reset
+            // sub-states to `.idle`, but `onSelectTab(.standings)` will
+            // bail out (selectedTab is already `.standings`). Kick the
+            // fetch here so the standings tab does not stay stuck on the
+            // skeleton after a stage switch.
+            if selectedTab == .standings, !standingsRequested {
+                standingsTask?.cancel()
+                standingsTask = Task { [weak self] in
+                    await self?.loadStandings(tournamentId: tournament.id)
+                }
+            }
             // Stage siblings — only fetched once per series.
             if stagesRequestedForSerieId != tournament.serie.id {
                 stagesRequestedForSerieId = tournament.serie.id
@@ -229,9 +242,8 @@ private extension TournamentDetailsViewModel {
                     await self?.loadStages(serieId: tournament.serie.id)
                 }
             }
-        } catch is CancellationError {
-            return
         } catch {
+            if error.isCancellation { return }
             guard generation == loadGeneration, snapshotIdOrSlug == activeIdOrSlug else { return }
             let kind = errorKind(for: error)
             state = .error(kind: kind)
@@ -252,11 +264,10 @@ private extension TournamentDetailsViewModel {
             } else {
                 stagesState = .idle
             }
-        } catch is CancellationError {
-            return
         } catch {
-            // Silent fallback — stage picker is enhancement, not core.
-            // Keep `.idle` so the picker just doesn't show.
+            // Silent fallback for both cancellation and any real error —
+            // stage picker is enhancement, not core. Keep `.idle` so the
+            // picker just doesn't show.
             return
         }
     }
@@ -287,9 +298,8 @@ private extension TournamentDetailsViewModel {
             } else {
                 matchesState = .loaded(matches)
             }
-        } catch is CancellationError {
-            return
         } catch {
+            if error.isCancellation { return }
             guard generation == matchesGeneration else { return }
             let kind = errorKind(for: error)
             matchesState = .error(kind: kind)
@@ -310,9 +320,8 @@ private extension TournamentDetailsViewModel {
             } else {
                 standingsState = .loaded(standings)
             }
-        } catch is CancellationError {
-            return
         } catch {
+            if error.isCancellation { return }
             guard generation == standingsGeneration else { return }
             let kind = errorKind(for: error)
             standingsState = .error(kind: kind)
