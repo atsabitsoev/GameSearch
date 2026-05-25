@@ -59,17 +59,22 @@ final class ScreenFactory: ScreenFactoryProtocol {
         return ArticleDetailsView(viewModel: viewModel)
     }
 
-    // MARK: - Tournaments (legacy placeholder + Phase 1 stubs)
+    // MARK: - Tournaments
 
+    @MainActor
     func makeTournamentsView() -> some View {
-        TournamentsPlaceholderView()
+        makeTournamentsListView()
     }
 
     @MainActor
     func makeTournamentsListView() -> some View {
-        // Phase 1 will replace this with a real TournamentsListView that
-        // consumes `tournamentsService` and `matchesService`.
-        TournamentsPlaceholderView()
+        let interactor = TournamentsListInteractor(
+            tournamentsService: tournamentsService,
+            matchesService: matchesService,
+            cache: tournamentsCacheStore
+        )
+        let viewModel = TournamentsListViewModel(interactor: interactor)
+        return TournamentsListView(viewModel: viewModel)
     }
 
     @MainActor

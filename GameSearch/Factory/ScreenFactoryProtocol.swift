@@ -26,6 +26,7 @@ protocol ScreenFactoryProtocol {
     @MainActor
     func makeArticlesListView() -> ArticlesList
     func makeArticleDetailsView(data: ArticleDetailsVMInitData) -> ArticleDetails
+    @MainActor
     func makeTournamentsView() -> Tournaments
 
     @MainActor

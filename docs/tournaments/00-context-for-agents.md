@@ -28,13 +28,25 @@
 Проект использует **VIPER-подобную структуру**: `Service → Interactor → ViewModel → View`, плюс `Router` для навигации и `ScreenFactory` для DI. Этот же паттерн расширяем на турниры — см. `08-modules-and-files.md`.
 
 ### Текущее состояние модуля турниров
-- `GameSearch/Services/Tournaments/PandaScoreTournamentsService.swift` — дёргает PandaScore и берёт название первого running/upcoming турнира для CS2 и Dota 2. Кэш в `UserDefaults` на 10 минут.
-- `GameSearch/Modules/Tournaments/TournamentsPlaceholderView.swift` — заглушка с двумя карточками и кнопкой «Да хочу!» (AppMetrica event).
-- `Router/TabTag.swift` — таб `.tournaments` уже зарегистрирован.
-- `Factory/ScreenFactory.makeTournamentsView()` — отдаёт placeholder.
-- `Routes.swift` — для турниров маршрутов **нет**, добавляем при работе.
 
-**Важно**: placeholder НЕ удаляем, превращаем в empty/error-state — см. `10-screens.md`.
+**Phase 0 (Foundation) — завершена.** Сервисный слой, кэш L1/L2, модели, mappers, роутер, фабрика — на месте. Покрыто 48 unit-тестами.
+
+**Phase 1.A (Список турниров) — завершена.**
+- `GameSearch/Modules/Tournaments/TournamentsList/` — VIPER-стек (View/ViewModel/Interactor/Protocols) поверх `TournamentsService` и `MatchesService`.
+- `GameSearch/Modules/Tournaments/TournamentsList/Views/` — `GameSegmentControl`, `TournamentSegmentControl`, `TournamentCard`, `LiveMatchChip`, `LiveMatchesStrip`, `TournamentsSkeletonList`.
+- `GameSearch/Modules/Tournaments/Shared/` — `TierBadge`, `LiveBadge`, `TeamLogo`, `DateRangeLabel`, `CountryFlag`, `PrizepoolLabel`, `ScoreView`, `GameAccentColor`, `TournamentsEmptyStateView`, `TournamentsStrings`, `TournamentsAnalytics`.
+- `Factory/ScreenFactory.makeTournamentsView()` — теперь отдаёт реальный `TournamentsListView`.
+- `Router/RootView.swift` — таб «Турниры» обёрнут в `NavigationStack(path: $tournamentsRouter.path)` + `.navigationDestination(for: TournamentsRoute.self)`. Deeplinks `gamesearch://tournaments`, `gamesearch://tournament/<id>`, `gamesearch://match/<id>` работают (URL scheme `gamesearch` зарегистрирован в `Info.plist`).
+- `Modules/Tournaments/TournamentsPlaceholderView.swift` (legacy) — пока сохранён, удалить когда уберём `PandaScoreTournamentsService` (DoD Phase 1).
+
+**Phase 1.B (Детали турнира) и 1.C (Детали матча) — следующие на очереди.** В `ScreenFactory` пока заглушки `TournamentsPhasePlaceholder` для `makeTournamentDetailsView(idOrSlug:)` и `makeMatchDetailsView(id:)`.
+
+**Что точно НЕ трогать (Phase 0 контракт):**
+- Сигнатуры `TournamentsServiceProtocol.fetchTournaments(game:segment:)` и `fetchTournamentsPage(game:segment:page:pageSize:)` — page=1 со значением pageSize=50 сохраняет старый cache key для совместимости с Phase 0 тестами.
+- `MatchesServiceProtocol`.
+- Старый `PandaScoreTournamentsService` (он же `PlaceholderTournamentsServiceProtocol`) — продолжает работать как раньше, удалить только в конце Phase 1.
+
+**Важно**: при создании новых экранов в 1.B/1.C — переиспользовать `Shared/` компоненты (особенно `TournamentsStrings`, `TournamentsAnalytics`, `TeamLogo`, `LiveBadge`, `ScoreView`).
 
 ---
 

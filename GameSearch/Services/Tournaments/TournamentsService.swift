@@ -11,7 +11,16 @@ import Foundation
 // MARK: - Protocol
 
 protocol TournamentsServiceProtocol: Sendable {
+    /// Legacy entry-point preserved for Phase 0 tests; defaults to page 1.
     func fetchTournaments(game: Game, segment: TournamentSegment) async throws -> [Tournament]
+    /// Phase 1 paginated fetch. Page is 1-based; `pageSize` is capped by
+    /// PandaScore at 100, we default to 50 to align with cache TTLs.
+    func fetchTournamentsPage(
+        game: Game,
+        segment: TournamentSegment,
+        page: Int,
+        pageSize: Int
+    ) async throws -> [Tournament]
     func fetchTournamentDetails(idOrSlug: String) async throws -> Tournament
     func fetchStandings(tournamentId: TournamentId) async throws -> [Standing]
     func fetchBrackets(tournamentId: TournamentId) async throws -> Bracket
@@ -36,7 +45,18 @@ final class TournamentsService: TournamentsServiceProtocol, @unchecked Sendable 
     // MARK: - Public
 
     func fetchTournaments(game: Game, segment: TournamentSegment) async throws -> [Tournament] {
-        let key = cacheKeyList(game: game, segment: segment)
+        try await fetchTournamentsPage(game: game, segment: segment, page: 1, pageSize: 50)
+    }
+
+    func fetchTournamentsPage(
+        game: Game,
+        segment: TournamentSegment,
+        page: Int = 1,
+        pageSize: Int = 50
+    ) async throws -> [Tournament] {
+        let safePage = max(1, page)
+        let safeSize = max(1, min(pageSize, 100))
+        let key = cacheKeyList(game: game, segment: segment, page: safePage, pageSize: safeSize)
         let ttl = ttl(forList: segment)
 
         if let cached: [Tournament] = await cache.read([Tournament].self, key: key) {
@@ -46,7 +66,8 @@ final class TournamentsService: TournamentsServiceProtocol, @unchecked Sendable 
         let path = "/\(game.pandaScorePrefix)/tournaments/\(segment.pandaScorePath)"
         let query: [URLQueryItem] = [
             URLQueryItem(name: "filter[tier]", value: "s,a"),
-            URLQueryItem(name: "page[size]", value: "50"),
+            URLQueryItem(name: "page[size]", value: "\(safeSize)"),
+            URLQueryItem(name: "page[number]", value: "\(safePage)"),
             URLQueryItem(name: "sort", value: segment == .past ? "-begin_at" : "begin_at")
         ]
         let dtos = try await api.get([PandaScoreTournamentDTO].self, path: path, query: query)
@@ -128,5 +149,20 @@ private extension TournamentsService {
 
     func cacheKeyList(game: Game, segment: TournamentSegment) -> String {
         "tournaments:list:\(game.rawValue):\(segment.pandaScorePath)"
+    }
+
+    /// Page 1 keeps the legacy key for backward compatibility with Phase 0
+    /// tests; subsequent pages append a `:p<page>:s<size>` suffix.
+    func cacheKeyList(
+        game: Game,
+        segment: TournamentSegment,
+        page: Int,
+        pageSize: Int
+    ) -> String {
+        let base = cacheKeyList(game: game, segment: segment)
+        if page == 1, pageSize == 50 {
+            return base
+        }
+        return "\(base):p\(page):s\(pageSize)"
     }
 }

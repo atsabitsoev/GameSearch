@@ -12,6 +12,7 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
     @AppStorage("has_seen_welcome_view") private var hasSeenWelcomeView = false
     @EnvironmentObject private var clubsRouter: ClubsRouter
     @EnvironmentObject private var articlesRouter: ArticlesRouter
+    @EnvironmentObject private var tournamentsRouter: TournamentsRouter
 
     @State private var currentTab: TabTag = .news
     @State private var isWelcomeViewPresented = false
@@ -55,8 +56,17 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 .setupClubsNavigationBarAppearance()
             }
             Tab("Турниры", systemImage: "trophy", value: .tournaments) {
-                NavigationStack {
+                NavigationStack(path: $tournamentsRouter.path) {
                     factory.makeTournamentsView()
+                        .environmentObject(tournamentsRouter)
+                        .navigationDestination(for: TournamentsRoute.self) { route in
+                            switch route {
+                            case .tournamentDetails(let idOrSlug):
+                                factory.makeTournamentDetailsView(idOrSlug: idOrSlug)
+                            case .matchDetails(let id):
+                                factory.makeMatchDetailsView(id: id)
+                            }
+                        }
                 }
             }
         }
@@ -97,9 +107,21 @@ struct RootView<Factory: ScreenFactoryProtocol>: View {
                 articlesRouter.reset()
             }
             sendDeeplinkAnalytics(url, slug: slug)
-        case .tournamentsTab, .tournamentDetails, .matchDetails:
-            // Routing for tournaments deeplinks ships with Phase 1 navigation.
-            return
+        case .tournamentsTab:
+            isWelcomeViewPresented = false
+            currentTab = .tournaments
+            tournamentsRouter.reset()
+            sendTournamentsDeeplinkAnalytics(url, kind: "tab")
+        case .tournamentDetails(let idOrSlug):
+            isWelcomeViewPresented = false
+            currentTab = .tournaments
+            tournamentsRouter.push(.tournamentDetails(idOrSlug: idOrSlug))
+            sendTournamentsDeeplinkAnalytics(url, kind: "tournament", value: idOrSlug)
+        case .matchDetails(let id):
+            isWelcomeViewPresented = false
+            currentTab = .tournaments
+            tournamentsRouter.push(.matchDetails(id: id))
+            sendTournamentsDeeplinkAnalytics(url, kind: "match", value: String(id))
         case nil:
             return
         }
@@ -134,6 +156,14 @@ private extension RootView {
         }
 
         AppMetricaReporter.reportEvent("deeplink_open", parameters: deeplinkParams)
+    }
+
+    func sendTournamentsDeeplinkAnalytics(_ url: URL, kind: String, value: String? = nil) {
+        var params: [String: Any] = ["path": url.path, "kind": kind]
+        if let value {
+            params["value"] = value
+        }
+        AppMetricaReporter.reportEvent("deeplink_open", parameters: params)
     }
 
     func sendTabAnalytics(for tab: TabTag) {

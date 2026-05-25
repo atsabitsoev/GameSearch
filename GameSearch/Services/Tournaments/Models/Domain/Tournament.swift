@@ -28,6 +28,24 @@ struct Tournament: Identifiable, Hashable, Sendable, Codable {
         "\(league.name) — \(serie.name) · \(name)"
     }
 
+    /// Заголовок турнира для карточек и хедера: содержательное имя серии
+    /// (например, "Cologne Major 2026", "Atlanta 2026"), а если у серии
+    /// нет имени (PandaScore часто возвращает `serie.name == ""` и
+    /// `full_name == "<year>"`) — фолбэк на «<Лига> <год>», например
+    /// "CS Asia Championships 2026".
+    var displayListTitle: String {
+        let trimmedSerieName = serie.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedFullName = (serie.fullName ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if !trimmedSerieName.isEmpty {
+            return trimmedFullName.isEmpty ? trimmedSerieName : trimmedFullName
+        }
+        if let year = serie.year {
+            return "\(league.name) \(year)"
+        }
+        return league.name
+    }
+
     var isLive: Bool {
         guard let begin = beginAt, let end = endAt else { return false }
         let now = Date()

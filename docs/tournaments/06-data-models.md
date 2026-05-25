@@ -155,6 +155,11 @@ struct Tournament: Identifiable, Hashable, Sendable {
         "\(league.name) — \(serie.name) · \(name)"
     }
 
+    /// Заголовок для списков: содержательное имя серии, fallback на
+    /// "<League> <year>" если у серии пустое `name` (бывает у "годовых"
+    /// серий вроде CS Asia Championships, где serie.full_name == "2026").
+    var displayListTitle: String { ... }
+
     var isLive: Bool {
         guard let begin = beginAt, let end = endAt else { return false }
         let now = Date()
@@ -172,6 +177,35 @@ struct Prizepool: Hashable, Sendable {
     }
 }
 ```
+
+### TournamentSeriesGroup (клиентский агрегат)
+
+PandaScore отдаёт каждую стадию серии как отдельный `Tournament` (например, серия «CS Asia Championships 2026» = `Group A` + `Group B` + `Playoffs` — три объекта). При этом `prizepool` обычно есть только у Playoffs. Чтобы в списке не было дубликатов и пропусков по призовому, в Phase 1.A на клиенте делается группировка по `serie.id`:
+
+```swift
+struct TournamentSeriesGroup: Identifiable, Hashable, Sendable {
+    var id: SerieId { serie.id }
+    let serie: Serie
+    let league: League
+    let game: Game
+    let stages: [Tournament]               // отсортированы по begin_at, tie-break по name/id
+
+    var beginAt: Date? { stages.compactMap(\.beginAt).min() }
+    var endAt:   Date? { stages.compactMap(\.endAt).max() }
+    var prizepool: Prizepool? { stages.compactMap(\.prizepool).first }
+    var tier: Tier? { ...  /* минимальный rank среди стадий */ }
+    var isLive: Bool { stages.contains(where: \.isLive) }
+    var representativeStage: Tournament { /* live > последняя по begin_at > первая */ }
+    var stageNamesJoined: String { stages.map(\.name).joined(separator: " · ") }
+    var displayTitle: String { representativeStage.displayListTitle }
+
+    static func makeGroups(from tournaments: [Tournament]) -> [TournamentSeriesGroup]
+}
+```
+
+Используется внутри `TournamentsListViewModel`: `state.loaded(groups: [TournamentSeriesGroup])`. Карточка списка (`TournamentCard`) принимает группу, а не одиночный турнир. Навигация выполняется на `representativeStage.slug`.
+
+В Phase 1.B (детали) можно либо открывать конкретную стадию (как сейчас), либо подгружать все стадии серии для отображения tab «Матчи» по группам.
 
 ---
 
