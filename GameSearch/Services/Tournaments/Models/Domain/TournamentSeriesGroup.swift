@@ -48,8 +48,9 @@ struct TournamentSeriesGroup: Identifiable, Hashable, Sendable {
 
     /// Highest tier across stages (S > A > B > C > D). Stages of the same
     /// series almost always carry the same tier — this is just a safe net.
+    /// `Tier` is `Comparable` (rank-based), so `min()` returns the best tier.
     var tier: Tier? {
-        stages.compactMap(\.tier).min(by: { Self.tierRank($0) < Self.tierRank($1) })
+        stages.compactMap(\.tier).min()
     }
 
     /// `true` if at least one stage is currently live.
@@ -145,16 +146,6 @@ extension TournamentSeriesGroup {
                 game: head.game,
                 stages: sortedStages
             )
-        }
-    }
-
-    private static func tierRank(_ tier: Tier) -> Int {
-        switch tier {
-        case .s: 0
-        case .a: 1
-        case .b: 2
-        case .c: 3
-        case .d: 4
         }
     }
 }

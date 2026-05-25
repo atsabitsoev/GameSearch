@@ -265,7 +265,28 @@ private extension TournamentsListViewModel {
             state = .empty(kind: kind)
         } else {
             let groups = TournamentSeriesGroup.makeGroups(from: allTournaments)
-            state = .loaded(groups: groups)
+            // Sort by tier rank ascending (S → A → B → C → D → nil) so the
+            // top of the list is always the most prestigious tournaments.
+            // The sort is stable (Swift's `sorted` is documented stable),
+            // so within the same tier the server's `begin_at` order is
+            // preserved — chronological for running/upcoming, reverse-
+            // chronological for past. nil-tier (amateur / unranked) lands
+            // at the bottom via `Int.max`.
+            //
+            // Trade-off: when a later pagination page brings a higher-tier
+            // tournament that wasn't on page 1, the list re-orders and
+            // the user sees a visual shift. In practice the first page
+            // (size 30) almost always contains all S/A tournaments because
+            // PandaScore returns them sorted by `begin_at` (the upcoming
+            // calendar is finite). Acceptable for MVP; if it becomes an
+            // issue, switch to "sort on initial only, append at tail for
+            // subsequent pages".
+            let sorted = groups.sorted { lhs, rhs in
+                let l = lhs.tier?.rank ?? Int.max
+                let r = rhs.tier?.rank ?? Int.max
+                return l < r
+            }
+            state = .loaded(groups: sorted)
         }
     }
 

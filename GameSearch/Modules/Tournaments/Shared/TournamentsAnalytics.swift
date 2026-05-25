@@ -27,6 +27,11 @@ enum TournamentsAnalyticsEvent {
     case liveStripChipTapped(matchId: MatchId, position: Int)
 
     case matchOpened(id: MatchId, status: MatchStatus, fromScreen: Screen)
+    case matchHasStreamsCount(matchId: MatchId, count: Int)
+    case matchShared(id: MatchId)
+
+    case streamOpened(matchId: MatchId, platform: StreamPlatformAnalytics, language: String, isMain: Bool, isOfficial: Bool)
+    case streamOpenFailed(matchId: MatchId, platform: StreamPlatformAnalytics, reason: StreamOpenFailReason)
 
     case errorShown(screen: Screen, kind: ErrorKind)
     case errorRetryTapped(screen: Screen, kind: ErrorKind)
@@ -52,6 +57,28 @@ enum TournamentsAnalyticsEvent {
         case noInternet = "no_internet"
         case temporary
     }
+
+    enum StreamPlatformAnalytics: String {
+        case twitch
+        case youtube
+        case other
+    }
+
+    enum StreamOpenFailReason: String {
+        case appNotInstalled = "app_not_installed"
+        case invalidUrl = "invalid_url"
+        case other
+    }
+}
+
+extension TournamentsAnalyticsEvent.StreamPlatformAnalytics {
+    init(_ platform: StreamPlatform) {
+        switch platform {
+        case .twitch: self = .twitch
+        case .youtube: self = .youtube
+        case .other: self = .other
+        }
+    }
 }
 
 extension TournamentsAnalyticsEvent {
@@ -69,6 +96,10 @@ extension TournamentsAnalyticsEvent {
         case .liveStripShown: "live_strip_shown"
         case .liveStripChipTapped: "live_strip_chip_tapped"
         case .matchOpened: "match_opened"
+        case .matchHasStreamsCount: "match_has_streams_count"
+        case .matchShared: "match_shared"
+        case .streamOpened: "stream_opened"
+        case .streamOpenFailed: "stream_open_failed"
         case .errorShown: "tournaments_error_shown"
         case .errorRetryTapped: "tournaments_error_retry_tapped"
         }
@@ -117,6 +148,24 @@ extension TournamentsAnalyticsEvent {
                 "match_id": id,
                 "status": status.rawValue,
                 "from_screen": from.rawValue
+            ]
+        case .matchHasStreamsCount(let matchId, let count):
+            return ["match_id": matchId, "count": count]
+        case .matchShared(let id):
+            return ["match_id": id]
+        case .streamOpened(let matchId, let platform, let language, let isMain, let isOfficial):
+            return [
+                "match_id": matchId,
+                "platform": platform.rawValue,
+                "language": language,
+                "is_main": isMain,
+                "is_official": isOfficial
+            ]
+        case .streamOpenFailed(let matchId, let platform, let reason):
+            return [
+                "match_id": matchId,
+                "platform": platform.rawValue,
+                "reason": reason.rawValue
             ]
         case .errorShown(let screen, let kind):
             return ["screen": screen.rawValue, "kind": kind.rawValue]

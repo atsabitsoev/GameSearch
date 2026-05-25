@@ -93,27 +93,15 @@ final class ScreenFactory: ScreenFactoryProtocol {
 
     @MainActor
     func makeMatchDetailsView(id: MatchId) -> some View {
-        TournamentsPhasePlaceholder(title: "Матч \(id)")
-    }
-}
-
-// MARK: - Placeholder
-
-private struct TournamentsPhasePlaceholder: View {
-    let title: String
-
-    var body: some View {
-        ZStack {
-            EAColor.background.ignoresSafeArea()
-            VStack(spacing: 12) {
-                Text(title)
-                    .font(EAFont.header)
-                    .foregroundStyle(EAColor.textPrimary)
-                Text("Этот экран появится в Phase 1")
-                    .font(EAFont.info)
-                    .foregroundStyle(EAColor.textSecondary)
-            }
-            .padding()
-        }
+        let interactor = MatchDetailsInteractor(
+            matchesService: matchesService,
+            tournamentsService: tournamentsService,
+            cache: tournamentsCacheStore
+        )
+        let viewModel = MatchDetailsViewModel(
+            matchId: id,
+            interactor: interactor
+        )
+        return MatchDetailsView(viewModel: viewModel)
     }
 }

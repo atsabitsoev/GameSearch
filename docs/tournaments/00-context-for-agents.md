@@ -61,14 +61,36 @@
 - Share: `ShareLink` с URL `gamesearch://tournament/<slug>` показывается только в `.loaded` state. `simultaneousGesture` отправляет analytics на нажатие.
 - Подтверждено в Proxyman: открытие Astana 2026 Playoffs → 2 запроса (`/tournaments/cs-go-pgl-astana-2026-playoffs` + `/matches?filter[tournament_id]=20930`) → таб «Матчи» отрисовывает реальные 8 матчей с командами/счётами; открытие Cologne Major 2026 Stage 1 → тоже 2 запроса → 7 матчей рендерятся с лого. Pull-to-refresh инвалидирует обе кэш-записи.
 
-**Phase 1.C (Детали матча) — следующая на очереди.** В `ScreenFactory.makeMatchDetailsView(id:)` пока заглушка `TournamentsPhasePlaceholder`.
+**Phase 1.C (Детали матча) — завершена.**
+- `GameSearch/Modules/Tournaments/MatchDetails/` — VIPER-стек (`MatchDetailsProtocols`, `MatchDetailsInteractor`, `MatchDetailsViewModel`, `MatchDetailsView`).
+- `GameSearch/Modules/Tournaments/MatchDetails/Views/` — `MatchHeaderView` (caption «League · Stage» + двух-командный hero + BoX/LIVE/счёт/время), `MatchGamesList` + `GameMapRow` (карты CS2 / игры Dota 2, плейсхолдеры до `numberOfGames`, winner подсвечен `EAColor.yellow`, per-game score намеренно не отрисован — PandaScore Free возвращает только `winner.id`), `MatchStreamsList` + `StreamRow` (sort main → official → others, language flag + display name для 15 локалей, native deeplink в Twitch/YouTube → fallback на Safari через `UIApplication.shared.open`), `MatchRostersView` (опционально, из `opponent.team.players`), `MatchDetailsSkeleton`.
+- `Shared/TournamentsStrings.swift` — расширен строками матча (`matchDetailsNavTitle`, `matchSection*`, `streamPlatform*`, `streamOpen*`, `streamOpenFailedToast` для toast'а, `matchVersusSeparator`).
+- `Shared/TournamentsAnalytics.swift` — добавлены события `matchHasStreamsCount(matchId:count:)`, `matchShared(id:)`, `streamOpened(matchId:platform:language:isMain:isOfficial:)`, `streamOpenFailed(matchId:platform:reason:)`. Type-safe enum'ы `StreamPlatformAnalytics` (с инициализатором из доменного `StreamPlatform`) и `StreamOpenFailReason`.
+- `Factory/ScreenFactory.makeMatchDetailsView(id:)` — отдаёт реальный `MatchDetailsView`. `TournamentsPhasePlaceholder` удалён.
+
+**Архитектура загрузки данных деталей матча (важно для Phase 2/3):**
+1. **Match details** — `MatchesService.fetchMatchDetails(id:)` → `GET /matches/<id>`. Возвращает полный `Match` с opponents/results/games/streams + опциональным `opponent.team.players` (когда PandaScore их выдаёт).
+2. **Tournament context (caption)** — best-effort secondary fetch `TournamentsService.fetchTournamentDetails(idOrSlug: String(match.tournamentId))`. Silent fallback в `.unavailable` — экран не падает, caption просто не отрисовывается. Это компромисс: `/matches/{id}` не содержит structured `league.name` / `stage.name`, поэтому второй request — единственный способ показать «PGL Major · Group Stage».
+3. **Streams** — section показывается только для `notStarted` / `running` / `postponed`. Для finished/canceled section полностью скрывается (нет VOD-поддержки в MVP). `StreamOpener.open(_:onFailure:)` пробует platform-specific deeplink (`twitch://stream/<channel>`, `youtube://watch?v=<id>`) → fallback `rawUrl` через Safari. Toast «Не получилось открыть стрим» через `.alert(...)` показывается только если **оба** пути упали.
+4. **Rosters** — derive из `opponent.team.players?`. Вся секция скрывается если ни у одной команды нет ростера. Тапы по игрокам — Phase 2 (PlayerProfile).
+5. **Share**: `ShareLink` с URL `gamesearch://match/<id>` показывается только в `.loaded` state. `simultaneousGesture` отправляет `matchShared` analytics на нажатие.
+6. **TabBar скрыт** через `.toolbar(.hidden, for: .tabBar)` — даёт ощущение «глубины» для match details (см. `10-screens.md`).
+7. **`gamesearch://match/<id>` deeplink** — работало с Phase 1.A (`RootView.handleUrl`), теперь пушит реальный `MatchDetailsView` вместо placeholder. Verified `xcrun simctl openurl`.
+
+End-to-end проверка на симуляторе: open «Турниры» → live-chip «NTR vs OXUJI» → push MatchDetailsView → header с лого команд, BO3, LIVE, 1:0, caption «CIS LAN Championship · Group A», карты (Карта 1 winner=NTR в yellow, Карта 2 LIVE, Карта 3 «Не начато»), стрим mpkbk (русский, Главный/Официальный) → тап → Safari открыл `twitch.tv/mpkbk` (fallback после неудачного `twitch://`).
+
+**Post-Phase-1.C bugfix-итерация (UX-консистентность списка):**
+1. **`filter[tier]=s,a` снят с listing-запроса** в `TournamentsService.fetchTournamentsPage`. Live-strip пуллит live матчи всех tier'ов (без фильтра), а listing был ограничен S/A — пользователь видел live-чип, но empty state «Сейчас никто не играет». Если в будущем потребуется опционально скрывать мелочь — это UI-фильтр для пользователя (Settings Phase 3), а не серверный фильтр.
+2. **Клиентская сортировка списка по tier**: `Tier` теперь `Comparable` (поле `rank: Int` где S=0, A=1, …, D=4). `TournamentsListViewModel.applyLoadedState` делает **stable sort** по `tier?.rank ?? Int.max` после группировки в `[TournamentSeriesGroup]`. Внутри одного tier сохраняется серверный порядок по `begin_at`. `nil`-tier (любительские турниры) — в конец. Серверный `sort=tier` не годится — PandaScore сортирует строки лексикографически («a» < «b» < … < «s»), кладя S в конец. Тот же `Comparable` упростил `TournamentSeriesGroup.tier` до `stages.compactMap(\.tier).min()`. Caveat: при пагинации (loadNextPage) re-sort применяется, и если высокий tier пришёл на странице 2 — будет визуальный сдвиг. На практике первая страница (size 30) при `sort=begin_at` обычно содержит все S/A — приемлемо для MVP.
+
+**Phase 1 (MVP) — ЗАВЕРШЕНА.** Phase 2 (Favorites & Push) — следующая. Перед стартом — смотри `15-roadmap.md` секция Phase 2 и `02-features-matrix.md`.
 
 **Что точно НЕ трогать (Phase 0 контракт):**
 - Сигнатуры `TournamentsServiceProtocol.fetchTournaments(game:segment:)` и `fetchTournamentsPage(game:segment:page:pageSize:)` — page=1 со значением pageSize=50 сохраняет старый cache key для совместимости с Phase 0 тестами.
-- `MatchesServiceProtocol`.
-- Старый `PandaScoreTournamentsService` (он же `PlaceholderTournamentsServiceProtocol`) — продолжает работать как раньше, удалить только в конце Phase 1.
+- `MatchesServiceProtocol` — все методы (`fetchMatches`, `fetchMatchDetails`, `fetchLives`, `fetchTournamentMatches`).
+- Старый `PandaScoreTournamentsService` (он же `PlaceholderTournamentsServiceProtocol`) — продолжает работать как раньше, удалить только в конце Phase 1. **Сейчас Phase 1 завершена — placeholder можно удалить отдельным cleanup-PR.**
 
-**Важно**: при создании новых экранов в 1.C — переиспользовать `Shared/` компоненты (особенно `TournamentsStrings`, `TournamentsAnalytics`, `TeamLogo`, `LiveBadge`, `ScoreView`, `MatchTimeFormatter`, `CountryFlag`). Для MatchHeaderView подойдут уже `TeamLogo` + `ScoreView` + `LiveBadge`. Для отрисовки игроков матча — паттерн из `ParticipantTeamCard` (флажок страны + nickname + role).
+**Важно**: при создании новых экранов в Phase 2/3 — переиспользовать `Shared/` компоненты (`TournamentsStrings`, `TournamentsAnalytics`, `TeamLogo`, `LiveBadge`, `ScoreView`, `MatchTimeFormatter`, `CountryFlag`). Для match-карточек (Favorites Phase 2, TeamRecentMatchesList Phase 3) — паттерн уже есть в `Modules/Tournaments/TournamentDetails/Views/MatchesTab.swift::MatchRowView`. Для player-карточек — `Modules/Tournaments/MatchDetails/Views/MatchRostersView.swift` (приватный `TeamRosterCard`) или `Modules/Tournaments/TournamentDetails/Views/ParticipantTeamCard.swift`. Для stream-открытия (если когда-нибудь понадобится в Phase 2) — переиспользовать `Modules/Tournaments/MatchDetails/Views/StreamRow.swift::StreamOpener`.
 
 ---
 
@@ -159,4 +181,4 @@
 
 ---
 
-_Last updated: 2026-05-25_
+_Last updated: 2026-05-25 (Phase 1.C завершена — детали матча с открытием стримов; Phase 1 в целом завершена.)_

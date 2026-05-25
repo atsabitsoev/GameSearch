@@ -88,18 +88,18 @@ GameSearch/
 │       │       ├── ParticipantTeamCard.swift
 │       │       └── TournamentDetailsSkeleton.swift
 │       │
-│       ├── MatchDetails/
+│       ├── MatchDetails/                  ← Phase 1.C
 │       │   ├── MatchDetailsView.swift
 │       │   ├── MatchDetailsViewModel.swift
 │       │   ├── MatchDetailsInteractor.swift
-│       │   ├── MatchDetailsProtocols.swift
+│       │   ├── MatchDetailsProtocols.swift  ← interactor + state + VM протоколы, включая `MatchDetailsTournamentContextState` для best-effort caption
 │       │   └── Views/
-│       │       ├── MatchHeaderView.swift
-│       │       ├── MatchGamesList.swift
-│       │       ├── GameMapRow.swift
-│       │       ├── MatchRostersView.swift
-│       │       ├── MatchStreamsList.swift
-│       │       ├── StreamRow.swift
+│       │       ├── MatchHeaderView.swift     ← двух-командный hero + BoX/LIVE/счёт/время + caption «League · Stage»
+│       │       ├── MatchGamesList.swift      ← композиция карт; per-game score намеренно не отрисован
+│       │       ├── GameMapRow.swift          ← одна карта (CS2) / игра (Dota); winner в `EAColor.yellow`
+│       │       ├── MatchRostersView.swift    ← опционально, скрыта если у обеих команд `players == nil/[]`
+│       │       ├── MatchStreamsList.swift    ← скрыта для finished/canceled
+│       │       ├── StreamRow.swift           ← внутри также `enum StreamOpener` (deeplink → fallback Safari)
 │       │       └── MatchDetailsSkeleton.swift
 │       │
 │       ├── TeamProfile/                    ← Phase 2
@@ -264,6 +264,16 @@ TournamentsListView
 
 Решение Phase 1.B: построить отдельный `TournamentTabPicker` в стиле уже существующего `TournamentSegmentControl` (Phase 1.A) — единый визуальный язык внутри модуля, минимальная поверхность для багов. Если в Phase 4 (Polish) потребуется swipe-between-tabs, чистый рефакторинг — generic-параметризация `SwipeSegmentedView<Tag: Hashable & Identifiable>` отдельным тикетом.
 
+## Решения по реюзу компонентов (Phase 1.C)
+
+### `StreamOpener` живёт **внутри** `StreamRow.swift`, а не в `Shared/`
+
+Логика «попробовать native deeplink → fallback на raw URL в Safari» нужна только в одном месте — в `MatchStreamsList`. Помещение её в отдельный `Shared/StreamOpener.swift` создаст лишний файл и неоправданное «общее API». Если в Phase 2 (Favorites) или Phase 3 (TeamProfile) появится второй потребитель — вынести в `Shared/` отдельным микро-PR с минимальной заменой импортов.
+
+### Tournament context в `MatchHeaderView` грузится отдельным запросом, а не передаётся через init
+
+Альтернатива — передавать `Tournament` в `MatchDetailsView` от вызывающего экрана (TournamentDetails знает, какой стадии принадлежит матч). Но это создаёт зависимости между экранами и ломает deeplink-кейс (`gamesearch://match/<id>` не знает контекст). Поэтому VM делает **best-effort secondary fetch** `tournament/<match.tournamentId>` после загрузки матча и silent fallback в `.unavailable` при ошибке (caption просто не отрисовывается). Если в Phase 2 потребуется снизить latency caption — можно добавить `TournamentsRouter.knownTournamentContext(for: matchId)` со снапшотом, который VM учитывает первым.
+
 ---
 
 ## Что НЕ создавать (распространённые ошибки агентов)
@@ -296,4 +306,4 @@ TournamentsListView
 
 ---
 
-_Last updated: 2026-05-25 (Phase 1.B — добавлен `TournamentDetails/` с реальной реализацией, `Shared/MatchTimeFormatter.swift`, ADR-эквивалент про `TournamentTabPicker`)_
+_Last updated: 2026-05-25 (Phase 1.C — добавлен `MatchDetails/` с реальной реализацией, `StreamOpener` живёт в `StreamRow.swift` (не в `Shared/`), tournament context для caption грузится отдельным best-effort запросом)_

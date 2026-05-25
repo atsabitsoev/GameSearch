@@ -63,10 +63,29 @@ enum Game: String, Hashable, Sendable, CaseIterable, Codable {
 
 // MARK: - Tier
 
-enum Tier: String, Hashable, Sendable, CaseIterable, Codable {
+enum Tier: String, Hashable, Sendable, CaseIterable, Codable, Comparable {
     case s, a, b, c, d
 
     var displayName: String { rawValue.uppercased() }
+
+    /// Lower rank = higher prestige. Powers `Comparable`, which is used by
+    /// list ordering (`TournamentsListViewModel.applyLoadedState`) to put
+    /// S-tier majors above amateur events. PandaScore's own `sort=tier`
+    /// would sort alphabetically (a < b < … < s) and put S last, so we
+    /// always sort tier on the client.
+    var rank: Int {
+        switch self {
+        case .s: 0
+        case .a: 1
+        case .b: 2
+        case .c: 3
+        case .d: 4
+        }
+    }
+
+    static func < (lhs: Tier, rhs: Tier) -> Bool {
+        lhs.rank < rhs.rank
+    }
 }
 
 // MARK: - TournamentSegment

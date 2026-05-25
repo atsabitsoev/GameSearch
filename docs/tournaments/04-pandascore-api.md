@@ -140,8 +140,10 @@ GET /tournaments?token=YOUR_TOKEN
 Пример полного URL:
 
 ```
-https://api.pandascore.co/csgo/tournaments/running?filter[tier]=s,a&page[size]=20&sort=-begin_at
+https://api.pandascore.co/csgo/tournaments/running?page[size]=50&sort=-begin_at
 ```
+
+> **Изменение Phase 1.C**: `filter[tier]=s,a` намеренно **убран** из listing query — live-strip отдаёт live-матчи любого tier, и пользователь видел противоречие («есть live-чип, но "Сейчас" пустое»). Listing теперь возвращает все tier; если нужно ограничение по tier — это product-level UI-фильтр (Phase 1+), а не серверный фильтр.
 
 ### Matches
 
@@ -345,7 +347,7 @@ https://api.pandascore.co/csgo/tournaments/running?filter[tier]=s,a&page[size]=2
 | `c` | Низкий | Малые турниры |
 | `d` | Любительский | |
 
-В MVP фильтруем `filter[tier]=s,a` — это убирает шум. В Phase 3 можно дать пользователю настройку «показывать все».
+В Phase 1.C tier-фильтр на listing **снят** — live-strip пуллит live-матчи всех tier'ов, и фильтрация только листинга создавала UX-противоречие («live-чип есть, а в "Сейчас" empty»). Список теперь показывает турниры всех tier'ов (как у HLTV / Liquipedia). Если нужно скрыть мелочь — это UI-фильтр (Phase 1+, опционально настраиваемый пользователем).
 
 ---
 

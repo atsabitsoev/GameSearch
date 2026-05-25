@@ -29,7 +29,12 @@ final class TournamentsServiceTests: XCTestCase {
     func test_fetchTournaments_whenEmptyCache_callsApi() async throws {
         apiClient.responseHandler = { path, query in
             XCTAssertEqual(path, "/csgo/tournaments/running")
-            XCTAssertTrue(query.contains { $0.name == "filter[tier]" && $0.value == "s,a" })
+            // No tier filter (Phase 1.C bugfix): listing matches all
+            // tiers so the live-strip and the "Сейчас" segment are
+            // consistent for the user.
+            XCTAssertFalse(query.contains { $0.name == "filter[tier]" })
+            XCTAssertTrue(query.contains { $0.name == "page[size]" })
+            XCTAssertTrue(query.contains { $0.name == "sort" && $0.value == "begin_at" })
             let dto = try PandaScoreFixtures.decode(
                 PandaScoreTournamentDTO.self,
                 named: "tournament_running_cs2",

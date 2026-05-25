@@ -68,8 +68,13 @@ final class TournamentsService: TournamentsServiceProtocol, @unchecked Sendable 
         }
 
         let path = "/\(game.pandaScorePrefix)/tournaments/\(segment.pandaScorePath)"
+        // No `filter[tier]` here: live-strip pulls ALL live matches
+        // regardless of tier (any match that's streamed), so filtering
+        // the tournament list to s/a only created a UX inconsistency
+        // ("live chip exists but Сейчас is empty"). Mirroring competitors
+        // (HLTV / Liquipedia) which list every tier. See ADR-equivalent
+        // note in `15-roadmap.md` Phase 1.C bugfix.
         let query: [URLQueryItem] = [
-            URLQueryItem(name: "filter[tier]", value: "s,a"),
             URLQueryItem(name: "page[size]", value: "\(safeSize)"),
             URLQueryItem(name: "page[number]", value: "\(safePage)"),
             URLQueryItem(name: "sort", value: segment == .past ? "-begin_at" : "begin_at")

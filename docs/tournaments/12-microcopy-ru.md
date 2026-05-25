@@ -137,43 +137,51 @@
 
 ## MatchDetailsView — Детали матча
 
-| Ключ | Текст |
-|---|---|
-| `match_details_nav_title` | `Матч` |
-| `match_format_bo3` | `BO3` |
-| `match_format_bo5` | `BO5` |
-| `match_format_bo1` | `BO1` |
-| `match_status_live` | `LIVE` |
-| `match_status_finished` | `Завершён` |
-| `match_status_canceled` | `Отменён` |
-| `match_status_postponed` | `Перенесён` |
-| `match_status_not_started` | (показываем время вместо счёта) |
-| `match_section_maps` | `Карты` |
-| `match_section_games` | `Игры` (для Dota 2) |
-| `match_section_streams` | `Где смотреть` |
-| `match_section_rosters` | `Составы` |
-| `match_map_not_started` | `Не начато` |
-| `match_no_streams_title` | `Стримов пока нет` |
-| `match_no_streams_subtitle` | `Появятся ближе к началу` |
-| `match_share_button` | `Поделиться` |
+| Ключ | Текст | Status |
+|---|---|---|
+| `match_details_nav_title` | `Матч` | ✅ Phase 1.C |
+| `match_format_bo3` | `BO3` | (через `bestOf(_:)`) |
+| `match_format_bo5` | `BO5` | (через `bestOf(_:)`) |
+| `match_format_bo1` | `BO1` | (через `bestOf(_:)`) |
+| `match_status_live` | `LIVE` | ✅ |
+| `match_status_finished` | `Завершён` | ✅ |
+| `match_status_canceled` | `Отменён` | ✅ |
+| `match_status_postponed` | `Перенесён` | ✅ |
+| `match_status_not_started` | (показываем время вместо счёта) | ✅ Phase 1.C |
+| `match_section_maps` | `Карты` | ✅ Phase 1.C |
+| `match_section_games` | `Игры` (для Dota 2) | ✅ Phase 1.C |
+| `match_section_streams` | `Где смотреть` | ✅ Phase 1.C |
+| `match_section_rosters` | `Составы` | ✅ Phase 1.C |
+| `match_map_not_started` | `Не начато` | ✅ Phase 1.C |
+| `match_no_streams_title` | `Стримов пока нет` | ✅ Phase 1.C (резерв — секция показывается только для notStarted/running) |
+| `match_no_streams_subtitle` | `Появятся ближе к началу` | ✅ Phase 1.C |
+| `match_share_button` | `Поделиться` | ✅ Phase 1.C |
+| `match_versus_separator` | `vs` | ✅ Phase 1.C (используется в header для finished статуса и в accessibility) |
+| `unknown_language` | `Без языка` | ✅ Phase 1.C (фоллбэк для пустого `Stream.language`) |
 
 ### Stream platforms
 
-| Платформа | Лейбл |
-|---|---|
-| Twitch | `Twitch` |
-| YouTube | `YouTube` |
-| Другое | `Веб` |
+| Платформа | Лейбл | CTA в строке стрима |
+|---|---|---|
+| Twitch | `Twitch` | `Twitch` |
+| YouTube | `YouTube` | `YouTube` |
+| Другое | `Веб` | `Открыть` |
 
 ### Action labels на стримах
 
 | Ключ | Текст |
 |---|---|
-| `stream_open_twitch` | `Открыть в Twitch` |
-| `stream_open_youtube` | `Открыть в YouTube` |
-| `stream_open_safari` | `Открыть в Safari` |
+| `stream_open_twitch` | `Открыть в Twitch` (для accessibility) |
+| `stream_open_youtube` | `Открыть в YouTube` (для accessibility) |
+| `stream_open_safari` | `Открыть в Safari` (для accessibility) |
+| `stream_open_generic` | `Открыть` (для платформы `.other`) |
 | `stream_official_badge` | `Официальный` |
 | `stream_main_badge` | `Главный` |
+| `stream_open_failed_toast` | `Не получилось открыть стрим` (показывается в `.alert(...)` когда оба пути — native deeplink и fallback в Safari — упали) |
+
+### Languages в стримах (Phase 1.C)
+
+`StreamRow.languageDisplayName(for:)` поддерживает: ru, en, uk/ukr, es, pt/pt-br/br, de, fr, it, pl, zh/zh-cn, ja, ko, tr, ar. Для остальных кодов — `code.uppercased()`. Флаг подбирается по country-маппингу или из суффикса `xx-YY`.
 
 ---
 
@@ -346,4 +354,4 @@
 
 ---
 
-_Last updated: 2026-05-25 (Phase 1.B — добавлены empty states для Standings/Participants/Matches табов, базовые «Сегодня/Завтра/Вчера»)_
+_Last updated: 2026-05-25 (Phase 1.C — экран деталей матча: header, секции «Карты»/«Где смотреть»/«Составы», stream-CTA лейблы для Twitch/YouTube/Other, language display names для 15 локалей, toast «Не получилось открыть стрим»)_

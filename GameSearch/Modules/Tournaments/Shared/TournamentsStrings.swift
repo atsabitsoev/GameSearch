@@ -109,4 +109,43 @@ enum TournamentsStrings {
     static let timeToday = "Сегодня"
     static let timeTomorrow = "Завтра"
     static let timeYesterday = "Вчера"
+
+    // MARK: - Match details
+
+    static let matchDetailsNavTitle = "Матч"
+    static let matchShareButton = "Поделиться"
+
+    static let matchSectionMaps = "Карты"
+    static let matchSectionGames = "Игры"
+    static let matchSectionStreams = "Где смотреть"
+    static let matchSectionRosters = "Составы"
+
+    static let matchMapNotStarted = "Не начато"
+
+    static let matchNoStreamsTitle = "Стримов пока нет"
+    static let matchNoStreamsSubtitle = "Появятся ближе к началу"
+
+    // MARK: - Stream platforms
+
+    static let streamPlatformTwitch = "Twitch"
+    static let streamPlatformYouTube = "YouTube"
+    static let streamPlatformOther = "Веб"
+
+    static let streamOpenTwitch = "Открыть в Twitch"
+    static let streamOpenYouTube = "Открыть в YouTube"
+    static let streamOpenSafari = "Открыть в Safari"
+    static let streamOpenGeneric = "Открыть"
+
+    static let streamOfficialBadge = "Официальный"
+    static let streamMainBadge = "Главный"
+
+    static let streamOpenFailedToast = "Не получилось открыть стрим"
+
+    // MARK: - Stream languages (fallback rendering of language code)
+
+    static let unknownLanguage = "Без языка"
+
+    // MARK: - Match versus separator
+
+    static let matchVersusSeparator = "vs"
 }
