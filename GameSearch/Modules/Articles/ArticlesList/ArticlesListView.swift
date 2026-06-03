@@ -56,17 +56,36 @@ private extension ArticlesListView {
     }
 
     var articlesContentView: some View {
-        VStack(spacing: 0) {
-            filtersHeader
-                .background(EAColor.background)
+        articlesList
+            .overlay(alignment: .top) {
+                floatingChipOverlay
+                    .padding(.top, 4)
+                    .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
+                    .animation(.easeOut(duration: 0.2), value: refreshChip)
+            }
+    }
 
-            articlesList
-                .overlay(alignment: .top) {
-                    floatingChipOverlay
-                        .padding(.top, 4)
-                        .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
-                        .animation(.easeOut(duration: 0.2), value: refreshChip)
+    var articlesList: some View {
+        ScrollViewReader { proxy in
+            List {
+                Section {
+                    listCellsView
+                } header: {
+                    filtersHeader
                 }
+            }
+            .listStyle(.plain)
+            .listRowSpacing(12)
+            .contentMargins(.top, 0, for: .scrollContent)
+            .refreshable {
+                await refreshArticles()
+            }
+            .onChange(of: scrollToTopToggle) {
+                guard let firstId = viewModel.articles.first?.id else { return }
+                withAnimation(.easeOut(duration: 0.25)) {
+                    proxy.scrollTo(firstId, anchor: .top)
+                }
+            }
         }
     }
 
@@ -80,26 +99,6 @@ private extension ArticlesListView {
                 scrollToTopToggle.toggle()
             }
         )
-        .padding(.bottom, 10)
-    }
-
-    var articlesList: some View {
-        ScrollViewReader { proxy in
-            List {
-                listCellsView
-            }
-            .listStyle(.plain)
-            .listRowSpacing(12)
-            .refreshable {
-                await refreshArticles()
-            }
-            .onChange(of: scrollToTopToggle) {
-                guard let firstId = viewModel.articles.first?.id else { return }
-                withAnimation(.easeOut(duration: 0.25)) {
-                    proxy.scrollTo(firstId, anchor: .top)
-                }
-            }
-        }
     }
 
     @ViewBuilder
