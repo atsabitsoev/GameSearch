@@ -11,7 +11,13 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
     @EnvironmentObject private var router: ArticlesRouter
     @StateObject private var viewModel: ViewModel
     @State private var scrollToTopToggle = false
-    @State private var showRefreshChip = false
+    @State private var refreshChip: RefreshChip = .none
+
+    private enum RefreshChip {
+        case none
+        case success
+        case failure
+    }
 
 
     init(viewModel: ViewModel) {
@@ -25,14 +31,11 @@ struct ArticlesListView<ViewModel: ArticlesListViewModelProtocol>: View {
                 .ignoresSafeArea()
 
             contentView
-                .refreshable {
-                    await refreshArticles()
-                }
         }
         .navigationTitle("Новости")
-        .navigationBarTitleDisplayMode(.automatic)
+        .navigationBarTitleDisplayMode(.inline)
         .task {
-            await viewModel.loadArticles()
+            await viewModel.onAppear()
         }
     }
 }
@@ -44,7 +47,7 @@ private extension ArticlesListView {
         case .loading:
             skeletonView
         case .content:
-            articlesListView
+            articlesContentView
         case .empty:
             emptyStateView
         case .error(let message):
@@ -52,17 +55,31 @@ private extension ArticlesListView {
         }
     }
 
-    var articlesListView: some View {
+    var articlesContentView: some View {
+        articlesList
+            .overlay(alignment: .top) {
+                floatingChipOverlay
+                    .padding(.top, 4)
+                    .animation(.easeOut(duration: 0.2), value: viewModel.filteredPendingCount)
+                    .animation(.easeOut(duration: 0.2), value: refreshChip)
+            }
+    }
+
+    var articlesList: some View {
         ScrollViewReader { proxy in
             List {
                 Section {
                     listCellsView
                 } header: {
-                    filtersPinnedHeader
+                    filtersHeader
                 }
             }
             .listStyle(.plain)
             .listRowSpacing(12)
+            .contentMargins(.top, 0, for: .scrollContent)
+            .refreshable {
+                await refreshArticles()
+            }
             .onChange(of: scrollToTopToggle) {
                 guard let firstId = viewModel.articles.first?.id else { return }
                 withAnimation(.easeOut(duration: 0.25)) {
@@ -70,6 +87,18 @@ private extension ArticlesListView {
                 }
             }
         }
+    }
+
+    var filtersHeader: some View {
+        ArticlesFiltersView(
+            selectedFilter: viewModel.selectedFilter,
+            onSelect: { filter in
+                withAnimation(.easeOut(duration: 0.2)) {
+                    viewModel.onFilterSelect(filter)
+                }
+                scrollToTopToggle.toggle()
+            }
+        )
     }
 
     @ViewBuilder
@@ -101,29 +130,69 @@ private extension ArticlesListView {
         }
     }
 
-    var filtersPinnedHeader: some View {
-        VStack(spacing: 8) {
-            ArticlesFiltersView(
-                selectedFilter: viewModel.selectedFilter,
-                onSelect: { filter in
-                    withAnimation(.easeOut(duration: 0.2)) {
-                        viewModel.onFilterSelect(filter)
-                    }
-                    scrollToTopToggle.toggle()
-                }
-            )
-            if showRefreshChip {
-                Text("Обновлено только что")
-                    .font(EAFont.infoSmall)
-                    .foregroundStyle(EAColor.textPrimary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(EAColor.secondaryBackground.opacity(0.8))
-                    .clipShape(Capsule())
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+    @ViewBuilder
+    var floatingChipOverlay: some View {
+        if viewModel.filteredPendingCount > 0 {
+            showNewButton
+        } else {
+            switch refreshChip {
+            case .success:
+                refreshedChip
+                    .allowsHitTesting(false)
+            case .failure:
+                refreshFailedChip
+                    .allowsHitTesting(false)
+            case .none:
+                EmptyView()
             }
         }
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
+    }
+
+    var showNewButton: some View {
+        Button {
+            withAnimation(.easeOut(duration: 0.25)) {
+                viewModel.revealPendingArticles()
+            }
+            scrollToTopToggle.toggle()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.up")
+                    .font(EAFont.infoSmall)
+                    .accessibilityHidden(true)
+                Text("Показать новое (\(viewModel.filteredPendingCount))")
+                    .font(EAFont.infoSmall)
+            }
+            .foregroundStyle(EAColor.background)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(EAColor.accent)
+            .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Показать новое (\(viewModel.filteredPendingCount))"))
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    var refreshedChip: some View {
+        Text("Обновлено только что")
+            .font(EAFont.infoSmall)
+            .foregroundStyle(EAColor.textPrimary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(EAColor.secondaryBackground.opacity(0.8))
+            .clipShape(Capsule())
+            .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    var refreshFailedChip: some View {
+        Text("Не удалось обновить")
+            .font(EAFont.infoSmall)
+            .foregroundStyle(EAColor.textPrimary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(EAColor.secondaryBackground.opacity(0.8))
+            .clipShape(Capsule())
+            .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     var skeletonView: some View {
@@ -177,7 +246,7 @@ private extension ArticlesListView {
                 .foregroundStyle(EAColor.textPrimary)
             Button("Повторить") {
                 Task {
-                    await viewModel.loadArticles()
+                    await viewModel.retry()
                 }
             }
             .padding(.horizontal, 12)
@@ -191,19 +260,30 @@ private extension ArticlesListView {
     }
 
     func refreshArticles() async {
-        await viewModel.loadArticles()
+        let firstIdBefore = viewModel.articles.first?.id
+        let succeeded = await viewModel.pullToRefresh()
+        let firstIdAfter = viewModel.articles.first?.id
+        let hasNewArticles = succeeded && firstIdBefore != firstIdAfter
+
+        let nextChip: RefreshChip = succeeded ? .success : .failure
+        let displayDuration: UInt64 = succeeded ? 1_600_000_000 : 2_500_000_000
+
         withAnimation(.easeOut(duration: 0.2)) {
-            showRefreshChip = true
+            refreshChip = nextChip
         }
+
+        if hasNewArticles {
+            scrollToTopToggle.toggle()
+        }
+
         Task {
-            try? await Task.sleep(nanoseconds: 1_600_000_000)
+            try? await Task.sleep(nanoseconds: displayDuration)
             await MainActor.run {
+                guard refreshChip == nextChip else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
-                    showRefreshChip = false
+                    refreshChip = .none
                 }
             }
         }
     }
 }
-
-
